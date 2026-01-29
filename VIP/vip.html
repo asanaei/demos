@@ -1,3 +1,788 @@
-<html>
-  
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIP Demo Tool (Robust JS Edition)</title>
+    
+    <!-- Bootstrap for UI -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Libraries -->
+    <!-- Math.js for Matrix operations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.min.js"></script>
+    <!-- Plotly for Charts -->
+    <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
+    
+    <style>
+        body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .sidebar { background-color: #ffffff; border-right: 1px solid #dee2e6; height: 100vh; overflow-y: auto; padding: 20px; box-shadow: 2px 0 5px rgba(0,0,0,0.05); }
+        .main-content { padding: 20px; height: 100vh; overflow-y: auto; }
+        .card { margin-bottom: 20px; border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-radius: 8px; }
+        .card-header { background-color: #fff; border-bottom: 1px solid #eee; font-weight: 600; }
+        .nav-tabs .nav-link { cursor: pointer; color: #495057; }
+        .nav-tabs .nav-link.active { font-weight: bold; color: #0d6efd; border-bottom: 2px solid #0d6efd; }
+        .tooltip-icon { color: #6c757d; cursor: help; margin-left: 5px; font-size: 0.9em; }
+        
+        /* Loading Overlay */
+        #loading { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); z-index: 2000; backdrop-filter: blur(2px); }
+        .loading-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+        
+        /* Range Slider Styling */
+        input[type=range] { height: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- SIDEBAR -->
+        <div class="col-md-3 sidebar">
+            <h4 class="mb-4 text-dark fw-bold">VIP Demo Tool</h4>
+            
+            <!-- Data Gen -->
+            <div class="card p-3 mb-3">
+                <h6 class="text-primary text-uppercase small fw-bold mb-3">Data Generation</h6>
+                
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">Sample Size (N)</label>
+                    <input type="number" id="n_obs" class="form-control form-control-sm" value="500" min="100" max="2000">
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">Train/Test Split <span class="tooltip-icon" title="Percentage of data used for training">ⓘ</span></label>
+                    <div class="d-flex align-items-center">
+                        <input type="range" id="split_ratio" class="form-range flex-grow-1" min="0.5" max="0.9" step="0.05" value="0.7">
+                        <span class="ms-2 small text-muted" id="split_val">0.7</span>
+                    </div>
+                </div>
+
+                <hr class="my-2">
+
+                <div class="mb-2">
+                    <label class="form-label small fw-bold">Corr (x1 vs x2) <span class="tooltip-icon" title="Collinearity: x1 and x2 will be correlated.">ⓘ</span></label>
+                    <div class="d-flex align-items-center">
+                        <input type="range" id="rho_pair" class="form-range flex-grow-1" min="-0.95" max="0.95" step="0.05" value="0">
+                        <span class="ms-2 small text-muted" id="rho_pair_val">0</span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">Corr (x3...x7) <span class="tooltip-icon" title="Background Noise Correlation">ⓘ</span></label>
+                    <div class="d-flex align-items-center">
+                        <!-- Limit negative correlation to prevent matrix breaking -->
+                        <input type="range" id="rho_rest" class="form-range flex-grow-1" min="-0.2" max="0.8" step="0.05" value="0">
+                        <span class="ms-2 small text-muted" id="rho_rest_val">0</span>
+                    </div>
+                </div>
+
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="x3_discrete">
+                    <label class="form-check-label small" for="x3_discrete">Discretize x3 (1-10)</label>
+                </div>
+
+                <hr class="my-2">
+
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">True Formula (Y ~ ...)</label>
+                    <input type="text" id="formula" class="form-control form-control-sm" value="x1 + x2">
+                    <div class="form-text x-small">Try: 'x1', 'x1+x2', 'x1*x2'</div>
+                </div>
+                
+                <div class="btn-group w-100 btn-group-sm" role="group">
+                    <input type="radio" class="btn-check" name="mode" id="mode_reg" value="regression" checked>
+                    <label class="btn btn-outline-secondary" for="mode_reg">Regression</label>
+                    <input type="radio" class="btn-check" name="mode" id="mode_class" value="classification">
+                    <label class="btn btn-outline-secondary" for="mode_class">Classification</label>
+                </div>
+            </div>
+
+            <!-- Model Settings -->
+            <div class="card p-3 mb-3">
+                <h6 class="text-primary text-uppercase small fw-bold mb-3">Model Settings</h6>
+                
+                <div class="mb-2">
+                    <label class="form-label small fw-bold">Importance Metric</label>
+                    <select id="imp_type" class="form-select form-select-sm">
+                        <option value="impurity">Impurity (Gini/Variance)</option>
+                        <option value="permutation">Permutation (Robust)</option>
+                    </select>
+                </div>
+
+                <div class="mb-2">
+                    <label class="form-label small fw-bold">Mtry <span class="tooltip-icon" title="Features considered at each split">ⓘ</span></label>
+                    <div class="d-flex align-items-center">
+                        <input type="range" id="mtry" class="form-range flex-grow-1" min="1" max="7" value="3">
+                        <span class="ms-2 small text-muted" id="mtry_val">3</span>
+                    </div>
+                </div>
+            </div>
+
+            <button id="runBtn" class="btn btn-primary w-100 fw-bold">Run Analysis</button>
+            
+            <!-- Error Alert -->
+            <div id="errorAlert" class="alert alert-danger mt-3 small d-none" role="alert"></div>
+            <div id="warningAlert" class="alert alert-warning mt-3 small d-none" role="alert"></div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="col-md-9 main-content">
+            <div class="row">
+                <!-- Tabs & Plots -->
+                <div class="col-md-8">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <ul class="nav nav-tabs card-header-tabs" id="myTab" role="tablist">
+                                <li class="nav-item"><a class="nav-link active" data-bs-target="#tab-vip" data-bs-toggle="tab">Variable Importance</a></li>
+                                <li class="nav-item"><a class="nav-link" data-bs-target="#tab-perf" data-bs-toggle="tab">Performance</a></li>
+                                <li class="nav-item"><a class="nav-link" data-bs-target="#tab-pdp" data-bs-toggle="tab">Partial Dependence (x1)</a></li>
+                                <li class="nav-item"><a class="nav-link" data-bs-target="#tab-corr" data-bs-toggle="tab">Correlation Matrix</a></li>
+                            </ul>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="tab-content">
+                                <div class="tab-pane fade show active" id="tab-vip"><div id="plot_vip" style="height: 550px;"></div></div>
+                                <div class="tab-pane fade" id="tab-perf"><div id="plot_perf" style="height: 550px;"></div></div>
+                                <div class="tab-pane fade" id="tab-pdp"><div id="plot_pdp" style="height: 550px;"></div></div>
+                                <div class="tab-pane fade" id="tab-corr"><div id="plot_corr" style="height: 550px;"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Metrics Panel -->
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header bg-light text-dark">Diagnostics (Test Set)</div>
+                        <div class="card-body" id="metrics_panel">
+                            <div class="text-center text-muted py-5">
+                                <p>Click <b>Run Analysis</b> to generate results.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card mt-3">
+                        <div class="card-header bg-light text-dark">Quick Tips</div>
+                        <div class="card-body small text-muted">
+                            <ul class="ps-3 mb-0">
+                                <li class="mb-2"><b>Collinearity:</b> Set "Corr (x1 vs x2)" to 0.9. See how VIP splits between them.</li>
+                                <li class="mb-2"><b>Cardinality Bias:</b> Check "Discretize x3". Use "Impurity" metric. See x3 score drop vs continuous vars.</li>
+                                <li><b>Fixing Bias:</b> Switch metric to "Permutation" to fix the cardinality bias.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Spinner -->
+<div id="loading">
+    <div class="loading-content">
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status"></div>
+        <h5 class="mt-3 text-dark">Training Random Forest...</h5>
+        <p class="text-muted">This runs entirely in your browser.</p>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+/**
+ * =============================================================================
+ *  ROBUST RANDOM FOREST IMPLEMENTATION (JS)
+ * =============================================================================
+ */
+
+class DecisionTree {
+    constructor(minNodeSize, maxDepth, mode) {
+        this.minNodeSize = minNodeSize;
+        this.maxDepth = maxDepth;
+        this.mode = mode; 
+        this.tree = null;
+    }
+
+    fit(X, y, featureIdxs) {
+        this.tree = this._buildTree(X, y, 0, featureIdxs);
+    }
+
+    predict(row) {
+        return this._traverse(row, this.tree);
+    }
+
+    _gini(y) {
+        const counts = {};
+        for (let val of y) counts[val] = (counts[val] || 0) + 1;
+        let impurity = 1;
+        for (let key in counts) {
+            let prob = counts[key] / y.length;
+            impurity -= prob * prob;
+        }
+        return impurity;
+    }
+
+    _variance(y) {
+        if (y.length === 0) return 0;
+        const mean = y.reduce((a,b) => a+b, 0) / y.length;
+        return y.reduce((a,b) => a + (b-mean)**2, 0) / y.length;
+    }
+
+    _buildTree(X, y, depth, featureIdxs) {
+        const numSamples = X.length;
+        
+        // Stopping criteria
+        let uniqueY = [...new Set(y)];
+        if (numSamples < this.minNodeSize || depth >= this.maxDepth || uniqueY.length === 1) {
+            if (this.mode === 'regression') {
+                return { leaf: true, val: y.reduce((a,b)=>a+b,0)/numSamples };
+            } else {
+                const counts = {};
+                let maxCount = 0, maxLabel = uniqueY[0];
+                for (let val of y) {
+                    counts[val] = (counts[val] || 0) + 1;
+                    if (counts[val] > maxCount) { maxCount = counts[val]; maxLabel = val; }
+                }
+                return { leaf: true, val: maxLabel, probs: counts };
+            }
+        }
+
+        let bestGain = -Infinity;
+        let bestSplit = null;
+        const currentImpurity = this.mode === 'regression' ? this._variance(y) : this._gini(y);
+
+        // Iterate over selected features (mtry)
+        for (let fIdx of featureIdxs) {
+            let values = X.map(row => row[fIdx]);
+            // Optimization: Sample split points if too many unique values
+            let uniqueValues = [...new Set(values)].sort((a,b)=>a-b);
+            let splitPoints = uniqueValues;
+            if(uniqueValues.length > 15) {
+                splitPoints = [];
+                for(let k=0; k<15; k++) splitPoints.push(uniqueValues[Math.floor(Math.random()*uniqueValues.length)]);
+            }
+
+            for (let threshold of splitPoints) {
+                let leftIndices = [], rightIndices = [];
+                for (let i=0; i<numSamples; i++) {
+                    if (X[i][fIdx] <= threshold) leftIndices.push(i);
+                    else rightIndices.push(i);
+                }
+
+                if (leftIndices.length === 0 || rightIndices.length === 0) continue;
+
+                let yLeft = leftIndices.map(i => y[i]);
+                let yRight = rightIndices.map(i => y[i]);
+
+                let impLeft = this.mode === 'regression' ? this._variance(yLeft) : this._gini(yLeft);
+                let impRight = this.mode === 'regression' ? this._variance(yRight) : this._gini(yRight);
+
+                let wLeft = yLeft.length / numSamples;
+                let wRight = yRight.length / numSamples;
+
+                let gain = currentImpurity - (wLeft * impLeft + wRight * impRight);
+
+                if (gain > bestGain) {
+                    bestGain = gain;
+                    bestSplit = { feature: fIdx, threshold: threshold, leftIdx: leftIndices, rightIdx: rightIndices, gain: gain };
+                }
+            }
+        }
+
+        if (!bestSplit) {
+             if (this.mode === 'regression') {
+                return { leaf: true, val: y.reduce((a,b)=>a+b,0)/numSamples };
+            } else {
+                const counts = {};
+                let maxCount = 0, maxLabel = uniqueY[0];
+                for (let val of y) {
+                    counts[val] = (counts[val] || 0) + 1;
+                    if (counts[val] > maxCount) { maxCount = counts[val]; maxLabel = val; }
+                }
+                return { leaf: true, val: maxLabel, probs: counts };
+            }
+        }
+
+        let leftX = bestSplit.leftIdx.map(i => X[i]);
+        let leftY = bestSplit.leftIdx.map(i => y[i]);
+        let rightX = bestSplit.rightIdx.map(i => X[i]);
+        let rightY = bestSplit.rightIdx.map(i => y[i]);
+
+        return {
+            leaf: false,
+            feature: bestSplit.feature,
+            threshold: bestSplit.threshold,
+            gain: bestSplit.gain,
+            left: this._buildTree(leftX, leftY, depth + 1, featureIdxs),
+            right: this._buildTree(rightX, rightY, depth + 1, featureIdxs)
+        };
+    }
+
+    _traverse(row, node) {
+        if (node.leaf) return node.val;
+        if (row[node.feature] <= node.threshold) return this._traverse(row, node.left);
+        return this._traverse(row, node.right);
+    }
+    
+    _traverseProb(row, node) {
+        if (node.leaf) {
+            let total = 0;
+            let countA = 0;
+            for(let k in node.probs) {
+                total += node.probs[k];
+                if(k == 1) countA += node.probs[k];
+            }
+            return total === 0 ? 0 : countA / total;
+        }
+        if (row[node.feature] <= node.threshold) return this._traverseProb(row, node.left);
+        return this._traverseProb(row, node.right);
+    }
+}
+
+class RandomForest {
+    constructor(nTrees, mtry, minNodeSize, mode) {
+        this.nTrees = nTrees;
+        this.mtry = mtry;
+        this.minNodeSize = minNodeSize;
+        this.mode = mode;
+        this.trees = [];
+        this.importances = new Array(7).fill(0);
+    }
+
+    fit(X, y) {
+        this.trees = [];
+        this.importances.fill(0);
+        const nSamples = X.length;
+        const nFeatures = X[0].length;
+        const allIndices = Array.from({length: nFeatures}, (_, k) => k);
+
+        for (let i = 0; i < this.nTrees; i++) {
+            // Bootstrap
+            let sampleX = [], sampleY = [];
+            for (let j = 0; j < nSamples; j++) {
+                let idx = Math.floor(Math.random() * nSamples);
+                sampleX.push(X[idx]);
+                sampleY.push(y[idx]);
+            }
+
+            // Random Subspace (Mtry)
+            // We pick mtry features for this tree (Simplified RF)
+            let subsetIdxs = [];
+            let indices = [...allIndices];
+            for(let k=0; k<this.mtry; k++) {
+                if(indices.length === 0) break;
+                let rand = Math.floor(Math.random() * indices.length);
+                subsetIdxs.push(indices[rand]);
+                indices.splice(rand, 1);
+            }
+            
+            let tree = new DecisionTree(this.minNodeSize, 10, this.mode);
+            tree.fit(sampleX, sampleY, subsetIdxs);
+            this.trees.push(tree);
+            this._accumulateImportance(tree.tree);
+        }
+    }
+
+    _accumulateImportance(node) {
+        if (!node || node.leaf) return;
+        this.importances[node.feature] += node.gain;
+        this._accumulateImportance(node.left);
+        this._accumulateImportance(node.right);
+    }
+
+    predict(X) {
+        return X.map(row => {
+            let rowPreds = this.trees.map(tree => tree.predict(row));
+            if (this.mode === 'regression') {
+                return rowPreds.reduce((a,b)=>a+b,0) / rowPreds.length;
+            } else {
+                let counts = {};
+                rowPreds.forEach(p => counts[p] = (counts[p]||0)+1);
+                return parseInt(Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b));
+            }
+        });
+    }
+    
+    predictProba(X) {
+        return X.map(row => {
+            let probs = this.trees.map(tree => tree._traverseProb(row, tree.tree));
+            return probs.reduce((a,b)=>a+b,0) / probs.length;
+        });
+    }
+}
+
+/**
+ * =============================================================================
+ *  DATA GENERATION (ROBUST)
+ * =============================================================================
+ */
+
+function generateData(n, rhoPair, rhoRest, formulaStr, mode, x3Discrete) {
+    // 1. Construct Covariance Matrix
+    let Sigma = math.identity(7).toArray();
+    
+    // Pair correlation
+    Sigma[0][1] = rhoPair;
+    Sigma[1][0] = rhoPair;
+    
+    // Rest correlation (x3..x7)
+    for(let i=2; i<7; i++){
+        for(let j=2; j<7; j++){
+            if(i!==j) Sigma[i][j] = rhoRest;
+        }
+    }
+
+    // 2. Jitter & Symmetry Enforcement (Crucial for JS Cholesky)
+    for(let i=0; i<7; i++) {
+        Sigma[i][i] += 1e-6; // Add jitter to diagonal
+        for(let j=i+1; j<7; j++) {
+            // Force symmetry
+            Sigma[j][i] = Sigma[i][j]; 
+        }
+    }
+
+    // 3. Cholesky Decomposition with Fallback
+    let L;
+    let usedFallback = false;
+    try {
+        L = math.cholesky(Sigma);
+    } catch (e) {
+        console.warn("Cholesky failed, falling back to Identity.", e);
+        usedFallback = true;
+        L = math.identity(7).toArray(); // Fallback to independent
+    }
+
+    if(usedFallback) {
+        document.getElementById('warningAlert').classList.remove('d-none');
+        document.getElementById('warningAlert').innerText = "Warning: The selected correlation structure was mathematically impossible. Data generated with independent variables instead.";
+    } else {
+        document.getElementById('warningAlert').classList.add('d-none');
+    }
+
+    let X_raw = [];
+    for(let i=0; i<n; i++) {
+        let Z = Array.from({length: 7}, () => randn_bm());
+        let row = math.multiply(Z, L); 
+        
+        // Discretize x3
+        if(x3Discrete) {
+            let p = 0.5 * (1 + math.erf(row[2] / Math.sqrt(2)));
+            row[2] = Math.ceil(p * 10);
+        }
+        X_raw.push(row);
+    }
+
+    // 4. Generate Y
+    let y = [];
+    let scope = {};
+    let node;
+    try {
+        node = math.parse(formulaStr);
+        node.compile(); 
+    } catch(e) {
+        throw new Error("Invalid Formula: " + e.message);
+    }
+
+    for(let i=0; i<n; i++) {
+        for(let j=0; j<7; j++) scope[`x${j+1}`] = X_raw[i][j];
+        
+        let y_val;
+        try {
+            y_val = node.evaluate(scope);
+        } catch(e) {
+            throw new Error("Error evaluating formula. Check variable names (x1...x7).");
+        }
+        
+        let noise = randn_bm();
+        let y_final = y_val + noise;
+        
+        if(mode === 'classification') {
+            y.push(y_final > 0 ? 1 : 0);
+        } else {
+            y.push(y_final);
+        }
+    }
+
+    return { X: X_raw, y: y };
+}
+
+function randn_bm() {
+    let u = 0, v = 0;
+    while(u === 0) u = Math.random();
+    while(v === 0) v = Math.random();
+    return Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v );
+}
+
+/**
+ * =============================================================================
+ *  UI LOGIC
+ * =============================================================================
+ */
+
+// Update slider labels
+document.querySelectorAll('input[type=range]').forEach(el => {
+    el.addEventListener('input', e => {
+        let id = e.target.id + "_val";
+        if(document.getElementById(id)) document.getElementById(id).innerText = e.target.value;
+    });
+});
+
+document.getElementById('runBtn').addEventListener('click', async () => {
+    const errorAlert = document.getElementById('errorAlert');
+    errorAlert.classList.add('d-none');
+    errorAlert.innerText = "";
+    document.getElementById('loading').style.display = 'block';
+
+    // Timeout to allow UI render
+    setTimeout(() => {
+        try {
+            runAnalysis();
+        } catch (e) {
+            errorAlert.innerText = e.message;
+            errorAlert.classList.remove('d-none');
+            console.error(e);
+        } finally {
+            document.getElementById('loading').style.display = 'none';
+        }
+    }, 100);
+});
+
+function runAnalysis() {
+    // Inputs
+    const n = parseInt(document.getElementById('n_obs').value);
+    const splitRatio = parseFloat(document.getElementById('split_ratio').value);
+    const rhoPair = parseFloat(document.getElementById('rho_pair').value);
+    const rhoRest = parseFloat(document.getElementById('rho_rest').value);
+    const x3Discrete = document.getElementById('x3_discrete').checked;
+    const formula = document.getElementById('formula').value;
+    const mode = document.querySelector('input[name="mode"]:checked').value;
+    const impType = document.getElementById('imp_type').value;
+    const mtry = parseInt(document.getElementById('mtry').value);
+
+    // Generate
+    const data = generateData(n, rhoPair, rhoRest, formula, mode, x3Discrete);
+    
+    // Split
+    const splitIdx = Math.floor(n * splitRatio);
+    const X_train = data.X.slice(0, splitIdx);
+    const y_train = data.y.slice(0, splitIdx);
+    const X_test = data.X.slice(splitIdx);
+    const y_test = data.y.slice(splitIdx);
+
+    // Train
+    // 60 trees for balance of speed/accuracy in JS
+    const rf = new RandomForest(60, mtry, 5, mode);
+    rf.fit(X_train, y_train);
+
+    // Importance
+    let importances = [...rf.importances];
+    
+    if (impType === 'permutation') {
+        let baselinePreds = rf.predict(X_train);
+        let baselineScore = getScore(y_train, baselinePreds, mode);
+        
+        importances = [];
+        for(let f=0; f<7; f++) {
+            let X_perm = X_train.map(row => [...row]);
+            // Shuffle column f
+            for (let i = X_perm.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                let temp = X_perm[i][f];
+                X_perm[i][f] = X_perm[j][f];
+                X_perm[j][f] = temp;
+            }
+            
+            let permPreds = rf.predict(X_perm);
+            let permScore = getScore(y_train, permPreds, mode);
+            
+            if(mode === 'regression') {
+                // MSE: Increase in Error = Importance
+                importances.push(permScore - baselineScore); 
+            } else {
+                // Acc: Decrease in Acc = Importance
+                importances.push(baselineScore - permScore);
+            }
+        }
+    }
+
+    // Normalize
+    const maxImp = Math.max(...importances, 0.0001); // avoid div by zero
+    const normImp = importances.map(v => Math.max(0, (v / maxImp) * 100));
+
+    // Plot VIP
+    const vars = ['x1','x2','x3','x4','x5','x6','x7'];
+    let indices = Array.from(vars.keys());
+    indices.sort((a,b) => normImp[a] - normImp[b]);
+    
+    let colors = indices.map(i => (x3Discrete && i===2) ? '#e67e22' : '#2c3e50');
+
+    Plotly.newPlot('plot_vip', [{
+        x: indices.map(i => normImp[i]),
+        y: indices.map(i => vars[i]),
+        type: 'bar',
+        orientation: 'h',
+        marker: { color: colors }
+    }], {
+        title: 'Variable Importance',
+        margin: {l: 50, r: 20, t: 40, b: 40},
+        xaxis: {title: 'Relative Importance (0-100)'}
+    });
+
+    // Plot Performance
+    if (mode === 'regression') {
+        const preds = rf.predict(X_test);
+        Plotly.newPlot('plot_perf', [{
+            x: y_test,
+            y: preds,
+            mode: 'markers',
+            type: 'scatter',
+            marker: {color: '#18bc9c', opacity: 0.6}
+        }, {
+            x: [Math.min(...y_test), Math.max(...y_test)],
+            y: [Math.min(...y_test), Math.max(...y_test)],
+            mode: 'lines',
+            line: {dash: 'dash', color: 'gray'}
+        }], {
+            title: 'Predicted vs Actual (Test)',
+            xaxis: {title: 'Actual'},
+            yaxis: {title: 'Predicted'},
+            showlegend: false
+        });
+        
+        const mse = preds.reduce((a, v, i) => a + (v - y_test[i])**2, 0) / preds.length;
+        const r2 = 1 - (preds.reduce((a, v, i) => a + (v - y_test[i])**2, 0) / 
+                        y_test.reduce((a, v) => a + (v - math.mean(y_test))**2, 0));
+        
+        document.getElementById('metrics_panel').innerHTML = `
+            <h6 class="text-primary">Regression Metrics</h6>
+            <div class="d-flex justify-content-between border-bottom py-2"><span>MSE:</span> <strong>${mse.toFixed(3)}</strong></div>
+            <div class="d-flex justify-content-between border-bottom py-2"><span>R²:</span> <strong>${r2.toFixed(3)}</strong></div>
+            <div class="text-muted small mt-2">Test Set Size: ${y_test.length}</div>
+        `;
+
+    } else {
+        const probs = rf.predictProba(X_test);
+        let rocData = [];
+        let posCount = y_test.filter(x=>x===1).length;
+        let negCount = y_test.length - posCount;
+        
+        let zipped = probs.map((p, i) => ({p, y: y_test[i]})).sort((a,b) => b.p - a.p);
+        
+        let tp = 0, fp = 0;
+        let tpr = [0], fpr = [0];
+        
+        for(let z of zipped) {
+            if(z.y === 1) tp++; else fp++;
+            tpr.push(tp/posCount);
+            fpr.push(fp/negCount);
+        }
+        
+        let auc = 0;
+        for(let i=1; i<tpr.length; i++) {
+            auc += (fpr[i]-fpr[i-1]) * tpr[i];
+        }
+
+        Plotly.newPlot('plot_perf', [{
+            x: fpr,
+            y: tpr,
+            mode: 'lines',
+            line: {color: '#18bc9c', width: 3}
+        }, {
+            x: [0,1], y: [0,1], mode: 'lines', line: {dash: 'dash', color: 'gray'}
+        }], {
+            title: `ROC Curve (AUC: ${auc.toFixed(3)})`,
+            xaxis: {title: 'False Positive Rate'},
+            yaxis: {title: 'True Positive Rate'},
+            showlegend: false
+        });
+
+        const preds = rf.predict(X_test);
+        const acc = preds.filter((v,i) => v === y_test[i]).length / preds.length;
+        
+        document.getElementById('metrics_panel').innerHTML = `
+            <h6 class="text-primary">Classification Metrics</h6>
+            <div class="d-flex justify-content-between border-bottom py-2"><span>Accuracy:</span> <strong>${(acc*100).toFixed(1)}%</strong></div>
+            <div class="d-flex justify-content-between border-bottom py-2"><span>AUC:</span> <strong>${auc.toFixed(3)}</strong></div>
+            <div class="text-muted small mt-2">Test Set Size: ${y_test.length}</div>
+        `;
+    }
+
+    // PDP
+    let grid = [];
+    let minX1 = Math.min(...data.X.map(r=>r[0]));
+    let maxX1 = Math.max(...data.X.map(r=>r[0]));
+    for(let i=0; i<=20; i++) grid.push(minX1 + (maxX1-minX1)*(i/20));
+    
+    let pdpY = grid.map(val => {
+        let tempX = X_train.map(row => {
+            let r = [...row];
+            r[0] = val;
+            return r;
+        });
+        let preds = mode === 'regression' ? rf.predict(tempX) : rf.predictProba(tempX);
+        return preds.reduce((a,b)=>a+b,0)/preds.length;
+    });
+
+    Plotly.newPlot('plot_pdp', [{
+        x: grid,
+        y: pdpY,
+        mode: 'lines+markers',
+        line: {color: '#3498db'}
+    }], {
+        title: 'Partial Dependence: x1',
+        xaxis: {title: 'x1 Value'},
+        yaxis: {title: 'Average Prediction'}
+    });
+
+    // Correlation
+    let corrMat = [];
+    for(let i=0; i<7; i++) {
+        let row = [];
+        for(let j=0; j<7; j++) {
+            let colI = X_train.map(r=>r[i]);
+            let colJ = X_train.map(r=>r[j]);
+            row.push(pearson(colI, colJ));
+        }
+        corrMat.push(row);
+    }
+
+    Plotly.newPlot('plot_corr', [{
+        z: corrMat,
+        x: vars,
+        y: vars,
+        type: 'heatmap',
+        colorscale: 'RdBu',
+        zmin: -1, zmax: 1
+    }], {
+        title: 'Correlation Matrix (Train)',
+        height: 550
+    });
+}
+
+function getScore(y_true, y_pred, mode) {
+    if(mode === 'regression') {
+        return y_pred.reduce((a, v, i) => a + (v - y_true[i])**2, 0) / y_pred.length;
+    } else {
+        return y_pred.filter((v,i) => v === y_true[i]).length / y_pred.length;
+    }
+}
+
+function pearson(x, y) {
+    let n = x.length;
+    let mx = x.reduce((a,b)=>a+b,0)/n;
+    let my = y.reduce((a,b)=>a+b,0)/n;
+    let num = 0, denX = 0, denY = 0;
+    for(let i=0; i<n; i++) {
+        let dx = x[i]-mx;
+        let dy = y[i]-my;
+        num += dx*dy;
+        denX += dx*dx;
+        denY += dy*dy;
+    }
+    if(denX === 0 || denY === 0) return 0;
+    return num / Math.sqrt(denX * denY);
+}
+</script>
+</body>
 </html>
