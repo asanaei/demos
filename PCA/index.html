@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PCA Playground</title>
+  <meta name="description" content="Interactive PCA dashboard for Gaussian data with editable means and variance-covariance matrix.">
+  <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <h1>PCA Playground</h1>
+      <div class="header-actions">
+        <button id="about-button" class="secondary-button" type="button">About</button>
+        <button id="reset-button" class="secondary-button" type="button">Reset</button>
+        <button id="run-button" class="primary-button" type="button">Run PCA</button>
+      </div>
+    </header>
+
+    <main class="dashboard-grid">
+      <section class="panel controls-panel">
+        <div class="panel-header">
+          <h2>Setup</h2>
+        </div>
+
+        <div class="control-group two-column">
+          <label>
+            <span class="control-label">Variables</span>
+            <select id="variable-count">
+              <option value="3">3 variables</option>
+              <option value="4">4 variables</option>
+            </select>
+          </label>
+
+          <label>
+            <span class="label-with-help">
+              <span class="control-label">Structure</span>
+              <span class="help-dot" tabindex="0" aria-label="Structure help" data-tip="Factor: most variables move together. Block: variables form clusters with strong within-cluster covariance and weaker between-cluster covariance. Contrast: one subset tends to move against another subset. Independent: covariances are near zero.">?</span>
+            </span>
+            <select id="preset-select">
+              <option value="factor">Factor</option>
+              <option value="block">Block</option>
+              <option value="contrast">Contrast</option>
+              <option value="independent">Independent</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="control-group">
+          <div class="control-label-row">
+            <span class="control-label">Observations</span>
+            <strong id="n-label">250</strong>
+          </div>
+          <input id="n-slider" type="range" min="10" max="10000" step="10" value="250">
+          <div class="chip-row">
+            <button class="chip-button" data-n="10" type="button">10</button>
+            <button class="chip-button" data-n="100" type="button">100</button>
+            <button class="chip-button" data-n="1000" type="button">1000</button>
+            <button class="chip-button" data-n="10000" type="button">10000</button>
+          </div>
+        </div>
+
+        <div class="control-group two-column">
+          <div class="toggle-wrap">
+            <span class="label-with-help">
+              <span class="control-label">Standardize</span>
+              <span class="help-dot" tabindex="0" aria-label="Standardize help" data-tip="Center each variable and divide by its sample standard deviation before PCA. With standardization on, PCA is based on the sample correlation matrix. With it off, PCA is based on the sample covariance matrix.">?</span>
+            </span>
+            <label class="switch">
+              <input id="scale-toggle" type="checkbox" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <label>
+            <span class="control-label">Seed</span>
+            <input id="seed-input" type="number" step="1" min="1" value="1234">
+          </label>
+        </div>
+
+        <div class="control-group">
+          <div class="section-title-row">
+            <h3>Means</h3>
+          </div>
+          <div id="means-grid" class="mini-grid"></div>
+        </div>
+
+        <div class="control-group">
+          <div class="section-title-row">
+            <span class="label-with-help">
+              <h3>Variance-covariance matrix</h3>
+              <span class="help-dot" tabindex="0" aria-label="Sigma help" data-tip="Edit the diagonal and lower triangle. The upper triangle mirrors automatically. If Sigma is not positive semidefinite, the run uses a repaired version and shows a warning.">?</span>
+            </span>
+          </div>
+          <div id="sigma-grid" class="matrix-wrap"></div>
+        </div>
+
+        <div id="status-box" class="status-box" aria-live="polite"></div>
+      </section>
+
+      <section class="panel results-panel">
+        <div class="panel-header">
+          <h2>Output</h2>
+        </div>
+
+        <div class="summary-grid">
+          <div class="summary-card">
+            <span class="label-with-help summary-label-inline">
+              <span class="summary-label">Parallel</span>
+              <span class="help-dot" tabindex="0" aria-label="Parallel analysis help" data-tip="Number of components whose observed eigenvalues exceed the 95th percentile of eigenvalues from Gaussian null data with the same sample size and number of variables.">?</span>
+            </span>
+            <strong id="summary-parallel">-</strong>
+          </div>
+          <div class="summary-card">
+            <span class="label-with-help summary-label-inline">
+              <span class="summary-label">Kaiser</span>
+              <span class="help-dot" tabindex="0" aria-label="Kaiser rule help" data-tip="When Standardize is on, count components with eigenvalue greater than 1. When Standardize is off, this rule is not shown.">?</span>
+            </span>
+            <strong id="summary-kaiser">-</strong>
+          </div>
+          <div class="summary-card">
+            <span class="summary-label">PC1</span>
+            <strong id="summary-pc1">-</strong>
+          </div>
+          <div class="summary-card">
+            <span class="summary-label">PC1 + PC2</span>
+            <strong id="summary-pc12">-</strong>
+          </div>
+        </div>
+
+        <div class="card-block">
+          <div class="card-head">
+            <h3>Data</h3>
+            <span class="muted">10 rows</span>
+          </div>
+          <div id="data-preview" class="table-host"></div>
+        </div>
+
+        <div class="card-block">
+          <div class="card-head">
+            <h3>Matrices</h3>
+          </div>
+          <div class="matrix-result-grid">
+            <div>
+              <h4>Sigma used</h4>
+              <div id="target-matrix" class="table-host"></div>
+            </div>
+            <div>
+              <h4>Observed covariance</h4>
+              <div id="observed-covariance" class="table-host"></div>
+            </div>
+            <div>
+              <h4>Observed correlation</h4>
+              <div id="observed-correlation" class="table-host"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-block">
+          <div class="card-head">
+            <h3>PCA printout</h3>
+          </div>
+          <pre id="pca-printout" class="printout-host"></pre>
+        </div>
+
+        <div class="card-block">
+          <div class="card-head">
+            <h3>Loadings</h3>
+          </div>
+          <div id="loadings-table" class="table-host"></div>
+        </div>
+
+        <div class="card-block">
+          <div class="card-head">
+            <h3>Scores</h3>
+            <span class="muted">10 rows</span>
+          </div>
+          <div id="scores-preview" class="table-host"></div>
+        </div>
+      </section>
+
+      <section class="panel plots-panel">
+        <div class="panel-header">
+          <h2>Plots</h2>
+          <p id="plot-note" class="panel-note hidden-note"></p>
+        </div>
+
+        <div class="plot-card large-plot-card">
+          <div class="card-head">
+            <h3>Scatter matrix</h3>
+          </div>
+          <div id="scatter-matrix" class="plot-host"></div>
+        </div>
+
+        <div class="plot-grid">
+          <div class="plot-card">
+            <div class="card-head">
+              <span class="label-with-help">
+                <h3>Scree plot</h3>
+                <span class="help-dot" tabindex="0" aria-label="Scree plot help" data-tip="Bars are observed eigenvalues. The dotted horizontal line at 1 is the Kaiser reference when Standardize is on. The line with markers is the 95th percentile parallel-analysis threshold.">?</span>
+              </span>
+            </div>
+            <div id="scree-plot" class="plot-host"></div>
+          </div>
+
+          <div class="plot-card">
+            <div class="card-head">
+              <span class="label-with-help">
+                <h3>Biplot</h3>
+                <span class="help-dot" tabindex="0" aria-label="Biplot help" data-tip="Points are observation scores on PC1 and PC2. Arrows show variable loadings. Longer arrows indicate stronger contribution to these two components.">?</span>
+              </span>
+            </div>
+            <div id="biplot" class="plot-host"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="about-modal" class="modal" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="about-title">
+      <div class="modal-header">
+        <h2 id="about-title">About this implementation</h2>
+        <button id="close-about" class="secondary-button modal-close" type="button">Close</button>
+      </div>
+      <div class="modal-body">
+        <h3>Data generation</h3>
+        <p>Each run simulates n observations from a multivariate Gaussian distribution with mean vector mu and covariance matrix Sigma. The app eigen-decomposes Sigma = V diag(lambda) V' and generates X = mu + Z diag(sqrt(lambda)) V', where Z contains independent standard normal draws from a seeded generator using a Box-Muller transform.</p>
+
+        <h3>PCA</h3>
+        <p>The data are always centered. If Standardize is on, each variable is also divided by its sample standard deviation, so PCA is done on the sample correlation matrix. If Standardize is off, PCA is done on the sample covariance matrix. Eigenvalues and eigenvectors are computed with a Jacobi rotation solver. Scores are centered or standardized data times eigenvectors. Loadings are eigenvectors times sqrt(eigenvalue).</p>
+
+        <h3>Scree and retention</h3>
+        <p>The scree plot shows the observed eigenvalues. When Standardize is on, the horizontal line at 1 gives the Kaiser reference. The second reference is a 95th percentile parallel-analysis line from Gaussian null data with the same sample size and number of variables.</p>
+
+        <h3>Invalid Sigma</h3>
+        <p>If Sigma is not positive semidefinite, the run does not use it directly. The app clips negative eigenvalues to a tiny positive floor, reconstructs a positive semidefinite matrix, rescales it to keep the user-entered variances on the diagonal, and shows a warning. The table labeled Sigma used shows the matrix actually used for the simulation.</p>
+
+        <h3>Notes</h3>
+        <p>The signs of eigenvectors, scores, and loadings can flip without changing the PCA solution. Hover over the ? icons for short definitions.</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
