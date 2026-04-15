@@ -1,0 +1,874 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Manifold Learning Playground</title>
+  <meta name="description" content="Interactive Dimensionality Reduction dashboard for generating and embedding a clock-hands dataset.">
+  <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+  <!-- Real-world TSNE and UMAP libraries -->
+  <script src="https://unpkg.com/tsne@1.0.1/tsne.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/umap-js@1.4.0/lib/umap-js.min.js"></script>
+  <style>
+    :root {
+      --font: system-ui, -apple-system, sans-serif;
+      --bg: #f8fafc;
+      --panel-bg: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --error-bg: #fff7ed;
+      --error-text: #c2410c;
+      --error-border: #fdba74;
+    }
+    body { margin: 0; font-family: var(--font); background: var(--bg); color: var(--text); }
+    .app-shell { display: flex; flex-direction: column; min-height: 100vh; }
+    .app-header { background: #0f172a; color: #fff; padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+    .app-header h1 { margin: 0; font-size: 1.25rem; font-weight: 600; }
+    .header-actions { display: flex; gap: 0.75rem; align-items: center; }
+    .secondary-button { background: transparent; color: #e2e8f0; border: 1px solid #475569; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; font-size: 0.875rem; font-weight: 500; }
+    .secondary-button:hover { background: #1e293b; color: #fff; }
+    .primary-button { background: var(--primary); color: #fff; border: none; padding: 0.6rem 1rem; border-radius: 4px; cursor: pointer; font-size: 0.875rem; font-weight: 600; transition: background 0.2s; }
+    .primary-button:hover { background: var(--primary-hover); }
+    .primary-button:disabled { opacity: 0.7; cursor: not-allowed; }
+    
+    .dashboard-grid { display: grid; grid-template-columns: 340px 1fr; gap: 1.5rem; padding: 1.5rem; max-width: 1400px; margin: 0 auto; width: 100%; box-sizing: border-box; align-items: start; }
+    @media (max-width: 800px) { .dashboard-grid { grid-template-columns: 1fr; } }
+    
+    .panel { background: var(--panel-bg); border-radius: 8px; border: 1px solid var(--border); padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .panel-header { margin-bottom: 1.25rem; border-bottom: 1px solid var(--border); padding-bottom: 0.75rem; }
+    .panel-header h2 { margin: 0; font-size: 1.125rem; font-weight: 600; }
+    
+    .control-group { margin-bottom: 1.5rem; }
+    .section-title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+    .section-title-row h3 { margin: 0; font-size: 0.875rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    
+    .control-label-row { display: flex; justify-content: space-between; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem; color: #334155; align-items: center; }
+    .control-label { font-size: 0.875rem; font-weight: 500; color: #334155; }
+    input[type="range"] { width: 100%; cursor: pointer; accent-color: var(--primary); margin-bottom: 1rem; }
+    select { width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; font-family: var(--font); font-size: 0.875rem; color: #0f172a; background: #fff; }
+    
+    .radio-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    .radio-label { display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; cursor: pointer; color: #0f172a; }
+    .hyperparams { background: #f8fafc; padding: 1rem; border-radius: 6px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 0.75rem; }
+    
+    .status-box { padding: 1rem; border-radius: 4px; background: var(--error-bg); color: var(--error-text); border: 1px solid var(--error-border); font-size: 0.875rem; display: none; margin-top: 1rem; word-wrap: break-word; }
+    #perf-warning { padding: 0.75rem; border-radius: 4px; background: #fff7ed; color: #c2410c; border: 1px solid #fdba74; font-size: 0.875rem; margin-bottom: 1.5rem; display: none; }
+    
+    .results-panel { display: flex; flex-direction: column; gap: 1.5rem; padding: 0; background: transparent; border: none; box-shadow: none; }
+    .top-results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    @media (max-width: 1100px) { .top-results-grid { grid-template-columns: 1fr; } }
+    
+    .card-block { background: var(--panel-bg); border-radius: 8px; border: 1px solid var(--border); overflow: hidden; display: flex; flex-direction: column; }
+    .card-head { background: #f8fafc; padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .card-head h3 { margin: 0; font-size: 1rem; font-weight: 600; color: #0f172a; }
+    .muted { color: var(--text-muted); font-size: 0.875rem; }
+    
+    .image-preview-grid { display: flex; flex-wrap: wrap; gap: 1rem; padding: 1.5rem; align-content: center; justify-content: center; flex: 1; }
+    .image-item { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; cursor: help; }
+    .image-item canvas { width: 56px; height: 56px; border: 1px solid var(--border); border-radius: 4px; image-rendering: pixelated; background: #fff; }
+    .image-item span { font-size: 0.75rem; font-weight: 500; color: var(--text-muted); }
+    
+    .plot-host { width: 100%; height: 500px; padding: 0.5rem; }
+    .scree-host { width: 100%; height: 260px; padding: 0.5rem; flex: 1; }
+    
+    .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.6); display: flex; align-items: center; justify-content: center; z-index: 50; }
+    .modal[hidden] { display: none; }
+    .modal-card { background: #fff; width: 100%; max-width: 500px; border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); overflow: hidden; }
+    .modal-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .modal-header h2 { margin: 0; font-size: 1.125rem; font-weight: 600; }
+    .modal-body { padding: 1.5rem; font-size: 0.9rem; line-height: 1.5; color: #334155; }
+    .modal-body p { margin-top: 0; margin-bottom: 1rem; }
+    .modal-body p:last-child { margin-bottom: 0; }
+  </style>
+</head>
+<body>
+
+  <div class="app-shell">
+    <header class="app-header">
+      <h1>Manifold Learning Playground</h1>
+      <div class="header-actions">
+        <button id="about-button" class="secondary-button" type="button">About</button>
+        <button id="run-header-button" class="primary-button" type="button">Run Embedding</button>
+      </div>
+    </header>
+    
+    <main class="dashboard-grid">
+      <section class="panel controls-panel">
+        <div class="panel-header">
+          <h2>Controls</h2>
+        </div>
+        
+        <div class="control-group">
+          <div class="section-title-row"><h3>Data Generation</h3></div>
+          
+          <div class="control-label-row">
+            <span class="control-label">Angles / Matrices</span>
+            <strong id="n-label">360</strong>
+          </div>
+          <input id="n-slider" type="range" min="30" max="720" step="10" value="360">
+          
+          <div class="control-label-row">
+            <span class="control-label">Matrix Size (S × S)</span>
+            <strong id="size-label">30</strong>
+          </div>
+          <input id="size-slider" type="range" min="10" max="50" step="2" value="30">
+          
+          <div class="control-label-row">
+            <span class="control-label">Microscopic Noise (SD)</span>
+            <strong id="noise-label">0.02</strong>
+          </div>
+          <input id="noise-slider" type="range" min="0" max="0.1" step="0.005" value="0.02" style="margin-bottom:0;">
+        </div>
+
+        <div id="perf-warning">
+          <strong>Performance Warning:</strong> Large datasets (N > 300 or Size > 35) may take a few seconds to compute natively in the browser.
+        </div>
+        
+        <div class="control-group">
+          <div class="section-title-row"><h3>Algorithm</h3></div>
+          <div class="radio-grid" id="method-radios">
+            <label class="radio-label"><input type="radio" name="method" value="PCA" checked> PCA</label>
+            <label class="radio-label"><input type="radio" name="method" value="KPCA"> Kernel PCA</label>
+            <label class="radio-label"><input type="radio" name="method" value="ISOMAP"> Isomap</label>
+            <label class="radio-label"><input type="radio" name="method" value="LLE"> LLE</label>
+            <label class="radio-label"><input type="radio" name="method" value="LE"> Laplacian Eig.</label>
+            <label class="radio-label"><input type="radio" name="method" value="tSNE"> t-SNE</label>
+            <label class="radio-label"><input type="radio" name="method" value="UMAP"> UMAP</label>
+          </div>
+        </div>
+
+        <div class="control-group" id="hyperparams-group" style="display: none;">
+          <div class="section-title-row"><h3>Hyperparameters</h3></div>
+          <div class="hyperparams" id="hyperparams-container">
+            </div>
+        </div>
+
+        <button id="run-button" class="primary-button" style="width: 100%;" type="button">Run Embedding</button>
+        <div id="status-box" class="status-box" aria-live="polite"></div>
+      </section>
+
+      <section class="results-panel">
+        
+        <div class="top-results-grid">
+          <div class="card-block">
+            <div class="card-head">
+              <h3>Raw Data Sample</h3>
+              <span class="muted">Subset of binary hands</span>
+            </div>
+            <div class="image-preview-grid" id="images-preview"></div>
+          </div>
+          
+          <div class="card-block">
+            <div class="card-head">
+              <h3>PCA Scree Plot (Raw Data)</h3>
+              <span class="muted">Intrinsic Dimensionality</span>
+            </div>
+            <div id="scree-container" class="scree-host"></div>
+          </div>
+        </div>
+        
+        <div class="card-block">
+          <div class="card-head">
+            <h3 id="plot-title">Embedding Space</h3>
+            <span class="muted" id="plot-time">-</span>
+          </div>
+          <div id="plot-container" class="plot-host"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+  
+  <div id="about-modal" class="modal" hidden>
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2>About this Implementation</h2>
+        <button id="close-about" class="secondary-button" type="button" style="border:none;">✕</button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Data Generating Process:</strong> This demo simulates an N × N binary matrix image grid with a line drawn from the center outward at various angles (0° to 360°), forming a circular "clock hand" manifold. Microscopic Gaussian noise is added to prevent perfectly duplicated rows which mathematically fracture non-linear neighborhood algorithms.</p>
+        <p><strong>Pure JS Implementation:</strong> Classic algorithms like Isomap, LLE, and LE are executed completely within your browser via optimized local matrix manipulation (Power Iterations, Gaussian Elimination, Shortest Path tracing).</p>
+        <p><strong>UMAP & t-SNE:</strong> We utilize the official <code>umap-js</code> and <code>tsnejs</code> libraries for authentic, production-grade output distributions identical to their Python counterparts.</p>
+        <p><strong>Scree Plot (Intrinsic Dimensionality):</strong> The Scree plot dynamically computes the variance explained by the top 10 Principal Components of the <em>raw</em> data. Watch how increasing the Gaussian noise flattens the curve, indicating a shattered manifold!</p>
+      </div>
+    </div>
+  </div>
+
+<script>
+/**
+ * 1. PRNG AND DATA GENERATOR
+ */
+function mulberry32(seed) {
+    let t = seed >>> 0;
+    return function() {
+        t += 0x6D2B79F5;
+        let x = t;
+        x = Math.imul(x ^ (x >>> 15), x | 1);
+        x ^= x + Math.imul(x ^ (x >>> 7), x | 61);
+        return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
+    };
+}
+
+function normalGenerator(seed) {
+    const random = mulberry32(seed);
+    let spare = null;
+    return function() {
+        if (spare !== null) { let v = spare; spare = null; return v; }
+        let u = 0, v = 0;
+        while(u === 0) u = random();
+        while(v === 0) v = random();
+        let s = Math.sqrt(-2.0 * Math.log(u));
+        let theta = 2.0 * Math.PI * v;
+        spare = s * Math.sin(theta);
+        return s * Math.cos(theta);
+    };
+}
+
+function generateData(nAngles, size, noiseLevel) {
+    let X = [], angles = [];
+    let cx = size / 2, cy = size / 2;
+    let max_r = size * 0.49;
+    const randNorm = normalGenerator(1234); 
+    
+    for (let i = 0; i < nAngles; i++) {
+        let angle_deg = i * (360 / nAngles);
+        let angle_rad = angle_deg * Math.PI / 180;
+        angles.push(angle_deg);
+        
+        let mat = new Float64Array(size * size);
+        for (let j = 0; j <= 150; j++) {
+            let r = (j / 150) * max_r;
+            let x = Math.round(cx + r * Math.cos(angle_rad));
+            let y = Math.round(cy + r * Math.sin(angle_rad));
+            if (x >= 0 && x < size && y >= 0 && y < size) {
+                mat[y * size + x] = 1;
+            }
+        }
+        for (let j = 0; j < mat.length; j++) mat[j] += noiseLevel * randNorm();
+        X.push(mat);
+    }
+    return { X, angles };
+}
+
+/**
+ * 2. MATHEMATICS & PURE JS LINEAR ALGEBRA
+ */
+function distanceMatrixSq(X) {
+    let n = X.length, d = X[0].length;
+    let D2 = Array.from({length:n}, () => new Float64Array(n));
+    for(let i=0; i<n; i++) {
+        for(let j=i; j<n; j++) {
+            let dist = 0;
+            for(let k=0; k<d; k++) {
+                let diff = X[i][k] - X[j][k];
+                dist += diff * diff;
+            }
+            D2[i][j] = dist; D2[j][i] = dist;
+        }
+    }
+    return D2;
+}
+
+function doubleCenter(K) {
+    let n = K.length;
+    let K_c = Array.from({length:n}, () => new Float64Array(n));
+    let rowMeans = new Float64Array(n), colMeans = new Float64Array(n), totalMean = 0;
+    for(let i=0; i<n; i++) {
+        for(let j=0; j<n; j++) {
+            rowMeans[i] += K[i][j]/n;
+            colMeans[j] += K[i][j]/n;
+            totalMean += K[i][j]/(n*n);
+        }
+    }
+    for(let i=0; i<n; i++) {
+        for(let j=0; j<n; j++) {
+            K_c[i][j] = K[i][j] - rowMeans[i] - colMeans[j] + totalMean;
+        }
+    }
+    return K_c;
+}
+
+function gaussianElimination(A, b) {
+    let n = A.length;
+    let M = Array.from({length:n}, (_, i) => {
+        let row = new Float64Array(n + 1);
+        for(let j=0; j<n; j++) row[j] = A[i][j];
+        row[n] = b[i];
+        return row;
+    });
+    
+    for(let i=0; i<n; i++) {
+        let maxRow = i;
+        for(let k=i+1; k<n; k++) if(Math.abs(M[k][i]) > Math.abs(M[maxRow][i])) maxRow = k;
+        let tmp = M[i]; M[i] = M[maxRow]; M[maxRow] = tmp;
+        
+        let pivot = M[i][i];
+        if (Math.abs(pivot) < 1e-12) return new Float64Array(n).fill(1/n); 
+        
+        for(let k=i+1; k<n; k++) {
+            let c = -M[k][i] / pivot;
+            for(let j=i; j<=n; j++) {
+                if(i===j) M[k][j] = 0; else M[k][j] += c * M[i][j];
+            }
+        }
+    }
+    let x = new Float64Array(n);
+    for(let i=n-1; i>=0; i--) {
+        x[i] = M[i][n] / M[i][i];
+        for(let k=i-1; k>=0; k--) M[k][n] -= M[k][i] * x[i];
+    }
+    return x;
+}
+
+// Power Iteration + Deflation mimics full eigen decompositions for the top eigenvalues 
+function powerIteration(A, num_components, num_iterations = 300) {
+    const n = A.length;
+    let current_A = Array.from({length:n}, (_, i) => new Float64Array(A[i]));
+    const eigenvalues = [], eigenvectors = [];
+    
+    for (let k = 0; k < num_components; k++) {
+        let v = new Float64Array(n), norm = 0;
+        for (let i = 0; i < n; i++) { v[i] = Math.random(); norm += v[i]*v[i]; }
+        norm = Math.sqrt(norm);
+        for (let i = 0; i < n; i++) v[i] /= norm;
+        
+        let lambda = 0;
+        for (let iter = 0; iter < num_iterations; iter++) {
+            let next_v = new Float64Array(n);
+            norm = 0;
+            for (let i = 0; i < n; i++) {
+                let sum = 0;
+                for (let j = 0; j < n; j++) sum += current_A[i][j] * v[j];
+                next_v[i] = sum;
+                norm += sum * sum;
+            }
+            norm = Math.sqrt(norm);
+            if (norm < 1e-12) break;
+            for (let i = 0; i < n; i++) v[i] = next_v[i] / norm;
+        }
+        
+        lambda = 0;
+        let Av = new Float64Array(n);
+        for (let i = 0; i < n; i++) {
+            let sum = 0;
+            for (let j = 0; j < n; j++) sum += current_A[i][j] * v[j];
+            Av[i] = sum;
+            lambda += v[i] * Av[i];
+        }
+        
+        eigenvalues.push(lambda);
+        eigenvectors.push(v);
+        
+        for (let i = 0; i < n; i++) {
+            for (let j = 0; j < n; j++) current_A[i][j] -= lambda * v[i] * v[j];
+        }
+    }
+    return { eigenvalues, eigenvectors };
+}
+
+/**
+ * 3. ALGORITHM IMPLEMENTATIONS
+ */
+
+// Compute Base PCA (Returns up to 10 components and total variance for Scree Plot)
+function computeBasePCA(X, num_comps=10) {
+    let n = X.length, d = X[0].length;
+    num_comps = Math.min(num_comps, n);
+    let means = new Float64Array(d);
+    for(let i=0; i<n; i++) for(let j=0; j<d; j++) means[j] += X[i][j]/n;
+    
+    let X_c = Array.from({length:n}, () => new Float64Array(d));
+    for(let i=0; i<n; i++) for(let j=0; j<d; j++) X_c[i][j] = X[i][j] - means[j];
+    
+    let K = Array.from({length:n}, () => new Float64Array(n));
+    let totalVar = 0;
+    
+    for(let i=0; i<n; i++) {
+        for(let j=i; j<n; j++) {
+            let val = 0;
+            for(let k=0; k<d; k++) val += X_c[i][k]*X_c[j][k];
+            K[i][j] = val; 
+            K[j][i] = val;
+            if (i === j) totalVar += val; // Fixed bug: Only sum the diagonal (Trace) once per item!
+        }
+    }
+    
+    let res = powerIteration(K, num_comps, 300);
+    return { ...res, totalVar };
+}
+
+function runKPCA(X, kernel, gamma, degree, coef0) {
+    let n = X.length, d = X[0].length;
+    let K = Array.from({length:n}, () => new Float64Array(n));
+    
+    for(let i=0; i<n; i++) {
+        for(let j=i; j<n; j++) {
+            let val = 0;
+            if (kernel === 'RBF') {
+                let dist = 0;
+                for(let k=0; k<d; k++) {
+                    let diff = X[i][k] - X[j][k];
+                    dist += diff * diff;
+                }
+                val = Math.exp(-gamma * dist);
+            } else if (kernel === 'Polynomial') {
+                let dot = 0;
+                for(let k=0; k<d; k++) dot += X[i][k] * X[j][k];
+                val = Math.pow(gamma * dot + coef0, degree);
+            } else if (kernel === 'Linear') {
+                let dot = 0;
+                for(let k=0; k<d; k++) dot += X[i][k] * X[j][k];
+                val = dot;
+            } else if (kernel === 'Cosine') {
+                let dot = 0, normI = 0, normJ = 0;
+                for(let k=0; k<d; k++) {
+                    dot += X[i][k] * X[j][k];
+                    normI += X[i][k] * X[i][k];
+                    normJ += X[j][k] * X[j][k];
+                }
+                val = dot / (Math.sqrt(normI * normJ) + 1e-12);
+            }
+            K[i][j] = val; K[j][i] = val;
+        }
+    }
+    
+    let K_c = doubleCenter(K);
+    let res = powerIteration(K_c, 2);
+    let Y = Array.from({length:n}, () => new Float64Array(2));
+    for(let i=0; i<n; i++) {
+        Y[i][0] = res.eigenvectors[0][i] * Math.sqrt(Math.max(0, res.eigenvalues[0]));
+        Y[i][1] = res.eigenvectors[1][i] * Math.sqrt(Math.max(0, res.eigenvalues[1]));
+    }
+    return Y;
+}
+
+function runIsomap(X, k) {
+    let n = X.length;
+    k = Math.min(k, n - 1);
+    let D2 = distanceMatrixSq(X);
+    let D = Array.from({length:n}, () => new Float64Array(n));
+    for(let i=0; i<n; i++) {
+        let dists = [];
+        for(let j=0; j<n; j++) {
+            D[i][j] = Math.sqrt(D2[i][j]);
+            if(i!==j) dists.push({id: j, val: D[i][j]});
+        }
+        dists.sort((a,b)=>a.val - b.val);
+        let keep = new Set(dists.slice(0, k).map(d=>d.id));
+        for(let j=0; j<n; j++) if(i!==j && !keep.has(j)) D[i][j] = Infinity;
+    }
+    for(let i=0; i<n; i++) {
+        for(let j=i+1; j<n; j++) {
+            let min = Math.min(D[i][j], D[j][i]);
+            D[i][j] = min; D[j][i] = min;
+        }
+    }
+    let fwD = Array.from({length:n}, (_, i) => new Float64Array(D[i]));
+    for(let k_=0; k_<n; k_++) {
+        for(let i=0; i<n; i++) {
+            for(let j=0; j<n; j++) {
+                if (fwD[i][k_] + fwD[k_][j] < fwD[i][j]) fwD[i][j] = fwD[i][k_] + fwD[k_][j];
+            }
+        }
+    }
+    let maxFinite = 0;
+    for(let i=0; i<n; i++) for(let j=0; j<n; j++) if(fwD[i][j] !== Infinity && fwD[i][j]>maxFinite) maxFinite = fwD[i][j];
+    for(let i=0; i<n; i++) for(let j=0; j<n; j++) if(fwD[i][j] === Infinity) fwD[i][j] = maxFinite * 2;
+    
+    let fwD2 = Array.from({length:n}, () => new Float64Array(n));
+    for(let i=0; i<n; i++) for(let j=0; j<n; j++) fwD2[i][j] = fwD[i][j]*fwD[i][j];
+    let K = doubleCenter(fwD2);
+    for(let i=0; i<n; i++) for(let j=0; j<n; j++) K[i][j] *= -0.5;
+    
+    let res = powerIteration(K, 2);
+    let Y = Array.from({length:n}, () => new Float64Array(2));
+    for(let i=0; i<n; i++) {
+        Y[i][0] = res.eigenvectors[0][i] * Math.sqrt(Math.max(0, res.eigenvalues[0]));
+        Y[i][1] = res.eigenvectors[1][i] * Math.sqrt(Math.max(0, res.eigenvalues[1]));
+    }
+    return Y;
+}
+
+function runLLE(X, k) {
+    let n = X.length, D2 = distanceMatrixSq(X);
+    k = Math.min(k, n - 1);
+    let W = Array.from({length:n}, () => new Float64Array(n));
+    
+    for(let i=0; i<n; i++) {
+        let dists = [];
+        for(let j=0; j<n; j++) if(i!==j) dists.push({id: j, val: D2[i][j]});
+        dists.sort((a,b)=>a.val - b.val);
+        let neighbors = dists.slice(0, k).map(d=>d.id);
+        
+        let C = Array.from({length:k}, () => new Float64Array(k));
+        for(let a=0; a<k; a++) {
+            for(let b=0; b<k; b++) {
+                let val = 0;
+                for(let d=0; d<X[i].length; d++) val += (X[neighbors[a]][d] - X[i][d])*(X[neighbors[b]][d] - X[i][d]);
+                C[a][b] = val;
+            }
+        }
+        let trace = 0;
+        for(let a=0; a<k; a++) trace += C[a][a];
+        let reg = 1e-3 * trace + 1e-6;
+        for(let a=0; a<k; a++) C[a][a] += reg;
+        
+        let ones = new Float64Array(k).fill(1);
+        let wLocal = gaussianElimination(C, ones);
+        let sumW = 0;
+        for(let a=0; a<k; a++) sumW += wLocal[a];
+        for(let a=0; a<k; a++) W[i][neighbors[a]] = wLocal[a] / sumW;
+    }
+    
+    let I_minus_W = Array.from({length:n}, (_, i) => {
+        let row = new Float64Array(n);
+        for(let j=0; j<n; j++) row[j] = (i===j ? 1 : 0) - W[i][j];
+        return row;
+    });
+    let M = Array.from({length:n}, () => new Float64Array(n));
+    for(let i=0; i<n; i++) {
+        for(let j=i; j<n; j++) {
+            let val = 0;
+            for(let a=0; a<n; a++) val += I_minus_W[a][i] * I_minus_W[a][j];
+            M[i][j] = val; M[j][i] = val;
+        }
+    }
+    
+    // M has smallest eigenvectors at 0. Since power iteration finds largest, we transform M' = lmax * I - M 
+    let lmax = powerIteration(M, 1).eigenvalues[0] * 1.05;
+    let M_prime = Array.from({length:n}, () => new Float64Array(n));
+    for(let i=0; i<n; i++) {
+        for(let j=0; j<n; j++) M_prime[i][j] = (i===j ? lmax : 0) - M[i][j];
+    }
+    
+    let res = powerIteration(M_prime, 3);
+    let Y = Array.from({length:n}, () => new Float64Array(2));
+    for(let i=0; i<n; i++) {
+        Y[i][0] = res.eigenvectors[1][i];
+        Y[i][1] = res.eigenvectors[2][i];
+    }
+    return Y;
+}
+
+function runLE(X, k) {
+    let n = X.length;
+    k = Math.min(k, n - 1);
+    let D2 = distanceMatrixSq(X);
+    let W = Array.from({length:n}, () => new Float64Array(n));
+    
+    for(let i=0; i<n; i++) {
+        let dists = [];
+        for(let j=0; j<n; j++) if(i!==j) dists.push({id: j, val: D2[i][j]});
+        dists.sort((a,b)=>a.val - b.val);
+        let keep = new Set(dists.slice(0, k).map(d=>d.id));
+        for(let j=0; j<n; j++) if(keep.has(j)) W[i][j] = 1;
+    }
+    for(let i=0; i<n; i++) {
+        for(let j=i+1; j<n; j++) {
+            let max = Math.max(W[i][j], W[j][i]);
+            W[i][j] = max; W[j][i] = max;
+        }
+    }
+    let deg = new Float64Array(n);
+    for(let i=0; i<n; i++) for(let j=0; j<n; j++) deg[i] += W[i][j];
+    
+    let degInvSqrt = new Float64Array(n);
+    for(let i=0; i<n; i++) degInvSqrt[i] = deg[i]>0 ? 1/Math.sqrt(deg[i]) : 0;
+    
+    let S = Array.from({length:n}, () => new Float64Array(n));
+    for(let i=0; i<n; i++) for(let j=0; j<n; j++) S[i][j] = degInvSqrt[i] * W[i][j] * degInvSqrt[j];
+    
+    let res = powerIteration(S, 3);
+    let Y = Array.from({length:n}, () => new Float64Array(2));
+    
+    // Fixed Bug: Removed redundant *degInvSqrt[i] scaling that caused cluster crunching
+    for(let i=0; i<n; i++) {
+        Y[i][0] = res.eigenvectors[1][i]; 
+        Y[i][1] = res.eigenvectors[2][i];
+    }
+    return Y;
+}
+
+
+/**
+ * UI & INTERACTION CONTROLLER
+ */
+const methodConfigs = {
+    PCA: [],
+    KPCA: [ 
+        { id: 'kpca_kernel', label: 'Kernel Type', type: 'select', options: ['RBF', 'Polynomial', 'Linear', 'Cosine'], default: 'RBF' },
+        { id: 'kpca_gamma', label: 'Gamma (γ)', type: 'range', min: 0.001, max: 0.5, step: 0.001, default: 0.1 },
+        { id: 'kpca_degree', label: 'Degree (d)', type: 'range', min: 2, max: 5, step: 1, default: 2 },
+        { id: 'kpca_coef0', label: 'Coef0 (c)', type: 'range', min: 0, max: 5, step: 0.1, default: 1 }
+    ],
+    ISOMAP: [ { id: 'isomap_k', label: 'Neighbors (k)', type: 'range', min: 3, max: 50, step: 1, default: 10 } ],
+    LLE: [ { id: 'lle_k', label: 'Neighbors (k)', type: 'range', min: 5, max: 50, step: 1, default: 10 } ],
+    LE: [ { id: 'le_k', label: 'Neighbors (k)', type: 'range', min: 5, max: 50, step: 1, default: 10 } ],
+    tSNE: [ 
+        { id: 'tsne_perp', label: 'Perplexity', type: 'range', min: 5, max: 100, step: 1, default: 30 },
+        { id: 'tsne_steps', label: 'Steps (Iterations)', type: 'range', min: 50, max: 1000, step: 50, default: 500 }
+    ],
+    UMAP: [ 
+        { id: 'umap_n', label: 'Neighbors', type: 'range', min: 3, max: 100, step: 1, default: 15 },
+        { id: 'umap_md', label: 'Min Dist', type: 'range', min: 0.01, max: 0.99, step: 0.01, default: 0.1 }
+    ]
+};
+
+function updateHyperparams() {
+    let method = document.querySelector('input[name="method"]:checked').value;
+    let container = document.getElementById('hyperparams-container');
+    let group = document.getElementById('hyperparams-group');
+    container.innerHTML = '';
+    
+    if (methodConfigs[method].length === 0) {
+        group.style.display = 'none';
+        return;
+    }
+    group.style.display = 'block';
+    
+    methodConfigs[method].forEach(param => {
+        let div = document.createElement('div');
+        div.style.marginBottom = '0.5rem';
+        
+        let labelRow = document.createElement('div');
+        labelRow.className = 'control-label-row';
+        
+        let label = document.createElement('span');
+        label.className = 'control-label';
+        label.textContent = param.label;
+        
+        labelRow.appendChild(label);
+        
+        if (param.type === 'select') {
+            let select = document.createElement('select');
+            select.id = param.id;
+            select.style.marginBottom = '0.5rem';
+            param.options.forEach(opt => {
+                let option = document.createElement('option');
+                option.value = opt;
+                option.textContent = opt;
+                if (opt === param.default) option.selected = true;
+                select.appendChild(option);
+            });
+            div.appendChild(labelRow);
+            div.appendChild(select);
+        } else {
+            let valDisplay = document.createElement('strong');
+            valDisplay.id = param.id + '-label';
+            valDisplay.textContent = param.default;
+            labelRow.appendChild(valDisplay);
+            
+            let input = document.createElement('input');
+            input.type = 'range';
+            input.id = param.id;
+            input.min = param.min;
+            input.max = param.max;
+            input.step = param.step;
+            input.value = param.default;
+            input.style.marginBottom = '0';
+            
+            input.addEventListener('input', (e) => {
+                valDisplay.textContent = e.target.value;
+            });
+            
+            div.appendChild(labelRow);
+            div.appendChild(input);
+        }
+        container.appendChild(div);
+    });
+}
+
+function checkPerformanceWarning() {
+    let nAngles = parseInt(document.getElementById('n-slider').value);
+    let size = parseInt(document.getElementById('size-slider').value);
+    let warning = document.getElementById('perf-warning');
+    
+    if (nAngles > 300 || size > 35) {
+        warning.style.display = 'block';
+    } else {
+        warning.style.display = 'none';
+    }
+}
+
+function drawImagesPreview(X, angles, size) {
+    let container = document.getElementById('images-preview');
+    container.innerHTML = '';
+    
+    let numImages = 6;
+    let step = Math.max(1, Math.floor(X.length / numImages)); 
+    
+    for(let i = 0; i < X.length; i += step) {
+        if (container.children.length >= numImages) break;
+        let wrapper = document.createElement('div');
+        wrapper.className = 'image-item';
+        wrapper.title = `Angle: ${angles[i].toFixed(1)}°`;
+        
+        let canvas = document.createElement('canvas');
+        canvas.width = size; canvas.height = size;
+        let ctx = canvas.getContext('2d');
+        let imgData = ctx.createImageData(size, size);
+        for(let j=0; j<size*size; j++) {
+            let val = Math.min(255, Math.max(0, 255 - X[i][j] * 255));
+            imgData.data[j*4] = val; imgData.data[j*4+1] = val; imgData.data[j*4+2] = val; imgData.data[j*4+3] = 255;
+        }
+        ctx.putImageData(imgData, 0, 0);
+        
+        let label = document.createElement('span');
+        label.textContent = `${angles[i].toFixed(0)}°`;
+        
+        wrapper.appendChild(canvas);
+        wrapper.appendChild(label);
+        container.appendChild(wrapper);
+    }
+}
+
+function runDR() {
+    let btn = document.getElementById('run-button');
+    let btnHeader = document.getElementById('run-header-button');
+    let status = document.getElementById('status-box');
+    
+    btn.disabled = true;
+    btnHeader.disabled = true;
+    btn.textContent = 'Computing...';
+    btnHeader.textContent = 'Computing...';
+    status.style.display = 'none';
+    
+    setTimeout(() => {
+        try {
+            let nAngles = parseInt(document.getElementById('n-slider').value);
+            let size = parseInt(document.getElementById('size-slider').value);
+            let noise = parseFloat(document.getElementById('noise-slider').value);
+            
+            let data = generateData(nAngles, size, noise);
+            drawImagesPreview(data.X, data.angles, size);
+            
+            let method = document.querySelector('input[name="method"]:checked').value;
+            let Y, start = Date.now();
+            let title = document.querySelector(`input[name="method"]:checked`).parentNode.textContent.trim();
+            
+            // ALWAYS compute base PCA for the Scree Plot (top 10 components max)
+            let basePCAResult = computeBasePCA(data.X, 10);
+            
+            // Draw Scree Plot
+            let evals = basePCAResult.eigenvalues.map(v => Math.max(0, v));
+            let expVar = evals.map(v => (v / Math.max(1e-12, basePCAResult.totalVar)) * 100);
+            
+            Plotly.newPlot('scree-container', [{
+                x: Array.from({length: evals.length}, (_, i) => `PC${i+1}`),
+                y: expVar,
+                type: 'bar',
+                marker: { color: '#3b82f6', opacity: 0.8 },
+                hovertemplate: 'Variance Explained: %{y:.1f}%<extra></extra>'
+            }], {
+                margin: { l: 40, r: 20, t: 20, b: 30 },
+                yaxis: { title: '% Variance Explained' },
+                plot_bgcolor: '#ffffff', paper_bgcolor: '#ffffff',
+                font: { family: 'system-ui, sans-serif', color: '#334155' }
+            }, {responsive: true, displayModeBar: false});
+
+            // Perform selected dimensionality reduction
+            if (method === 'PCA') {
+                // We already computed PCA for the scree plot! Re-use the results to be extremely fast.
+                let n = data.X.length;
+                Y = Array.from({length:n}, () => new Float64Array(2));
+                for(let i=0; i<n; i++) {
+                    Y[i][0] = basePCAResult.eigenvectors[0][i] * Math.sqrt(Math.max(0, basePCAResult.eigenvalues[0]));
+                    Y[i][1] = basePCAResult.eigenvectors[1][i] * Math.sqrt(Math.max(0, basePCAResult.eigenvalues[1]));
+                }
+            } else if (method === 'KPCA') {
+                Y = runKPCA(
+                    data.X, 
+                    document.getElementById('kpca_kernel').value,
+                    parseFloat(document.getElementById('kpca_gamma').value),
+                    parseInt(document.getElementById('kpca_degree').value),
+                    parseFloat(document.getElementById('kpca_coef0').value)
+                );
+            } else if (method === 'ISOMAP') {
+                Y = runIsomap(data.X, parseInt(document.getElementById('isomap_k').value));
+            } else if (method === 'LLE') {
+                Y = runLLE(data.X, parseInt(document.getElementById('lle_k').value));
+            } else if (method === 'LE') {
+                Y = runLE(data.X, parseInt(document.getElementById('le_k').value));
+            } else if (method === 'tSNE') {
+                const tsne = new tsnejs.tSNE({
+                    epsilon: 10,
+                    perplexity: parseFloat(document.getElementById('tsne_perp').value),
+                    dim: 2
+                });
+                tsne.initDataRaw(data.X);
+                let steps = parseInt(document.getElementById('tsne_steps').value);
+                for(let i = 0; i < steps; i++) tsne.step();
+                let sol = tsne.getSolution();
+                Y = Array.from({length: data.X.length}, (_, i) => new Float64Array([sol[i][0], sol[i][1]]));
+            } else if (method === 'UMAP') {
+                const umapInstance = new UMAP.UMAP({
+                    nNeighbors: parseInt(document.getElementById('umap_n').value),
+                    minDist: parseFloat(document.getElementById('umap_md').value),
+                    nComponents: 2
+                });
+                let sol = umapInstance.fit(data.X); 
+                Y = Array.from({length: data.X.length}, (_, i) => new Float64Array([sol[i][0], sol[i][1]]));
+            }
+            
+            let timeTaken = Date.now() - start;
+            document.getElementById('plot-title').textContent = `${title} Embedding`;
+            document.getElementById('plot-time').textContent = `Computed in ${timeTaken}ms`;
+            
+            Plotly.newPlot('plot-container', [{
+                x: Y.map(y => y[0]),
+                y: Y.map(y => y[1]),
+                mode: 'markers',
+                type: 'scatter',
+                marker: {
+                    color: data.angles,
+                    colorscale: 'HSV', cmin: 0, cmax: 360,
+                    size: 8, opacity: 0.8,
+                    colorbar: { title: 'Angle °' }
+                },
+                text: data.angles.map(a => `${a.toFixed(1)}°`),
+                hovertemplate: 'Dim 1: %{x:.3f}<br>Dim 2: %{y:.3f}<br>Angle: %{text}<extra></extra>'
+            }], {
+                margin: { l: 40, r: 20, t: 20, b: 40 },
+                xaxis: { title: 'Component 1', zeroline: false },
+                yaxis: { title: 'Component 2', zeroline: false },
+                plot_bgcolor: '#ffffff', paper_bgcolor: '#ffffff',
+                font: { family: 'system-ui, sans-serif', color: '#334155' }
+            }, {responsive: true, displayModeBar: false});
+            
+        } catch(e) {
+            console.error(e);
+            status.textContent = e.message;
+            status.style.display = 'block';
+        }
+        btn.disabled = false;
+        btnHeader.disabled = false;
+        btn.textContent = 'Run Embedding';
+        btnHeader.textContent = 'Run Embedding';
+    }, 50);
+}
+
+document.querySelectorAll('input[name="method"]').forEach(radio => radio.addEventListener('change', updateHyperparams));
+document.getElementById('run-button').addEventListener('click', runDR);
+document.getElementById('run-header-button').addEventListener('click', runDR);
+
+['n', 'size', 'noise'].forEach(id => {
+    document.getElementById(id + '-slider').addEventListener('input', e => {
+        document.getElementById(id + '-label').textContent = e.target.value;
+        if(id === 'n' || id === 'size') checkPerformanceWarning();
+    });
+});
+
+document.getElementById('about-button').addEventListener('click', () => document.getElementById('about-modal').hidden = false);
+document.getElementById('close-about').addEventListener('click', () => document.getElementById('about-modal').hidden = true);
+document.getElementById('about-modal').addEventListener('click', (e) => {
+    if (e.target.id === 'about-modal') e.target.hidden = true;
+});
+
+checkPerformanceWarning();
+updateHyperparams();
+runDR();
+</script>
+</body>
+</html>
