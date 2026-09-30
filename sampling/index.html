@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How many marbles are enough?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;1,400&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" onload="window.renderTex &amp;&amp; window.renderTex()"></script>
+<style>
+:root {
+  --paper: #EEF1F0;
+  --ink: #1D2A30;
+  --graphite: #57656B;
+  --rule: #CBD2D1;
+  --red: #C3363E;
+  --blue: #2A5EA8;
+  --serif: "Spectral", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --sans: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--paper); color: var(--ink); }
+body { font-family: var(--sans); font-size: 15px; line-height: 1.45; }
+.wrap { max-width: 1240px; margin: 0 auto; padding: 22px 32px 56px; }
+
+header h1 {
+  font-family: var(--serif); font-weight: 500; font-size: 34px; line-height: 1.12;
+  letter-spacing: -0.012em; margin: 0 0 6px;
+}
+header p {
+  font-family: var(--serif); font-size: 17px; line-height: 1.5; color: var(--graphite);
+  max-width: 84ch; margin: 0;
+}
+
+.main { display: grid; grid-template-columns: 262px minmax(0, 1fr); gap: 0 36px; margin-top: 18px; }
+
+/* controls */
+.controls { border-right: 1px solid var(--rule); padding: 6px 28px 0 0; }
+.field { margin-bottom: 24px; }
+.field > .label-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+.field .name { font-weight: 500; }
+.field output { font-variant-numeric: tabular-nums; color: var(--graphite); }
+.hint { font-size: 13px; color: var(--graphite); margin: 6px 0 0; font-variant-numeric: tabular-nums; }
+.swatch { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin: 0 4px 0 0; vertical-align: 0; }
+
+.seg { display: flex; border: 1px solid var(--ink); border-radius: 7px; overflow: hidden; }
+.seg label { flex: 1; position: relative; }
+.seg input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.seg span {
+  display: block; text-align: center; padding: 7px 0; font-size: 14px; font-variant-numeric: tabular-nums;
+  border-left: 1px solid var(--ink); cursor: pointer; user-select: none;
+}
+.seg label:first-child span { border-left: 0; }
+.seg input:checked + span { background: var(--ink); color: var(--paper); }
+.seg input:focus-visible + span { outline: 2px solid var(--blue); outline-offset: -4px; }
+.seg input:disabled + span { cursor: default; }
+
+input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 22px; background: transparent; margin: 0; }
+input[type=range]::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: var(--track, #AEB9B9); }
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%;
+  background: var(--paper); border: 2px solid var(--ink); margin-top: -7px; cursor: pointer;
+}
+input[type=range]::-moz-range-track { height: 4px; border-radius: 2px; background: var(--track, #AEB9B9); }
+input[type=range]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--paper); border: 2px solid var(--ink); cursor: pointer; }
+input[type=range]:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; border-radius: 4px; }
+#pct { --track: linear-gradient(to right, var(--red) 0 var(--split), var(--blue) var(--split) 100%); }
+
+.toggle { display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; }
+.toggle input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.toggle .track {
+  width: 38px; height: 22px; border-radius: 11px; background: #AEB9B9; position: relative;
+  transition: background 0.18s; flex: none;
+}
+.toggle .track::after {
+  content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px;
+  border-radius: 50%; background: var(--paper); transition: transform 0.18s;
+}
+.toggle input:checked + .track { background: var(--ink); }
+.toggle input:checked + .track::after { transform: translateX(16px); }
+.toggle input:focus-visible + .track { outline: 2px solid var(--blue); outline-offset: 2px; }
+
+.buttons { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
+button {
+  font: inherit; font-weight: 500; border-radius: 7px; padding: 10px 14px; cursor: pointer;
+  border: 1px solid var(--ink); background: transparent; color: var(--ink);
+}
+button.primary { background: var(--ink); color: var(--paper); font-size: 16px; padding: 12px 14px; }
+button.primary.stop { background: var(--paper); color: var(--ink); }
+button:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+button:disabled { opacity: 0.4; cursor: default; }
+button.quiet { border-color: transparent; color: var(--graphite); padding: 6px 0; text-align: left; text-decoration: underline; text-underline-offset: 3px; }
+.controls.busy .field { opacity: 0.55; }
+
+/* stage and plot */
+.stage-wrap { position: relative; height: clamp(300px, 44vh, 400px); }
+#stage, #plot { display: block; width: 100%; height: 100%; }
+
+.dist { margin-top: 8px; }
+.dist-head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; }
+.dist-head h2, .lower h2 { font-family: var(--serif); font-weight: 500; font-size: 20px; margin: 0; }
+.dist-head .count { color: var(--graphite); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.progress { height: 3px; background: var(--rule); border-radius: 2px; margin: 8px 0 6px; overflow: hidden; }
+.progress span { display: block; height: 100%; width: 0; background: var(--ink); transition: width 0.12s linear; }
+.legend { font-size: 13.5px; color: var(--graphite); margin: 0; }
+.plot-wrap { height: clamp(180px, 28vh, 250px); }
+
+.summary { margin-top: 30px; padding-top: 16px; border-top: 1px solid var(--rule); }
+.summary h3 { font-family: var(--serif); font-weight: 500; font-size: 17px; margin: 0 0 6px; }
+.stats { margin: 0; font-variant-numeric: tabular-nums; }
+.stats div { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 5px 0; }
+.stats dt { color: var(--graphite); font-size: 13.5px; }
+.stats dd { margin: 0; font-size: 15px; font-weight: 500; white-space: nowrap; }
+
+.lower { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 48px; margin-top: 40px; padding-top: 26px; border-top: 1px solid var(--rule); }
+table { width: 100%; border-collapse: collapse; margin-top: 12px; font-variant-numeric: tabular-nums; font-size: 14px; }
+th { text-align: right; font-weight: 500; color: var(--graphite); padding: 6px 8px; border-bottom: 1px solid var(--ink); font-size: 13px; }
+td { text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--rule); }
+th:first-child, td:first-child { text-align: left; padding-left: 0; }
+tr.new td { animation: settle 1.2s ease-out; }
+@keyframes settle { from { background: rgba(29, 42, 48, 0.08); } to { background: transparent; } }
+.empty-log { color: var(--graphite); font-size: 14px; margin-top: 12px; }
+.log-head { display: flex; justify-content: space-between; align-items: baseline; }
+
+.notes { font-family: var(--serif); font-size: 16.5px; line-height: 1.62; }
+.notes p { margin: 12px 0 0; max-width: 64ch; }
+.tex:not(.done) { font-style: italic; }
+.derivation .tex .katex { font-size: 1.04em; }
+.derivation .eq .katex { font-size: 1.12em; }
+.size { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 0 56px; margin-top: 40px; padding-top: 26px; border-top: 1px solid var(--rule); }
+.size h2 { font-family: var(--serif); font-weight: 500; font-size: 20px; margin: 0; }
+.derivation { font-family: var(--serif); font-size: 16.5px; line-height: 1.62; }
+.derivation p { margin: 12px 0 0; max-width: 64ch; }
+.derivation .eq { margin: 14px 0 4px; max-width: 64ch; text-align: center; overflow-x: auto; overflow-y: hidden; font-size: 16px; }
+.calc { align-self: start; position: sticky; top: 16px; }
+.calc .field { margin-bottom: 18px; }
+.calc .seg span { font-size: 14px; }
+.n0 { display: flex; align-items: baseline; gap: 14px; margin: 6px 0 4px; }
+.n0 .big { font-family: var(--serif); font-size: 42px; font-weight: 500; line-height: 1; font-variant-numeric: tabular-nums; }
+.n0 .n0-txt { color: var(--graphite); font-size: 14px; max-width: 36ch; }
+.curve-wrap { height: 270px; margin-top: 8px; }
+#curve { display: block; width: 100%; height: 100%; }
+.calc-note { font-size: 14px; color: var(--graphite); margin: 8px 0 0; max-width: 60ch; }
+.refs { margin-top: 40px; padding-top: 22px; border-top: 1px solid var(--rule); font-family: var(--serif); font-size: 14.5px; line-height: 1.5; }
+.refs h2 { font-family: var(--serif); font-weight: 500; font-size: 17px; margin: 0 0 10px; }
+.refs p { margin: 0 0 6px; padding-left: 2em; text-indent: -2em; max-width: 90ch; }
+
+@media (max-width: 920px) {
+  .wrap { padding: 20px 18px 40px; }
+  header h1 { font-size: 29px; }
+  .main { grid-template-columns: 1fr; }
+  .controls { border-right: 0; border-bottom: 1px solid var(--rule); padding: 0 0 12px; margin-bottom: 14px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 0 24px; }
+  .buttons { grid-column: 1 / -1; flex-direction: row; }
+  .buttons button.primary { flex: 1; }
+  .stage-wrap { height: 340px; }
+  .summary { grid-column: 1 / -1; margin-top: 16px; }
+  .lower { grid-template-columns: 1fr; gap: 28px; }
+  .size { grid-template-columns: 1fr; gap: 24px; }
+  .calc { position: static; }
+  .controls .field:first-child { grid-column: 1 / -1; }
+}
+@media (max-width: 560px) {
+  .controls { grid-template-columns: 1fr; }
+  .stage-wrap { height: 300px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>How many marbles are enough?</h1>
+    <p>Draw samples from a bowl of red and blue marbles. How far the estimates stray from the truth depends on how many marbles you draw, and hardly at all on how many the bowl holds.</p>
+  </header>
+
+  <div class="main">
+    <aside class="controls" id="controls">
+      <div class="field">
+        <div class="label-row"><span class="name" id="lbl-N">Marbles in the bowl</span></div>
+        <div class="seg" role="radiogroup" aria-labelledby="lbl-N">
+          <label><input type="radio" name="N" value="100"><span>100</span></label>
+          <label><input type="radio" name="N" value="1000" checked><span>1,000</span></label>
+          <label><input type="radio" name="N" value="10000"><span>10,000</span></label>
+          <label><input type="radio" name="N" value="100000"><span>100,000</span></label>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="label-row"><label class="name" for="pct">Share of red</label><output id="pct-out" for="pct">40%</output></div>
+        <input type="range" id="pct" min="10" max="90" step="1" value="40">
+        <p class="hint" id="pct-hint"></p>
+      </div>
+
+      <div class="field">
+        <div class="label-row"><label class="name" for="nsl">Marbles per sample</label><output id="n-out" for="nsl">100</output></div>
+        <input type="range" id="nsl" min="0" max="23" step="1" value="13">
+        <p class="hint" id="n-hint"></p>
+      </div>
+
+      <div class="field">
+        <label class="toggle"><input type="checkbox" id="multi" checked><span class="track"></span><span>Repeat 100 times</span></label>
+      </div>
+
+      <div class="buttons">
+        <button class="primary" id="go">Draw 100 samples</button>
+        <button class="quiet" id="clear">Clear the estimates</button>
+      </div>
+
+      <div class="summary">
+        <h3>The estimates so far</h3>
+        <dl class="stats" id="stats">
+          <div><dt>Average estimate</dt><dd id="s-mean">&nbsp;</dd></div>
+          <div><dt>Observed SD</dt><dd id="s-sd">&nbsp;</dd></div>
+          <div><dt>Theoretical SE</dt><dd id="s-se">&nbsp;</dd></div>
+          <div><dt>Outside the band</dt><dd id="s-out">&nbsp;</dd></div>
+        </dl>
+      </div>
+    </aside>
+
+    <main>
+      <div class="stage-wrap" id="stage-wrap"><canvas id="stage" aria-label="A glass bowl of marbles and the sample drawn from it"></canvas></div>
+
+      <section class="dist">
+        <div>
+          <div class="dist-head">
+            <h2>Estimates from repeated samples</h2>
+            <span class="count" id="count">No samples yet</span>
+          </div>
+          <div class="progress" aria-hidden="true"><span id="bar"></span></div>
+          <p class="legend" id="legend"></p>
+          <div class="plot-wrap" id="plot-wrap"><canvas id="plot" aria-label="Plot of sample estimates"></canvas></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <section class="lower">
+    <div>
+      <div class="log-head"><h2>Completed runs</h2><button class="quiet" id="clear-log" hidden>Clear</button></div>
+      <p class="empty-log" id="empty-log">Each run of 100 samples is recorded here, so that settings can be compared side by side.</p>
+      <table id="log" hidden>
+        <thead><tr><th>Bowl</th><th>Red</th><th>Sample</th><th>Of bowl</th><th>Observed SD</th><th>Theory SE</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="notes">
+      <h2>Reading the picture</h2>
+      <p>Each block in the plot is one sample&rsquo;s estimate of the share of red marbles. The blocks gather around the bowl&rsquo;s true share, and their spread is the sampling error of a single poll. The shaded band marks where theory expects 95 of every 100 estimates to fall, and its half-width is the margin of error.</p>
+      <p>Hold the sample at 100 and switch the bowl among 1,000, 10,000, and 100,000 marbles. The spread barely changes; between the smallest and the largest of these bowls, theory puts the difference at about 5 percent of the spread itself. Then hold the bowl fixed and quadruple the sample, from 25 to 100 and then to 400. Each quadrupling halves the spread, because the standard error falls with the square root of the sample size. Precision is bought with the absolute size of the sample, not with the fraction of the population it covers.</p>
+      <p>The size of the bowl enters only through the finite population correction, the factor &radic;[(<i>N</i> &minus; <i>n</i>)/(<i>N</i> &minus; 1)] (Kish 1965). It departs appreciably from one only when the sample is a sizable share of the bowl. Draw all 1,000 marbles from a bowl of 1,000 and the spread vanishes, since a census has no sampling error. For an adult population numbering in the millions, the correction for a sample of 1,000 is one for every practical purpose, which is why such a sample yields a margin of roughly three points whether the country is Denmark or the United States.</p>
+      <p>The bowl is a best case. Every marble has the same chance of selection, and every marble reports its color faithfully. Surveys of people must also contend with coverage, nonresponse, and measurement error, none of which diminishes as the sample grows (Groves et al. 2009). The margin of error printed beneath a poll describes only the error this bowl can show.</p>
+    </div>
+  </section>
+
+  <section class="size" aria-labelledby="size-h">
+    <div class="derivation">
+      <h2 id="size-h">How large a sample does a 95 percent interval require?</h2>
+      <p>Let <span class="tex" data-tex="p">p</span> be the share of red marbles in the bowl and <span class="tex" data-tex="\hat{p}">p&#770;</span> the share in a simple random sample of <span class="tex" data-tex="n">n</span> marbles. When the bowl is large relative to the sample, <span class="tex" data-tex="\hat{p}">p&#770;</span> is centered on <span class="tex" data-tex="p">p</span>, and by the central limit theorem its sampling distribution is approximately normal. About 95 percent of a normal distribution lies within 1.96 standard errors of its mean, so</p>
+      <div class="eq tex" data-tex="\mathrm{SE}(\hat{p}) = \sqrt{\frac{p(1-p)}{n}}, \qquad \Pr\bigl(\lvert \hat{p} - p \rvert \le 1.96\,\mathrm{SE}\bigr) \approx 0.95 .">SE(p&#770;) = &radic;[p(1 &minus; p)/n], &nbsp; Pr(|p&#770; &minus; p| &le; 1.96 SE) &asymp; 0.95.</div>
+      <p>The inequality inside the parentheses can be read in two directions. As written, it says that 95 percent of samples land inside the band drawn in the plot above. Rearranged, it says that the interval <span class="tex" data-tex="\hat{p} \pm E">p&#770; &plusmn; E</span>, where <span class="tex" data-tex="E = 1.96\,\mathrm{SE}">E = 1.96 SE</span>, covers the true share in 95 percent of samples. The confidence attaches to the procedure and not to any single interval, which either covers <span class="tex" data-tex="p">p</span> or does not.</p>
+      <p>To find the sample size, fix the margin <span class="tex" data-tex="E">E</span> one is prepared to tolerate and solve for <span class="tex" data-tex="n">n</span>:</p>
+      <div class="eq tex" data-tex="E = 1.96\sqrt{\frac{p(1-p)}{n}} \quad\Longrightarrow\quad n_0 = \frac{1.96^2\, p(1-p)}{E^2} .">E = 1.96 &radic;[p(1 &minus; p)/n] &nbsp; &rArr; &nbsp; n<sub>0</sub> = 1.96<sup>2</sup> p(1 &minus; p)/E<sup>2</sup>.</div>
+      <p>The unknown share appears on the right-hand side, but <span class="tex" data-tex="p(1-p)">p(1 &minus; p)</span> reaches its maximum of 1/4 at <span class="tex" data-tex="p = 1/2">p = 1/2</span>, so the conservative choice, which holds whatever the true share, is</p>
+      <div class="eq tex" data-tex="n_0 = \frac{1.96^2}{4E^2} = \frac{3.8416}{4 \times 0.03^2} \approx 1067.1 \quad \text{for } E = 0.03 .">n<sub>0</sub> = 1.96<sup>2</sup>/(4E<sup>2</sup>) = 3.8416/(4 &times; 0.03<sup>2</sup>) &asymp; 1067.1 for E = 0.03.</div>
+      <p>Rounding up, 1,068 observations guarantee a margin of no more than 3 points for any share. Because <span class="tex" data-tex="E">E</span> enters squared, precision is expensive: halving the margin to 1.5 points quadruples the requirement to 4,269, and a margin of 1 point requires 9,604.</p>
+      <p>The size of the population has not yet appeared. It enters only because the bowl is sampled without replacement, which multiplies the variance by the finite population correction:</p>
+      <div class="eq tex" data-tex="\operatorname{Var}(\hat{p}) = \frac{p(1-p)}{n} \cdot \frac{N-n}{N-1} .">Var(p&#770;) = [p(1 &minus; p)/n] &middot; [(N &minus; n)/(N &minus; 1)].</div>
+      <p>Setting <span class="tex" data-tex="1.96^2 \operatorname{Var}(\hat{p}) = E^2">1.96<sup>2</sup> Var(p&#770;) = E<sup>2</sup></span> and solving for <span class="tex" data-tex="n">n</span> gives (Cochran 1977)</p>
+      <div class="eq tex" data-tex="n = \frac{n_0\, N}{N - 1 + n_0} = \frac{n_0}{1 + (n_0 - 1)/N} .">n = n<sub>0</sub>N/(N &minus; 1 + n<sub>0</sub>) = n<sub>0</sub>/[1 + (n<sub>0</sub> &minus; 1)/N].</div>
+      <p>As <span class="tex" data-tex="N">N</span> grows, the denominator approaches one and <span class="tex" data-tex="n">n</span> approaches <span class="tex" data-tex="n_0">n<sub>0</sub></span> from below. For a margin of 3 points, a population of 10,000 requires 965 observations, one of 100,000 requires 1,056, and one of 250 million requires 1,068. However large the population, the requirement never exceeds <span class="tex" data-tex="n_0">n<sub>0</sub></span>. The calculator beside this text draws the curve for any margin.</p>
+      <p>Two cautions keep the result honest. First, the margin refers to a single share estimated from the whole sample. An estimate for a subgroup rests on fewer cases and carries a wider margin, and the lead of one candidate over another is estimated less precisely than either share, since</p>
+      <div class="eq tex" data-tex="\operatorname{Var}(\hat{p}_1 - \hat{p}_2) = \frac{p_1 + p_2 - (p_1 - p_2)^2}{n} .">Var(p&#770;<sub>1</sub> &minus; p&#770;<sub>2</sub>) = [p<sub>1</sub> + p<sub>2</sub> &minus; (p<sub>1</sub> &minus; p<sub>2</sub>)<sup>2</sup>]/n.</div>
+      <p>When two candidates divide the vote evenly this equals <span class="tex" data-tex="1/n">1/n</span>, so the standard error of the lead is twice that of either share. Second, the factor 1.96 rests on the normal approximation, which is poor when <span class="tex" data-tex="np">np</span> or <span class="tex" data-tex="n(1-p)">n(1 &minus; p)</span> is small; for samples of five marbles, the band in the plot is only a rough guide.</p>
+    </div>
+
+    <div class="calc">
+      <div class="field">
+        <div class="label-row"><label class="name" for="moe">Margin of error</label><output id="moe-out" for="moe">&plusmn;3.0 points</output></div>
+        <input type="range" id="moe" min="0.5" max="10" step="0.5" value="3">
+      </div>
+      <div class="field">
+        <div class="label-row"><span class="name" id="lbl-p">Assumed share</span></div>
+        <div class="seg" role="radiogroup" aria-labelledby="lbl-p">
+          <label><input type="radio" name="passume" value="half" checked><span>50%, the worst case</span></label>
+          <label><input type="radio" name="passume" value="bowl"><span id="p-bowl">The bowl&rsquo;s, 40%</span></label>
+        </div>
+      </div>
+      <p class="n0"><span class="big" id="n0-val">1,068</span><span class="n0-txt" id="n0-txt"></span></p>
+      <div class="curve-wrap" id="curve-wrap"><canvas id="curve" aria-label="Required sample size by population size"></canvas></div>
+      <p class="calc-note" id="calc-note"></p>
+    </div>
+  </section>
+
+  <section class="refs">
+    <h2>References</h2>
+    <p>Cochran, William G. 1977. <i>Sampling Techniques</i>. 3rd ed. New York: John Wiley &amp; Sons.</p>
+    <p>Groves, Robert M., Floyd J. Fowler Jr., Mick P. Couper, James M. Lepkowski, Eleanor Singer, and Roger Tourangeau. 2009. <i>Survey Methodology</i>. 2nd ed. Hoboken, NJ: John Wiley &amp; Sons.</p>
+    <p>Kish, Leslie. 1965. <i>Survey Sampling</i>. New York: John Wiley &amp; Sons.</p>
+  </section>
+</div>
+
+<script>
+(function () {
+'use strict';
+
+/* ---------------------------------------------------------------
+   Constants and configuration
+--------------------------------------------------------------- */
+var RED = '#C3363E', BLUE = '#2A5EA8', INK = '#1D2A30', GRAPH = '#57656B';
+var SERIF = '"Spectral", "Iowan Old Style", "Palatino Linotype", Georgia, serif';
+var SANS = '"Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif';
+var PM = '\u00B1';
+var NICE_N = [5, 6, 8, 10, 12, 15, 20, 25, 30, 40, 50, 60, 75, 100, 120, 150, 200, 250, 300, 400, 500, 600, 750, 1000];
+var SAMPLES = 100;
+var REDUCED = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+var CANCEL = { cancelled: true };
+
+var cfg = { N: 1000, pct: 40, nIdx: NICE_N.indexOf(100), multi: true };
+function nSample() { return NICE_N[cfg.nIdx]; }
+function fmt(x) { return Number(x).toLocaleString('en-US'); }
+function fmtPct(x) {
+  if (x >= 10) return x.toFixed(0);
+  if (x >= 1) return x.toFixed(1);
+  return String(Number(x.toPrecision(2)));
+}
+function clamp(x, a, b) { return x < a ? a : (x > b ? b : x); }
+function lerp(a, b, t) { return a + (b - a) * t; }
+function easeInOut(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+function now() { return performance.now(); }
+
+/* log-factorials for exact hypergeometric probabilities */
+var LF = new Float64Array(100001);
+for (var i = 1; i <= 100000; i++) LF[i] = LF[i - 1] + Math.log(i);
+function lchoose(a, b) { return LF[a] - LF[b] - LF[a - b]; }
+
+/* ---------------------------------------------------------------
+   The bowl: marble positions in units of the bowl radius
+--------------------------------------------------------------- */
+var bowl = null;
+
+function hexRows(r) {
+  var rows = [], Rin = 0.95 - r, top = -0.70 + r, bottom = 0.885 - r, dy = Math.sqrt(3) * r;
+  var k = 0;
+  for (var y = bottom; y >= top; y -= dy, k++) {
+    var off = (k % 2) ? r : 0;
+    var half = Math.sqrt(Math.max(0, Rin * Rin - y * y));
+    var xs = [];
+    for (var j = Math.ceil((-half - off) / (2 * r)); ; j++) {
+      var x = j * 2 * r + off;
+      if (x > half) break;
+      xs.push(x);
+    }
+    rows.push({ y: y, xs: xs });
+  }
+  return rows;
+}
+function countHex(r) {
+  var Rin = 0.95 - r, top = -0.70 + r, bottom = 0.885 - r, dy = Math.sqrt(3) * r, c = 0, k = 0;
+  for (var y = bottom; y >= top; y -= dy, k++) {
+    var off = (k % 2) ? r : 0, half = Math.sqrt(Math.max(0, Rin * Rin - y * y));
+    var j0 = Math.ceil((-half - off) / (2 * r)), j1 = Math.floor((half - off) / (2 * r));
+    if (j1 >= j0) c += j1 - j0 + 1;
+  }
+  return c;
+}
+
+function buildBowl() {
+  var N = cfg.N, target = N / 0.66, lo = 0.002, hi = 0.3;
+  for (var it = 0; it < 40; it++) {
+    var mid = (lo + hi) / 2;
+    if (countHex(mid) >= target) lo = mid; else hi = mid;
+  }
+  var r = lo, rows = hexRows(r);
+  var xs = new Float32Array(N), ys = new Float32Array(N), m = 0;
+  for (var q = 0; q < rows.length && m < N; q++) {
+    var list = rows[q].xs;
+    if (m + list.length > N) {
+      list = list.slice().sort(function (a, b) { return Math.abs(a) - Math.abs(b); }).slice(0, N - m);
+    }
+    for (var k = 0; k < list.length; k++) {
+      xs[m] = list[k] + (Math.random() - 0.5) * 0.28 * r;
+      ys[m] = rows[q].y + (Math.random() - 0.5) * 0.28 * r;
+      m++;
+    }
+  }
+  var phase = new Float32Array(N);
+  for (var p = 0; p < N; p++) phase[p] = Math.random() * 6.2832;
+  bowl = {
+    N: N, r: r, xs: xs, ys: ys, phase: phase,
+    color: new Uint8Array(N), present: new Uint8Array(N),
+    pool: new Int32Array(N), poolLen: N, K: 0,
+    grain: N >= 100000, dirty: true
+  };
+  paintBowl();
+  resetPool();
+}
+
+function paintBowl() {
+  var N = bowl.N, K = Math.round(cfg.pct / 100 * N), c = bowl.color;
+  bowl.K = K;
+  for (var i = 0; i < N; i++) c[i] = i < K ? 1 : 0;
+  for (var j = N - 1; j > 0; j--) {
+    var s = Math.floor(Math.random() * (j + 1)), t = c[j];
+    c[j] = c[s]; c[s] = t;
+  }
+  bowl.dirty = true;
+}
+
+function resetPool() {
+  for (var i = 0; i < bowl.N; i++) { bowl.pool[i] = i; bowl.present[i] = 1; }
+  bowl.poolLen = bowl.N;
+  bowl.dirty = true;
+}
+
+/* local swaps give the look of marbles tumbling over one another */
+function churn(amount) {
+  var N = bowl.N, c = bowl.color, m = Math.ceil(N * 0.05 * amount) + 1;
+  var w = Math.max(2, Math.round(1 / bowl.r));
+  for (var q = 0; q < m; q++) {
+    var i = Math.floor(Math.random() * N);
+    var j = clamp(i + Math.floor((Math.random() * 2 - 1) * w), 0, N - 1);
+    var t = c[i]; c[i] = c[j]; c[j] = t;
+  }
+  bowl.dirty = true;
+}
+
+function trueP() { return bowl.K / bowl.N; }
+function seTheory() {
+  var n = nSample(), N = cfg.N, p = trueP();
+  if (n >= N) return 0;
+  return Math.sqrt(p * (1 - p) / n * (N - n) / (N - 1));
+}
+
+/* a whole sample drawn without replacement, by sequential selection */
+function quickSample(n) {
+  var left = bowl.N, redsLeft = bowl.K, reds = 0;
+  for (var i = 0; i < n; i++) {
+    if (Math.random() * left < redsLeft) { reds++; redsLeft--; }
+    left--;
+  }
+  return reds;
+}
+
+/* ---------------------------------------------------------------
+   Tray (the sample) and flying marbles
+--------------------------------------------------------------- */
+var tray = { n: 100, slots: new Int8Array(100).fill(-1), landed: 0, reds: 0, mode: 'empty', fadeT0: 0, header: '', sortIdx: null, sortT0: 0, sortDur: 0 };
+var flights = [];
+var fx = { shake: null, vibe: 0 };
+
+function trayClear() {
+  tray.mode = 'empty'; tray.slots = new Int8Array(tray.n).fill(-1);
+  tray.landed = 0; tray.reds = 0; tray.fadeT0 = 0; tray.sortIdx = null;
+}
+function trayStart(n) {
+  tray.n = n; tray.slots = new Int8Array(n).fill(-1);
+  tray.landed = 0; tray.reds = 0; tray.mode = 'draw'; tray.fadeT0 = 0; tray.sortIdx = null;
+}
+function marblesOut() { return bowl.poolLen < bowl.N || tray.mode !== 'empty'; }
+function returnMarbles() {
+  resetPool();
+  flights.length = 0;
+  if (tray.mode !== 'empty' && !tray.fadeT0) tray.fadeT0 = now();
+}
+
+/* ---------------------------------------------------------------
+   Canvas setup
+--------------------------------------------------------------- */
+var stageCv = document.getElementById('stage'), plotCv = document.getElementById('plot');
+var sg = stageCv.getContext('2d'), pg = plotCv.getContext('2d');
+var curveCv = document.getElementById('curve'), cg = curveCv.getContext('2d');
+var dpr = 1, SW = 800, SH = 400, PW = 800, PH = 236, CW = 480, CH = 270;
+var gridCache = {};
+var spriteCache = {};
+
+function sizeCanvases() {
+  dpr = Math.min(window.devicePixelRatio || 1, 2);
+  var a = document.getElementById('stage-wrap').getBoundingClientRect();
+  var b = document.getElementById('plot-wrap').getBoundingClientRect();
+  SW = Math.max(300, a.width); SH = a.height;
+  PW = Math.max(280, b.width); PH = b.height;
+  stageCv.width = Math.round(SW * dpr); stageCv.height = Math.round(SH * dpr);
+  plotCv.width = Math.round(PW * dpr); plotCv.height = Math.round(PH * dpr);
+  var c = document.getElementById('curve-wrap').getBoundingClientRect();
+  CW = Math.max(260, c.width); CH = c.height;
+  curveCv.width = Math.round(CW * dpr); curveCv.height = Math.round(CH * dpr);
+  gridCache = {}; spriteCache = {};
+  if (bowl) bowl.dirty = true;
+  if (typeof calcEl !== 'undefined' && calcEl && bowl) updateCalc();
+}
+
+/* With 100,000 marbles a marble is smaller than a pixel, so the bowl is
+   painted as a grain image and redrawn only when something changes. */
+var grain = { key: '', cv: null, ctx: null, img: null, u32: null, S: 0 };
+var RED32 = 0xFF3E36C3 >>> 0, BLUE32 = 0xFFA85E2A >>> 0;
+function grainImage(R) {
+  var S = Math.ceil(2 * R * dpr) + 6, key = S + '|' + dpr;
+  if (grain.key !== key) {
+    grain.cv = document.createElement('canvas');
+    grain.cv.width = grain.cv.height = S;
+    grain.ctx = grain.cv.getContext('2d');
+    grain.img = grain.ctx.createImageData(S, S);
+    grain.u32 = new Uint32Array(grain.img.data.buffer);
+    grain.key = key; grain.S = S; bowl.dirty = true;
+  }
+  if (bowl.dirty) {
+    var u = grain.u32, sc = R * dpr, off = S / 2;
+    var gs = Math.max(1, Math.ceil(2 * bowl.r * sc)), h0 = gs >> 1;
+    var xs = bowl.xs, ys = bowl.ys, col = bowl.color, pr = bowl.present;
+    u.fill(0);
+    for (var i = 0; i < bowl.N; i++) {
+      if (!pr[i]) continue;
+      var px = (xs[i] * sc + off - h0) | 0, py = (ys[i] * sc + off - h0) | 0, c = col[i] ? RED32 : BLUE32;
+      for (var a = 0; a < gs; a++) {
+        var row = (py + a) * S + px;
+        for (var b = 0; b < gs; b++) u[row + b] = c;
+      }
+    }
+    var x = grain.ctx;
+    x.putImageData(grain.img, 0, 0);
+    x.globalCompositeOperation = 'source-atop';
+    var rg = x.createRadialGradient(off - 0.3 * sc, off - 0.25 * sc, 0.05 * sc, off, off, 0.98 * sc);
+    rg.addColorStop(0, 'rgba(255,255,255,0.14)');
+    rg.addColorStop(0.55, 'rgba(0,0,0,0)');
+    rg.addColorStop(1, 'rgba(0,0,0,0.12)');
+    x.fillStyle = rg; x.fillRect(0, 0, S, S);
+    x.globalCompositeOperation = 'source-over';
+    bowl.dirty = false;
+  }
+  return { cv: grain.cv, half: grain.S / (2 * dpr) };
+}
+
+function sprite(c, r) {
+  var key = c + '|' + (Math.round(r * 8) / 8) + '|' + dpr;
+  var s = spriteCache[key];
+  if (s) return s;
+  var size = Math.ceil(2 * r * dpr) + 2, cv = document.createElement('canvas');
+  cv.width = cv.height = size;
+  var x = cv.getContext('2d'), m = size / 2, rr = r * dpr, base = c ? RED : BLUE;
+  x.beginPath(); x.arc(m, m, rr, 0, 6.2832);
+  if (r < 2.4) {
+    x.fillStyle = base; x.fill();
+  } else {
+    var gr = x.createRadialGradient(m - rr * 0.35, m - rr * 0.4, rr * 0.05, m, m, rr);
+    gr.addColorStop(0, c ? '#EE918A' : '#91B5E6');
+    gr.addColorStop(0.38, base);
+    gr.addColorStop(1, c ? '#7A1E24' : '#163A70');
+    x.fillStyle = gr; x.fill();
+    x.beginPath(); x.ellipse(m - rr * 0.34, m - rr * 0.42, rr * 0.2, rr * 0.13, -0.6, 0, 6.2832);
+    x.fillStyle = 'rgba(255,255,255,0.55)'; x.fill();
+  }
+  s = { cv: cv, half: size / (2 * dpr) };
+  spriteCache[key] = s;
+  return s;
+}
+function blit(g, s, x, y, scale) {
+  var h = s.half * (scale || 1);
+  g.drawImage(s.cv, x - h, y - h, 2 * h, 2 * h);
+}
+
+function layout() {
+  var W = SW, H = SH;
+  var R = Math.min(H * 0.35, W * 0.205);
+  var cx = Math.max(R * 1.15, W * 0.25);
+  var cy = H * 0.53;
+  var tx = W * 0.52, tw = W * 0.44, ty = tw < 300 ? 66 : 58, th = H - ty - 116;
+  return { W: W, H: H, R: R, cx: cx, cy: cy, rimY: cy - 0.72 * R, tx: tx, tw: tw, ty: ty, th: th, sMax: 46 };
+}
+
+function grid(L, n) {
+  var key = n + '|' + L.tw + '|' + L.th;
+  if (gridCache[key]) return gridCache[key];
+  var W = L.tw, H = L.th, best = null;
+  if (n <= 8) {
+    best = { rows: 1, cols: n, s: Math.min(L.sMax, W / n, H) };
+  } else {
+    var r0 = Math.max(1, Math.round(Math.sqrt(n * H / W)));
+    for (var rr = Math.max(1, r0 - 4); rr <= r0 + 4; rr++) {
+      var cc = Math.ceil(n / rr), ss = Math.min(L.sMax, W / cc, H / rr);
+      if (!best || ss > best.s + 0.01) best = { rows: rr, cols: cc, s: ss };
+    }
+  }
+  best.gw = best.cols * best.s; best.gh = best.rows * best.s;
+  best.x0 = L.tx + (W - best.gw) / 2;
+  best.y0 = L.ty + (H - best.gh) / 2;
+  gridCache[key] = best;
+  return best;
+}
+function drawPos(G, i) {
+  return [G.x0 + (i % G.cols + 0.5) * G.s, G.y0 + (Math.floor(i / G.cols) + 0.5) * G.s];
+}
+function sortPos(G, j) {
+  return [G.x0 + (Math.floor(j / G.rows) + 0.5) * G.s, G.y0 + (j % G.rows + 0.5) * G.s];
+}
+
+/* ---------------------------------------------------------------
+   Stage rendering
+--------------------------------------------------------------- */
+function bowlPath(g, R) {
+  var a1 = Math.atan2(-0.72, 0.694), a2 = Math.atan2(0.92, 0.392);
+  g.beginPath();
+  g.arc(0, 0, R, a1, a2);
+  g.lineTo(-0.392 * R, 0.92 * R);
+  g.arc(0, 0, R, Math.PI - a2, Math.PI - a1);
+}
+
+function drawBowl(g, L, t) {
+  var R = L.R, dx = 0, rot = 0, jit = 0;
+  var sh = fx.shake;
+  if (sh) {
+    var u = clamp((t - sh.t0) / sh.dur, 0, 1);
+    var env = Math.pow(Math.sin(Math.PI * u), 0.8);
+    var w = 2 * Math.PI * 3.3 * (t - sh.t0) / 1000;
+    dx = R * 0.06 * sh.amp * env * Math.sin(w);
+    rot = 0.05 * sh.amp * env * Math.sin(w + 0.7);
+    jit = env * sh.amp;
+  }
+  if (fx.vibe > 0) {
+    var w2 = 2 * Math.PI * 5.5 * t / 1000, a = fx.vibe * (REDUCED ? 0.2 : 1);
+    dx += R * 0.012 * a * Math.sin(w2);
+    rot += 0.009 * a * Math.sin(w2 * 1.3);
+    jit = Math.max(jit, 0.35 * a);
+  }
+
+  g.save();
+  g.translate(L.cx + dx * 0.5, L.cy);
+  /* shadow on the table */
+  var sgr = g.createRadialGradient(0, 0.95 * R, 0, 0, 0.95 * R, 0.62 * R);
+  sgr.addColorStop(0, 'rgba(29,42,48,0.20)'); sgr.addColorStop(1, 'rgba(29,42,48,0)');
+  g.save(); g.translate(0, 0.95 * R); g.scale(1, 0.11); g.translate(0, -0.95 * R);
+  g.fillStyle = sgr; g.beginPath(); g.arc(0, 0.95 * R, 0.62 * R, 0, 6.2832); g.fill();
+  g.restore();
+  g.translate(dx * 0.5, 0);
+  g.translate(0, 0.92 * R); g.rotate(rot); g.translate(0, -0.92 * R);
+
+  /* glass body, back surface */
+  var lg = g.createLinearGradient(-R, 0, R, 0);
+  lg.addColorStop(0, 'rgba(255,255,255,0.55)');
+  lg.addColorStop(0.55, 'rgba(214,226,229,0.35)');
+  lg.addColorStop(1, 'rgba(170,190,196,0.40)');
+  bowlPath(g, R); g.closePath(); g.fillStyle = lg; g.fill();
+  g.beginPath(); g.ellipse(0, -0.72 * R, 0.694 * R, 0.075 * R, 0, Math.PI, 2 * Math.PI);
+  g.strokeStyle = 'rgba(70,95,105,0.30)'; g.lineWidth = 1.2; g.stroke();
+
+  /* marbles */
+  if (bowl.grain) {
+    var gi = grainImage(R);
+    g.drawImage(gi.cv, -gi.half, -gi.half, 2 * gi.half, 2 * gi.half);
+  } else {
+  var rpx = bowl.r * R * (bowl.r * R < 2.6 ? 1.12 : 0.93), sR = sprite(1, rpx), sB = sprite(0, rpx);
+  var jamp = jit * bowl.r * R * 0.6, tt = t / 1000, slosh = -dx * 0.16 / R;
+  var xs = bowl.xs, ys = bowl.ys, col = bowl.color, pr = bowl.present, ph = bowl.phase, h = sR.half;
+  for (var i = 0; i < bowl.N; i++) {
+    if (!pr[i]) continue;
+    var x = xs[i] * R, y = ys[i] * R;
+    if (jamp > 0) {
+      x += jamp * Math.sin(ph[i] + tt * 17) + slosh * (0.9 - ys[i]) * R;
+      y += jamp * 0.6 * Math.cos(ph[i] * 1.7 + tt * 13);
+    }
+    g.drawImage(col[i] ? sR.cv : sB.cv, x - h, y - h, 2 * h, 2 * h);
+  }
+  }
+
+  /* glass body, front surface */
+  bowlPath(g, R);
+  g.strokeStyle = 'rgba(62,88,98,0.62)'; g.lineWidth = 1.5; g.stroke();
+  g.save(); g.scale(0.955, 0.955); bowlPath(g, R); g.restore();
+  g.strokeStyle = 'rgba(62,88,98,0.18)'; g.lineWidth = 1; g.stroke();
+  g.lineCap = 'round';
+  g.beginPath(); g.arc(0, 0, R * 0.885, Math.PI * 1.08, Math.PI * 1.30);
+  g.strokeStyle = 'rgba(255,255,255,0.80)'; g.lineWidth = R * 0.034; g.stroke();
+  g.beginPath(); g.arc(0, 0, R * 0.885, Math.PI * 0.80, Math.PI * 0.86);
+  g.strokeStyle = 'rgba(255,255,255,0.45)'; g.lineWidth = R * 0.022; g.stroke();
+  g.beginPath(); g.arc(0, 0, R * 0.9, -0.04 * Math.PI, 0.10 * Math.PI);
+  g.strokeStyle = 'rgba(255,255,255,0.30)'; g.lineWidth = R * 0.018; g.stroke();
+  g.beginPath(); g.ellipse(0, -0.72 * R, 0.694 * R, 0.075 * R, 0, 0, Math.PI);
+  g.strokeStyle = 'rgba(62,88,98,0.62)'; g.lineWidth = 1.5; g.stroke();
+  g.beginPath(); g.ellipse(0, -0.72 * R + 2.5, 0.68 * R, 0.066 * R, 0, 0.1, Math.PI - 0.1);
+  g.strokeStyle = 'rgba(255,255,255,0.7)'; g.lineWidth = 1.2; g.stroke();
+  g.beginPath(); g.ellipse(0, 0.92 * R, 0.392 * R, 0.03 * R, 0, 0, Math.PI);
+  g.strokeStyle = 'rgba(62,88,98,0.35)'; g.lineWidth = 1; g.stroke();
+  g.restore();
+
+  /* caption */
+  g.textAlign = 'center'; g.textBaseline = 'alphabetic';
+  g.fillStyle = INK; g.font = 'italic 16px ' + SERIF;
+  var capY = Math.min(L.H - 26, L.cy + 0.92 * R + 30);
+  g.fillText(fmt(bowl.N) + ' marbles, ' + cfg.pct + '% red', L.cx, capY);
+  var out = bowl.N - bowl.poolLen;
+  if (out > 0) {
+    g.font = '12.5px ' + SANS; g.fillStyle = GRAPH;
+    g.fillText(fmt(out) + ' out of the bowl', L.cx, capY + 18);
+  }
+}
+
+function flightPos(L, G, f, u) {
+  var R = L.R;
+  var mx = L.cx + bowl.xs[f.idx] * R, my = L.cy + bowl.ys[f.idx] * R;
+  var sp = drawPos(G, f.slot);
+  var p1x = lerp(mx, L.cx, 0.6), p1y = L.rimY - 0.5 * R;
+  var p2x = lerp(L.cx + 0.8 * R, sp[0], 0.55), p2y = Math.min(sp[1], L.rimY) - 0.45 * R;
+  var v = 1 - u;
+  return [
+    v * v * v * mx + 3 * v * v * u * p1x + 3 * v * u * u * p2x + u * u * u * sp[0],
+    v * v * v * my + 3 * v * v * u * p1y + 3 * v * u * u * p2y + u * u * u * sp[1]
+  ];
+}
+
+function drawTray(g, L, t) {
+  var n = tray.n, G = grid(L, n), rt = G.s * 0.42, alpha = 1;
+  if (tray.fadeT0) {
+    alpha = 1 - (t - tray.fadeT0) / 320;
+    if (alpha <= 0) { trayClear(); alpha = 1; }
+  }
+
+  g.textBaseline = 'alphabetic';
+  g.textAlign = 'left'; g.fillStyle = INK; g.font = 'italic 17px ' + SERIF;
+  g.fillText(tray.header || ('A sample of ' + fmt(n) + ' marbles'), L.tx, 34);
+  if (tray.mode === 'draw') {
+    g.fillStyle = GRAPH; g.font = '13px ' + SANS;
+    var drawnTxt = fmt(tray.landed) + ' of ' + fmt(n) + ' drawn';
+    if (L.tw < 300) { g.textAlign = 'left'; g.fillText(drawnTxt, L.tx, 52); }
+    else { g.textAlign = 'right'; g.fillText(drawnTxt, L.tx + L.tw, 34); }
+  }
+
+  /* empty slots */
+  if (tray.mode === 'empty' || tray.mode === 'draw') {
+    g.fillStyle = 'rgba(29,42,48,0.16)';
+    g.beginPath();
+    var er = Math.max(0.8, G.s * 0.09);
+    for (var i = 0; i < n; i++) {
+      if (tray.mode === 'draw' && tray.slots[i] >= 0) continue;
+      var p = drawPos(G, i);
+      g.moveTo(p[0] + er, p[1]); g.arc(p[0], p[1], er, 0, 6.2832);
+    }
+    g.fill();
+  }
+
+  g.globalAlpha = alpha;
+  var sR = sprite(1, rt), sB = sprite(0, rt), q, pos;
+  if (tray.mode === 'draw') {
+    for (q = 0; q < n; q++) {
+      if (tray.slots[q] < 0) continue;
+      pos = drawPos(G, q); blit(g, tray.slots[q] ? sR : sB, pos[0], pos[1]);
+    }
+  } else if (tray.mode === 'sort') {
+    for (q = 0; q < n; q++) {
+      var u = clamp((t - tray.sortT0 - 160 * q / n) / tray.sortDur, 0, 1), e = easeInOut(u);
+      var a = drawPos(G, q), b = sortPos(G, tray.sortIdx[q]);
+      blit(g, tray.slots[q] ? sR : sB, lerp(a[0], b[0], e), lerp(a[1], b[1], e));
+    }
+  } else if (tray.mode === 'sorted') {
+    for (q = 0; q < n; q++) {
+      pos = sortPos(G, q); blit(g, q < tray.reds ? sR : sB, pos[0], pos[1]);
+    }
+  }
+
+  /* axis under the sample, with the bowl's true share marked */
+  var ay = G.y0 + G.gh + 10, p0 = trueP();
+  g.globalAlpha = 1;
+  g.strokeStyle = 'rgba(29,42,48,0.35)'; g.lineWidth = 1;
+  g.beginPath(); g.moveTo(G.x0, ay); g.lineTo(G.x0 + G.gw, ay); g.stroke();
+  var mxp = G.x0 + p0 * G.gw;
+  g.fillStyle = INK; g.beginPath(); g.moveTo(mxp, ay + 1); g.lineTo(mxp - 4.5, ay + 8); g.lineTo(mxp + 4.5, ay + 8); g.closePath(); g.fill();
+  g.font = '12px ' + SANS; g.fillStyle = GRAPH; g.textAlign = 'center';
+  g.fillText('bowl ' + (100 * p0).toFixed(0) + '%', clamp(mxp, G.x0 + 26, G.x0 + G.gw - 26), ay + 22);
+
+  /* readout */
+  var by = L.H - 24;
+  g.textAlign = 'left';
+  if (tray.landed > 0 && tray.mode !== 'empty') {
+    g.globalAlpha = alpha;
+    var share = 100 * tray.reds / tray.landed, big = share.toFixed(1) + '%';
+    var narrow = L.tw < 300;
+    g.font = '500 ' + (narrow ? 24 : 30) + 'px ' + SERIF; g.fillStyle = INK;
+    g.fillText(big, L.tx, by);
+    var bw = g.measureText(big).width;
+    g.font = '13.5px ' + SANS; g.fillStyle = GRAPH;
+    var diff = share - 100 * p0, sign = diff > 0.05 ? '+' : (diff < -0.05 ? '\u2212' : '');
+    var done = tray.mode !== 'draw';
+    g.fillText((done ? 'red in this sample' : 'red so far'), L.tx + bw + 12, by - 12);
+    g.fillText('off by ' + sign + Math.abs(diff).toFixed(1) + (narrow ? '' : ' points'), L.tx + bw + 12, by + 3);
+    g.globalAlpha = 1;
+  } else {
+    g.font = '13.5px ' + SANS; g.fillStyle = GRAPH;
+    g.fillText(running ? '' : 'Press Draw to take marbles from the bowl.', L.tx, by);
+  }
+  return G;
+}
+
+function drawFlights(g, L, G, t) {
+  var rt = G.s * 0.42, rb = bowl.r * L.R * 0.93;
+  for (var i = 0; i < flights.length; i++) {
+    var f = flights[i];
+    var u = clamp((t - f.t0) / f.dur, 0, 1);
+    if (u <= 0) continue;
+    var e = easeInOut(u), p = flightPos(L, G, f, e);
+    var r = lerp(rb, rt, e) + f.bump * Math.sin(Math.PI * u);
+    var s = sprite(f.c, Math.max(r, 2.5));
+    blit(g, s, p[0], p[1]);
+  }
+}
+
+function renderStage(t) {
+  var g = sg;
+  g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  g.clearRect(0, 0, SW, SH);
+  var L = layout();
+  drawBowl(g, L, t);
+  var G = drawTray(g, L, t);
+  drawFlights(g, L, G, t);
+}
+
+/* ---------------------------------------------------------------
+   The sampling distribution (dot plot)
+--------------------------------------------------------------- */
+var hist = { props: [], counts: new Int32Array(1001), dots: [], cap: 20, step: 0, w: 1 };
+/* Bins are whole numbers of red marbles, about one point wide, so that every
+   bin holds the same number of attainable sample shares (no aliasing). */
+function binWidth(n) { return Math.max(1, Math.ceil(n / 100)); }
+
+function computeCap() {
+  var N = cfg.N, K = bowl.K, n = nSample();
+  var lo = Math.max(0, n - (N - K)), hi = Math.min(n, K), lc = lchoose(N, n);
+  var w = binWidth(n), acc = new Float64Array(1001), mx = 0;
+  for (var k = lo; k <= hi; k++) {
+    acc[Math.floor(k / w)] += Math.exp(lchoose(K, k) + lchoose(N - K, n - k) - lc);
+  }
+  for (var b = 0; b < acc.length; b++) if (acc[b] > mx) mx = acc[b];
+  var e = SAMPLES * mx;
+  return Math.max(10, Math.ceil(e + 2.2 * Math.sqrt(e) + 2));
+}
+
+function histReset() {
+  hist.props = []; hist.counts = new Int32Array(1001); hist.dots = [];
+  hist.w = binWidth(nSample()); hist.cap = computeCap(); hist.step = 0;
+  updateReadouts();
+}
+
+function histAdd(prop, fall) {
+  var n = nSample(), w = hist.w, k = Math.round(prop * n), b = Math.floor(k / w), s = hist.counts[b]++;
+  var hiK = Math.min(n, b * w + w - 1);
+  var out = Math.abs(prop - trueP()) > 1.96 * seTheory() + 1e-9;
+  hist.dots.push({ x: (b * w + hiK) / 2 / n, s: s, t0: now(), fall: fall, out: out });
+  hist.props.push(prop);
+  if (s + 2 > hist.cap) hist.cap = s + 3;
+  updateReadouts();
+}
+
+function renderPlot(t) {
+  var g = pg, W = PW, H = PH;
+  g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  g.clearRect(0, 0, W, H);
+  var ml = 12, mr = 12, mt = 26, mb = 40, pw = W - ml - mr, ph = H - mt - mb, base = H - mb;
+  function X(v) { return ml + v * pw; }
+  var p = trueP(), se = seTheory();
+
+  /* theoretical 95 percent band */
+  if (se > 0) {
+    var lo = clamp(p - 1.96 * se, 0, 1), hi = clamp(p + 1.96 * se, 0, 1);
+    g.fillStyle = 'rgba(29,42,48,0.075)';
+    g.fillRect(X(lo), mt, X(hi) - X(lo), ph);
+  }
+
+  /* axis */
+  g.strokeStyle = 'rgba(29,42,48,0.55)'; g.lineWidth = 1;
+  g.beginPath(); g.moveTo(ml, base + 0.5); g.lineTo(ml + pw, base + 0.5); g.stroke();
+  g.font = '12px ' + SANS; g.fillStyle = GRAPH; g.textAlign = 'center'; g.textBaseline = 'alphabetic';
+  var every = pw < 520 ? 2 : 1;
+  for (var k = 0; k <= 10; k++) {
+    var x = Math.round(X(k / 10)) + 0.5;
+    g.beginPath(); g.moveTo(x, base); g.lineTo(x, base + 5); g.stroke();
+    if (k % every === 0) g.fillText((k * 10) + '%', clamp(x, ml + 12, ml + pw - 14), base + 20);
+  }
+  g.fillText('share of red marbles in the sample', ml + pw / 2, H - 2);
+
+  /* the truth */
+  var xp = Math.round(X(p)) + 0.5;
+  g.strokeStyle = INK; g.lineWidth = 1;
+  g.beginPath(); g.moveTo(xp, mt - 4); g.lineTo(xp, base); g.stroke();
+  g.fillStyle = INK; g.font = '500 12.5px ' + SANS;
+  g.fillText('bowl ' + (100 * p).toFixed(0) + '%', clamp(xp, ml + 30, ml + pw - 30), mt - 9);
+
+  /* dots */
+  var spacing = clamp(hist.w / nSample(), 0.01, 0.03);
+  var bw = Math.max(2, spacing * pw * 0.8);
+  var target = Math.min(bw * 1.3 + 2, (ph - 4) / hist.cap);
+  hist.step = hist.step ? lerp(hist.step, target, 0.15) : target;
+  var step = hist.step, bh = Math.max(1.5, step * 0.8);
+  g.fillStyle = INK; g.strokeStyle = INK; g.lineWidth = 1;
+  for (var i = 0; i < hist.dots.length; i++) {
+    var d = hist.dots[i];
+    var cx = X(d.x), yT = base - (d.s + 0.5) * step, y = yT;
+    var u = (t - d.t0) / d.fall;
+    if (u < 1) y = lerp(mt, yT, easeOut(clamp(u, 0, 1)));
+    if (d.out) g.strokeRect(cx - bw / 2 + 0.5, y - bh / 2 + 0.5, bw - 1, bh - 1);
+    else g.fillRect(cx - bw / 2, y - bh / 2, bw, bh);
+  }
+}
+
+/* ---------------------------------------------------------------
+   Readouts, legend, log
+--------------------------------------------------------------- */
+var el = {
+  go: document.getElementById('go'), clear: document.getElementById('clear'),
+  pct: document.getElementById('pct'), pctOut: document.getElementById('pct-out'), pctHint: document.getElementById('pct-hint'),
+  nsl: document.getElementById('nsl'), nOut: document.getElementById('n-out'), nHint: document.getElementById('n-hint'),
+  multi: document.getElementById('multi'), controls: document.getElementById('controls'),
+  count: document.getElementById('count'), bar: document.getElementById('bar'), legend: document.getElementById('legend'),
+  smean: document.getElementById('s-mean'), ssd: document.getElementById('s-sd'),
+  sse: document.getElementById('s-se'), sout: document.getElementById('s-out'),
+  log: document.getElementById('log'), emptyLog: document.getElementById('empty-log'), clearLog: document.getElementById('clear-log')
+};
+var runs = [];
+var running = false, token = 0, activeToken = -1, multiRun = false;
+
+function stats() {
+  var a = hist.props, k = a.length, mean = 0, sd = NaN, out = 0;
+  for (var i = 0; i < k; i++) mean += a[i];
+  mean = k ? mean / k : NaN;
+  if (k > 1) {
+    var ss = 0;
+    for (var j = 0; j < k; j++) ss += (a[j] - mean) * (a[j] - mean);
+    sd = Math.sqrt(ss / (k - 1));
+  }
+  for (var q = 0; q < hist.dots.length; q++) if (hist.dots[q].out) out++;
+  return { k: k, mean: mean, sd: sd, out: out };
+}
+
+function updateReadouts() {
+  var s = stats(), se = seTheory(), n = nSample();
+  el.smean.textContent = s.k ? (100 * s.mean).toFixed(1) + '%' : '\u00A0';
+  el.ssd.textContent = s.k > 1 ? (100 * s.sd).toFixed(1) + ' points' : '\u00A0';
+  el.sse.textContent = (100 * se).toFixed(1) + ' points';
+  el.sout.textContent = s.k ? s.out + ' of ' + fmt(s.k) : '\u00A0';
+
+  if (multiRun) {
+    el.count.textContent = s.k + ' of ' + SAMPLES + ' samples';
+    el.bar.style.width = (100 * s.k / SAMPLES) + '%';
+  } else {
+    el.count.textContent = s.k ? (s.k === 1 ? '1 sample' : fmt(s.k) + ' samples') : 'No samples yet';
+    el.bar.style.width = '0%';
+  }
+
+  if (se > 0) {
+    el.legend.textContent = 'Each block is one sample\u2019s estimate. Theory expects 95 of 100 blocks inside the shaded band, the bowl\u2019s share ' +
+      PM + ' ' + (196 * se).toFixed(1) + ' points; hollow blocks fall outside it.';
+  } else {
+    el.legend.textContent = 'The sample is the whole bowl, a census, so every estimate equals the truth and there is no sampling error to show.';
+  }
+}
+
+function updateControls() {
+  var n = nSample(), N = cfg.N;
+  el.pctOut.textContent = cfg.pct + '%';
+  el.pct.style.setProperty('--split', ((cfg.pct - 10) / 80 * 100) + '%');
+  el.pctHint.innerHTML = '<span class="swatch" style="background:' + RED + '"></span>' + fmt(Math.round(cfg.pct / 100 * N)) +
+    ' red &nbsp; <span class="swatch" style="background:' + BLUE + '"></span>' + fmt(N - Math.round(cfg.pct / 100 * N)) + ' blue';
+  el.nOut.textContent = fmt(n);
+  var frac = n / N;
+  el.nHint.textContent = n >= N ? 'The whole bowl: a census.' :
+    'That is ' + fmtPct(100 * frac) + ' percent of the bowl.';
+  el.go.textContent = running ? 'Stop' : (cfg.multi ? 'Draw 100 samples' : 'Draw one sample');
+  el.go.classList.toggle('stop', running);
+  el.controls.classList.toggle('busy', running);
+  var inputs = el.controls.querySelectorAll('.field input');
+  for (var i = 0; i < inputs.length; i++) inputs[i].disabled = running;
+  el.clear.disabled = running || hist.props.length === 0;
+}
+
+function logRun() {
+  var s = stats();
+  runs.unshift({ N: cfg.N, pct: cfg.pct, n: nSample(), sd: s.sd, se: seTheory() });
+  if (runs.length > 10) runs.pop();
+  var tb = el.log.querySelector('tbody');
+  tb.innerHTML = '';
+  for (var i = 0; i < runs.length; i++) {
+    var r = runs[i], frac = r.n / r.N, tr = document.createElement('tr');
+    if (i === 0) tr.className = 'new';
+    tr.innerHTML = '<td>' + fmt(r.N) + '</td><td>' + r.pct + '%</td><td>' + fmt(r.n) + '</td><td>' +
+      fmtPct(100 * frac) + '%</td><td>' +
+      (100 * r.sd).toFixed(1) + '</td><td>' + (100 * r.se).toFixed(1) + '</td>';
+    tb.appendChild(tr);
+  }
+  el.log.hidden = false; el.emptyLog.hidden = true; el.clearLog.hidden = false;
+}
+
+/* ---------------------------------------------------------------
+   Timing primitives
+--------------------------------------------------------------- */
+function frame() { return new Promise(function (res) { requestAnimationFrame(res); }); }
+function check() { if (activeToken !== token) throw CANCEL; }
+async function wait(ms, each) {
+  var t0 = now();
+  while (now() - t0 < ms) {
+    check();
+    if (each) each((now() - t0) / ms);
+    await frame();
+  }
+  check();
+}
+
+/* schedules: start times and flight durations for each draw, in ms */
+function scheduleSlow(n) {
+  var st = [], fl = [], bu = [], t = 0, iv = 560, S = Math.min(n, 5);
+  var floor = Math.max(3, 2600 / Math.max(1, n - S));
+  for (var k = 0; k < n; k++) {
+    st.push(t);
+    fl.push(k < S ? 720 : clamp(iv * 1.7, 210, 620));
+    bu.push(k < S ? 7 : (k < S + 4 ? 3 : 0));
+    if (k >= S - 1) iv = Math.max(floor, iv * 0.8);
+    t += iv;
+  }
+  return { start: st, flight: fl, bump: bu };
+}
+function scheduleQuick(n) {
+  var st = [], fl = [], bu = [], t = 0, iv = 300, floor = Math.max(2, 1500 / n);
+  for (var k = 0; k < n; k++) {
+    st.push(t); fl.push(clamp(iv * 1.8, 200, 480)); bu.push(k < 2 ? 4 : 0);
+    if (k >= 1) iv = Math.max(floor, iv * 0.78);
+    t += iv;
+  }
+  return { start: st, flight: fl, bump: bu };
+}
+function scheduleMedium(n) {
+  var st = [], fl = [], bu = [], iv = 1000 / n;
+  for (var k = 0; k < n; k++) { st.push(k * iv); fl.push(clamp(iv * 5, 220, 400)); bu.push(0); }
+  return { start: st, flight: fl, bump: bu };
+}
+
+/* ---------------------------------------------------------------
+   Choreography
+--------------------------------------------------------------- */
+async function shake(dur, amp) {
+  returnMarbles();
+  fx.shake = { t0: now(), dur: dur, amp: amp * (REDUCED ? 0.2 : 1) };
+  try {
+    await wait(dur, function (u) { churn(Math.sin(Math.PI * u)); });
+  } finally { fx.shake = null; }
+}
+
+async function animatedSample(sched, header) {
+  var n = nSample();
+  trayStart(n); tray.header = header;
+  var t0 = now(), k = 0;
+  while (k < n || flights.length) {
+    check();
+    var tn = now(), t = tn - t0;
+    while (k < n && sched.start[k] <= t) {
+      var j = Math.floor(Math.random() * bowl.poolLen), idx = bowl.pool[j];
+      bowl.pool[j] = bowl.pool[--bowl.poolLen];
+      bowl.present[idx] = 0; bowl.dirty = true;
+      flights.push({ idx: idx, slot: k, c: bowl.color[idx], t0: t0 + sched.start[k], dur: sched.flight[k], bump: sched.bump[k] });
+      k++;
+    }
+    for (var q = flights.length - 1; q >= 0; q--) {
+      var f = flights[q];
+      if (tn >= f.t0 + f.dur) {
+        tray.slots[f.slot] = f.c; tray.landed++;
+        if (f.c) tray.reds++;
+        flights.splice(q, 1);
+      }
+    }
+    await frame();
+  }
+  check();
+}
+
+async function sortTray(dur) {
+  var n = tray.n, a = 0, b = tray.reds, idx = new Int32Array(n);
+  for (var i = 0; i < n; i++) idx[i] = tray.slots[i] ? a++ : b++;
+  tray.sortIdx = idx; tray.sortDur = dur; tray.sortT0 = now(); tray.mode = 'sort';
+  await wait(dur + 170);
+  tray.mode = 'sorted';
+}
+
+async function runSingle() {
+  multiRun = false;
+  var first = hist.props.length === 0;
+  if (marblesOut()) await shake(850, 1);
+  var label = 'Sample ' + (hist.props.length + 1);
+  await animatedSample(first ? scheduleSlow(nSample()) : scheduleQuick(nSample()), label);
+  await sortTray(first ? 650 : 380);
+  histAdd(tray.reds / tray.n, 480);
+}
+
+async function runMulti() {
+  multiRun = true;
+  histReset();
+  var n = nSample();
+  if (marblesOut()) await shake(800, 1);
+
+  /* sample 1: slow at first, so the mechanics are visible */
+  await animatedSample(scheduleSlow(n), 'Sample 1 of ' + SAMPLES);
+  await sortTray(650);
+  histAdd(tray.reds / n, 520);
+  await wait(420);
+
+  /* samples 2 and 3: the same ritual, briskly */
+  for (var s = 2; s <= 3; s++) {
+    await shake(s === 2 ? 950 : 750, s === 2 ? 1 : 0.85);
+    await animatedSample(scheduleMedium(n), 'Sample ' + s + ' of ' + SAMPLES);
+    await sortTray(300);
+    histAdd(tray.reds / n, 400);
+    await wait(220);
+  }
+  await shake(600, 0.7);
+
+  /* the rest: fast, with the bowl kept in motion */
+  fx.vibe = 1;
+  var iv = 150;
+  for (var m = 4; m <= SAMPLES; m++) {
+    var reds = quickSample(n);
+    tray.n = n; tray.mode = 'sorted'; tray.reds = reds; tray.landed = n; tray.fadeT0 = 0;
+    tray.header = 'Sample ' + m + ' of ' + SAMPLES;
+    histAdd(reds / n, 280);
+    await wait(iv, function () { churn(0.25); });
+    iv = Math.max(30, iv * 0.93);
+  }
+  await wait(420, function (u) { fx.vibe = 1 - u; });
+  fx.vibe = 0;
+  logRun();
+}
+
+async function go() {
+  if (running) { token++; return; }
+  running = true;
+  var my = ++token;
+  activeToken = my;
+  updateControls();
+  try {
+    if (cfg.multi) await runMulti(); else await runSingle();
+  } catch (e) {
+    if (e !== CANCEL) console.error(e);
+    fx.shake = null; returnMarbles();
+  }
+  fx.vibe = 0;
+  running = false;
+  activeToken = -1;
+  updateControls();
+  updateReadouts();
+}
+
+/* ---------------------------------------------------------------
+   Controls
+--------------------------------------------------------------- */
+function resetForNewSettings(rebuild) {
+  if (rebuild === 'bowl') buildBowl();
+  else if (rebuild === 'paint') { paintBowl(); resetPool(); }
+  else resetPool();
+  flights.length = 0;
+  tray.n = nSample(); tray.header = ''; trayClear();
+  multiRun = false;
+  histReset();
+  updateControls();
+  updateCalc();
+}
+
+function syncNSlider() {
+  var maxIdx = NICE_N.length - 1;
+  while (NICE_N[maxIdx] > cfg.N) maxIdx--;
+  el.nsl.max = String(maxIdx);
+  if (cfg.nIdx > maxIdx) cfg.nIdx = maxIdx;
+  el.nsl.value = String(cfg.nIdx);
+}
+
+var radios = document.querySelectorAll('input[name=N]');
+for (var ri = 0; ri < radios.length; ri++) {
+  radios[ri].addEventListener('change', function (e) {
+    cfg.N = parseInt(e.target.value, 10);
+    syncNSlider();
+    resetForNewSettings('bowl');
+  });
+}
+el.pct.addEventListener('input', function () {
+  cfg.pct = parseInt(el.pct.value, 10);
+  resetForNewSettings('paint');
+});
+el.nsl.addEventListener('input', function () {
+  cfg.nIdx = parseInt(el.nsl.value, 10);
+  resetForNewSettings('pool');
+});
+el.multi.addEventListener('change', function () {
+  cfg.multi = el.multi.checked;
+  updateControls();
+});
+el.go.addEventListener('click', go);
+el.clear.addEventListener('click', function () {
+  if (running) return;
+  returnMarbles(); tray.header = ''; multiRun = false;
+  histReset(); updateControls();
+});
+el.clearLog.addEventListener('click', function () {
+  runs = []; el.log.querySelector('tbody').innerHTML = '';
+  el.log.hidden = true; el.emptyLog.hidden = false; el.clearLog.hidden = true;
+});
+
+/* ---------------------------------------------------------------
+   Sample size for a 95 percent interval
+--------------------------------------------------------------- */
+var Z = 1.96;
+var calc = { E: 0.03, mode: 'half' };
+var MARKS = [100, 1000, 10000, 100000, 250e6];
+function calcP() { return calc.mode === 'half' ? 0.5 : cfg.pct / 100; }
+function nZero(E, p) { return Z * Z * p * (1 - p) / (E * E); }
+function nNeeded(n0, N) { return n0 / (1 + (n0 - 1) / N); }
+function up(x) { return Math.ceil(x - 1e-9); }
+var calcEl = {
+  moe: document.getElementById('moe'), moeOut: document.getElementById('moe-out'),
+  pBowl: document.getElementById('p-bowl'), n0: document.getElementById('n0-val'),
+  n0txt: document.getElementById('n0-txt'), note: document.getElementById('calc-note')
+};
+
+function niceStep(max) {
+  var raw = max / 4, mag = Math.pow(10, Math.floor(Math.log10(raw))), f = raw / mag;
+  return (f < 1.5 ? 1 : f < 3.5 ? 2.5 : f < 7.5 ? 5 : 10) * mag;
+}
+
+function renderCurve() {
+  var g = cg, W = CW, H = CH, p = calcP(), n0 = nZero(calc.E, p);
+  g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  g.clearRect(0, 0, W, H);
+  var ml = 54, mr = 14, mt = 22, mb = 46, pw = W - ml - mr, ph = H - mt - mb, base = mt + ph;
+  var lx0 = 2, lx1 = 9, ymax = n0 * 1.14;
+  function X(N) { return ml + (Math.log10(N) - lx0) / (lx1 - lx0) * pw; }
+  function Y(n) { return base - n / ymax * ph; }
+
+  /* axes */
+  g.strokeStyle = 'rgba(29,42,48,0.55)'; g.lineWidth = 1;
+  g.beginPath(); g.moveTo(ml, base + 0.5); g.lineTo(ml + pw, base + 0.5); g.stroke();
+  g.font = '12px ' + SANS; g.fillStyle = GRAPH; g.textBaseline = 'alphabetic';
+  var names = { 2: '100', 4: '10,000', 6: '1 million', 8: '100 million' };
+  for (var e = lx0; e <= lx1; e++) {
+    var x = Math.round(X(Math.pow(10, e))) + 0.5;
+    g.beginPath(); g.moveTo(x, base); g.lineTo(x, base + (names[e] ? 5 : 3)); g.stroke();
+    if (names[e]) { g.textAlign = 'center'; g.fillText(names[e], clamp(x, ml + 14, ml + pw - 30), base + 19); }
+  }
+  g.textAlign = 'center';
+  g.fillText('size of the population, N (log scale)', ml + pw / 2, H - 4);
+  var st = niceStep(ymax);
+  g.textAlign = 'right';
+  for (var v = 0; v <= ymax + 1e-9; v += st) {
+    var y = Math.round(Y(v)) + 0.5;
+    g.strokeStyle = 'rgba(29,42,48,0.10)';
+    g.beginPath(); g.moveTo(ml, y); g.lineTo(ml + pw, y); g.stroke();
+    g.fillText(fmt(Math.round(v)), ml - 8, y + 4);
+  }
+
+  /* asymptote */
+  var ya = Math.round(Y(n0)) + 0.5;
+  g.strokeStyle = INK; g.setLineDash([4, 4]); g.lineWidth = 1;
+  g.beginPath(); g.moveTo(ml, ya); g.lineTo(ml + pw, ya); g.stroke();
+  g.setLineDash([]);
+  g.fillStyle = INK; g.textAlign = 'left'; g.font = 'italic 14px ' + SERIF;
+  g.fillText('n\u2080 = ' + fmt(up(n0)), ml + 6, ya - 7);
+
+  /* the curve */
+  g.strokeStyle = INK; g.lineWidth = 2;
+  g.beginPath();
+  for (var k = 0; k <= 240; k++) {
+    var N = Math.pow(10, lx0 + (lx1 - lx0) * k / 240), yy = Y(nNeeded(n0, N));
+    if (k === 0) g.moveTo(X(N), yy); else g.lineTo(X(N), yy);
+  }
+  g.stroke();
+
+  /* marked populations: the bowl sizes, and 250 million */
+  g.font = '12px ' + SANS;
+  for (var m = 0; m < MARKS.length; m++) {
+    var Nm = MARKS[m], nm = up(nNeeded(n0, Nm)), px = X(Nm), py = Y(nNeeded(n0, Nm));
+    var current = Nm === cfg.N;
+    g.beginPath(); g.arc(px, py, current ? 5 : 4, 0, 6.2832);
+    g.fillStyle = current ? RED : '#EEF1F0'; g.fill();
+    g.strokeStyle = current ? RED : INK; g.lineWidth = 1.5; g.stroke();
+    var lab = fmt(nm) + (Nm === 250e6 ? ' (250 million)' : '');
+    g.fillStyle = current ? RED : INK;
+    if (base - py < 28 && Nm !== 250e6) {
+      g.textAlign = 'center'; g.fillText(lab, px, py - 10);
+    } else {
+      g.textAlign = Nm === 250e6 ? 'right' : 'left';
+      g.fillText(lab, Nm === 250e6 ? px + 4 : px + 9, py + 18);
+    }
+  }
+}
+
+function updateCalc() {
+  var p = calcP(), n0 = nZero(calc.E, p), N = cfg.N, n = nSample();
+  calcEl.moeOut.textContent = PM + (100 * calc.E).toFixed(1) + ' points';
+  calcEl.pBowl.textContent = 'The bowl\u2019s, ' + cfg.pct + '%';
+  calcEl.n0.textContent = fmt(up(n0));
+  calcEl.n0txt.textContent = 'observations give a margin of ' + PM + (100 * calc.E).toFixed(1) +
+    ' points at 95 percent confidence, for a population of any size.';
+  var need = up(nNeeded(n0, N));
+  var got = n >= N ? 0 : Z * Math.sqrt(p * (1 - p) / n * (N - n) / (N - 1));
+  calcEl.note.textContent = 'The bowl now selected, ' + fmt(N) + ' marbles, needs a sample of ' + fmt(need) +
+    ' (marked in red). The ' + fmt(n) + ' marbles now set above give a margin of ' + PM + (100 * got).toFixed(1) +
+    ' points under the same assumed share.';
+  renderCurve();
+}
+
+calcEl.moe.addEventListener('input', function () { calc.E = parseFloat(calcEl.moe.value) / 100; updateCalc(); });
+var pRadios = document.querySelectorAll('input[name=passume]');
+for (var pi = 0; pi < pRadios.length; pi++) {
+  pRadios[pi].addEventListener('change', function (e) { calc.mode = e.target.value; updateCalc(); });
+}
+
+window.renderTex = function () {
+  if (!window.katex) return;
+  var els = document.querySelectorAll('.tex[data-tex]');
+  for (var i = 0; i < els.length; i++) {
+    try {
+      window.katex.render(els[i].getAttribute('data-tex'), els[i], { displayMode: els[i].classList.contains('eq'), throwOnError: false });
+      els[i].classList.add('done');
+    } catch (err) { /* keep the plain-text fallback */ }
+  }
+};
+if (window.katex) window.renderTex();
+
+/* ---------------------------------------------------------------
+   Boot
+--------------------------------------------------------------- */
+sizeCanvases();
+buildBowl();
+syncNSlider();
+tray.n = nSample(); trayClear();
+histReset();
+updateControls();
+updateCalc();
+
+if (window.ResizeObserver) {
+  var ro = new ResizeObserver(function () { sizeCanvases(); });
+  ro.observe(document.getElementById('stage-wrap'));
+  ro.observe(document.getElementById('plot-wrap'));
+  ro.observe(document.getElementById('curve-wrap'));
+} else {
+  window.addEventListener('resize', sizeCanvases);
+}
+
+function loop(t) {
+  renderStage(t);
+  renderPlot(t);
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
