@@ -263,8 +263,8 @@ input[type="range"] {
 }
 
 .matrix-input {
-  width: 92px;
-  min-width: 92px;
+  width: 100%;
+  min-width: 0;
   border: none;
   border-radius: 0;
   padding: 11px 8px;
@@ -275,6 +275,18 @@ input[type="range"] {
 .matrix-input.readonly {
   color: var(--muted);
   background: #f8fbff;
+}
+
+.matrix-table .matrix-input {
+  padding: 10px 6px;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.matrix-table .matrix-input::-webkit-inner-spin-button,
+.matrix-table .matrix-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .status-box {

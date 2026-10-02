@@ -697,7 +697,8 @@
           input.value = formatNumber(state.sigma[i][j], 2);
           input.dataset.row = String(i);
           input.dataset.col = String(j);
-          input.addEventListener('input', onSigmaChange);
+          input.addEventListener('input', onSigmaInput);
+          input.addEventListener('change', onSigmaCommit);
         }
         td.appendChild(input);
         tr.appendChild(td);
@@ -710,23 +711,39 @@
     elements.sigmaGrid.appendChild(table);
   }
 
-  function onSigmaChange(event) {
-    const row = Number(event.target.dataset.row);
-    const col = Number(event.target.dataset.col);
-    let value = Number(event.target.value);
-    if (!Number.isFinite(value)) {
-      value = 0;
-    }
-    if (row === col && value <= 0) {
-      value = 0.01;
-      event.target.value = formatNumber(value, 2);
-    }
+  function setSigmaEntry(row, col, value) {
     state.sigma[row][col] = value;
     state.sigma[col][row] = value;
     const mirror = elements.sigmaGrid.querySelector(`input[data-row="${col}"][data-col="${row}"]`);
-    if (mirror && mirror !== event.target) {
+    if (mirror && row !== col) {
       mirror.value = formatNumber(value, 2);
     }
+  }
+
+  function onSigmaInput(event) {
+    const row = Number(event.target.dataset.row);
+    const col = Number(event.target.dataset.col);
+    const text = event.target.value.trim();
+    const value = Number(text);
+    if (text === '' || !Number.isFinite(value) || (row === col && value <= 0)) {
+      return;
+    }
+    setSigmaEntry(row, col, value);
+  }
+
+  function onSigmaCommit(event) {
+    const row = Number(event.target.dataset.row);
+    const col = Number(event.target.dataset.col);
+    const text = event.target.value.trim();
+    let value = Number(text);
+    if (text === '' || !Number.isFinite(value)) {
+      value = state.sigma[row][col];
+    }
+    if (row === col && value <= 0) {
+      value = 0.01;
+    }
+    setSigmaEntry(row, col, value);
+    event.target.value = formatNumber(value, 2);
   }
 
   function applyPreset() {
@@ -983,20 +1000,31 @@
       text: ''
     }));
 
-    const labelCoords = loadings2d.map((loading, index) => {
+    const labelAnnotations = loadings2d.map((loading, index) => {
       const x = loading[0] * arrowScale;
       const y = loading[1] * arrowScale;
-      const length = Math.hypot(x, y);
+      let dx = x / maxScoreX;
+      let dy = y / maxScoreY;
+      let length = Math.hypot(dx, dy);
       if (length < 1e-6) {
         const angle = (-Math.PI / 2) + (index * 2 * Math.PI) / Math.max(names.length, 1);
-        return {
-          x: 0.28 * Math.cos(angle),
-          y: 0.28 * Math.sin(angle)
-        };
+        dx = Math.cos(angle);
+        dy = Math.sin(angle);
+        length = 1;
       }
       return {
-        x: x + (x / length) * 0.22,
-        y: y + (y / length) * 0.22
+        x,
+        y,
+        xref: 'x',
+        yref: 'y',
+        text: names[index],
+        showarrow: false,
+        xshift: (18 * dx) / length,
+        yshift: (18 * dy) / length,
+        font: {
+          color: vectorColor,
+          size: 13
+        }
       };
     });
 
@@ -1013,20 +1041,6 @@
           color: pointColor
         },
         hovertemplate: 'PC1: %{x:.3f}<br>PC2: %{y:.3f}<extra></extra>'
-      },
-      {
-        type: 'scatter',
-        mode: 'text',
-        x: labelCoords.map((entry) => entry.x),
-        y: labelCoords.map((entry) => entry.y),
-        text: names,
-        textposition: 'middle center',
-        textfont: {
-          color: vectorColor,
-          size: 13
-        },
-        hoverinfo: 'skip',
-        showlegend: false
       }
     ];
 
@@ -1043,7 +1057,7 @@
         title: `PC2 (${formatNumber((run.pca.explained[1] || 0) * 100, 1)}%)`,
         zeroline: true
       },
-      annotations: arrowAnnotations,
+      annotations: arrowAnnotations.concat(labelAnnotations),
       showlegend: false
     };
 

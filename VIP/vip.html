@@ -360,7 +360,7 @@
               data-bs-content="
                 <div class='small'>
                   More trees reduce Monte Carlo noise in importance and performance, but slow down the browser.
-                  Tthe default is small for responsiveness.
+                  The default is small for responsiveness.
                 </div>
               "
             >?</span>
@@ -534,7 +534,7 @@
       <div class="modal-body small">
         <h6 class="fw-semibold">1) Two importance measures</h6>
         <ul>
-          <li><b>Impurity importance</b> sums split gains during training. It is fast, but can be biased.</li>
+          <li><b>Impurity importance</b> sums split gains during training, each weighted by the share of cases that reach the split. It is fast, but can be biased.</li>
           <li><b>Permutation importance</b> measures test-set performance drop after shuffling one feature. It is slower, usually more interpretable.</li>
         </ul>
 
@@ -555,8 +555,12 @@
         <div class="mb-2">Cardinality experiment:</div>
         <div class="mono border rounded p-2 bg-light">
           Discretize x3 = checked<br>
-          Formula = x1 + 0.2 * x3<br>
+          Formula = x1 + 0.35 * x3<br>
           Importance = impurity (then compare to permutation)
+        </div>
+        <div class="small text-muted mt-2">
+          Discretized x3 takes the values 1 to 10, with a standard deviation near 2.9, so a coefficient of 0.35
+          gives it about the same effect on y as x1, whose standard deviation is 1.
         </div>
 
         <hr>
@@ -912,6 +916,7 @@ class DecisionTree {
       feature: best.feature,
       threshold: best.threshold,
       gain: best.gain,
+      n: n,
       left: this._buildTree(best.leftX, best.leftY, depth + 1),
       right: this._buildTree(best.rightX, best.rightY, depth + 1)
     };
@@ -967,15 +972,18 @@ class RandomForest {
       tree.fit(sampleX, sampleY);
       this.trees.push(tree);
 
-      this._accumulateGains(tree.tree);
+      this._accumulateGains(tree.tree, n);
     }
   }
 
-  _accumulateGains(node) {
+  // Mean decrease in impurity: each split's gain is weighted by the share of the
+  // tree's sample that reaches the node, so a split near the root counts for more
+  // than one deep in the tree that separates a handful of cases.
+  _accumulateGains(node, rootN) {
     if (!node || node.leaf) return;
-    this.impurityImportances[node.feature] += node.gain;
-    this._accumulateGains(node.left);
-    this._accumulateGains(node.right);
+    this.impurityImportances[node.feature] += node.gain * node.n / rootN;
+    this._accumulateGains(node.left, rootN);
+    this._accumulateGains(node.right, rootN);
   }
 
   predict(X) {
@@ -1066,10 +1074,16 @@ function rocCurve(yTrue, probs) {
   const tpr = [0];
   const fpr = [0];
 
-  for (const z of pairs) {
-    if (z.y === 1) tp++; else fp++;
+  // Cases with tied scores are passed together, so ties do not depend on sort order.
+  for (let i = 0; i < pairs.length; ) {
+    let j = i;
+    while (j < pairs.length && pairs[j].p === pairs[i].p) {
+      if (pairs[j].y === 1) tp++; else fp++;
+      j++;
+    }
     tpr.push(tp / pos);
     fpr.push(fp / neg);
+    i = j;
   }
 
   let auc = 0;
@@ -1461,10 +1475,18 @@ document.getElementById("preset_cardinality").addEventListener("click", () => {
   document.getElementById("rho_pair").value = "0.0";
   document.getElementById("rho_rest").value = "0.0";
   document.getElementById("x3_discrete").checked = true;
-  document.getElementById("formula").value = "2*x3 + x1";
+  document.getElementById("formula").value = "x1 + 0.35 * x3";
   document.getElementById("imp_type").value = "impurity";
   updateSliderLabel("rho_pair");
   updateSliderLabel("rho_rest");
+});
+
+// Plots drawn while their tab is hidden take a default size; resize on display.
+document.querySelectorAll('a[data-bs-toggle="tab"]').forEach(tab => {
+  tab.addEventListener("shown.bs.tab", () => {
+    const pane = document.querySelector(tab.getAttribute("data-bs-target"));
+    pane.querySelectorAll(".js-plotly-plot").forEach(el => Plotly.Plots.resize(el));
+  });
 });
 
 // Bootstrap popovers

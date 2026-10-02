@@ -188,9 +188,9 @@
         <button id="close-about" class="secondary-button" type="button" style="border:none;">✕</button>
       </div>
       <div class="modal-body">
-        <p><strong>Data Generating Process:</strong> This demo simulates an N × N binary matrix image grid with a line drawn from the center outward at various angles (0° to 360°), forming a circular "clock hand" manifold. Microscopic Gaussian noise is added to prevent perfectly duplicated rows which mathematically fracture non-linear neighborhood algorithms.</p>
-        <p><strong>Pure JS Implementation:</strong> Classic algorithms like Isomap, LLE, and LE are executed completely within your browser via optimized local matrix manipulation (Power Iterations, Gaussian Elimination, Shortest Path tracing).</p>
-        <p><strong>UMAP & t-SNE:</strong> We utilize the official <code>umap-js</code> and <code>tsnejs</code> libraries for authentic, production-grade output distributions identical to their Python counterparts.</p>
+        <p><strong>Data Generating Process:</strong> This demo simulates N binary images of size S × S with a line drawn from the center outward at various angles (0° to 360°), forming a circular "clock hand" manifold. Microscopic Gaussian noise is added to prevent perfectly duplicated rows which mathematically fracture non-linear neighborhood algorithms.</p>
+        <p><strong>Pure JS Implementation:</strong> The classic algorithms are written in plain JavaScript and run in your browser. PCA, kernel PCA, and Isomap find their leading eigenvectors by power iteration. LLE and Laplacian eigenmaps need eigenvectors whose eigenvalues lie too close together for power iteration to separate, so they use a full symmetric eigendecomposition. Isomap gets its geodesic distances from Floyd-Warshall shortest paths, and LLE solves for its reconstruction weights by Gaussian elimination.</p>
+        <p><strong>UMAP & t-SNE:</strong> These come from two JavaScript libraries: <code>umap-js</code>, written at Google's PAIR group, and <code>tsne</code>, a packaged fork of Andrej Karpathy's <code>tsnejs</code>. Both implement the published algorithms, but their embeddings will not match those of the Python implementations exactly.</p>
         <p><strong>Scree Plot (Intrinsic Dimensionality):</strong> The Scree plot dynamically computes the variance explained by the top 10 Principal Components of the <em>raw</em> data. Watch how increasing the Gaussian noise flattens the curve, indicating a shattered manifold!</p>
       </div>
     </div>
@@ -368,6 +368,133 @@ function powerIteration(A, num_components, num_iterations = 300) {
     return { eigenvalues, eigenvectors };
 }
 
+// Symmetric eigen-decomposition: Householder tridiagonalization followed by
+// the implicit QL algorithm (after the public-domain JAMA routines tred2/tql2).
+// Returns eigenvalues in ascending order and the matching unit eigenvectors.
+function symmetricEigen(A) {
+    const n = A.length;
+    const V = Array.from({length: n}, (_, i) => Float64Array.from(A[i]));
+    const d = new Float64Array(n), e = new Float64Array(n);
+
+    // Householder reduction to tridiagonal form (tred2)
+    for (let j = 0; j < n; j++) d[j] = V[n - 1][j];
+    for (let i = n - 1; i > 0; i--) {
+        let scale = 0, h = 0;
+        for (let k = 0; k < i; k++) scale += Math.abs(d[k]);
+        if (scale === 0) {
+            e[i] = d[i - 1];
+            for (let j = 0; j < i; j++) { d[j] = V[i - 1][j]; V[i][j] = 0; V[j][i] = 0; }
+        } else {
+            for (let k = 0; k < i; k++) { d[k] /= scale; h += d[k] * d[k]; }
+            let f = d[i - 1];
+            let g = Math.sqrt(h);
+            if (f > 0) g = -g;
+            e[i] = scale * g;
+            h -= f * g;
+            d[i - 1] = f - g;
+            for (let j = 0; j < i; j++) e[j] = 0;
+            for (let j = 0; j < i; j++) {
+                f = d[j];
+                V[j][i] = f;
+                g = e[j] + V[j][j] * f;
+                for (let k = j + 1; k <= i - 1; k++) {
+                    g += V[k][j] * d[k];
+                    e[k] += V[k][j] * f;
+                }
+                e[j] = g;
+            }
+            f = 0;
+            for (let j = 0; j < i; j++) { e[j] /= h; f += e[j] * d[j]; }
+            const hh = f / (h + h);
+            for (let j = 0; j < i; j++) e[j] -= hh * d[j];
+            for (let j = 0; j < i; j++) {
+                f = d[j]; g = e[j];
+                for (let k = j; k <= i - 1; k++) V[k][j] -= (f * e[k] + g * d[k]);
+                d[j] = V[i - 1][j];
+                V[i][j] = 0;
+            }
+        }
+        d[i] = h;
+    }
+    for (let i = 0; i < n - 1; i++) {
+        V[n - 1][i] = V[i][i];
+        V[i][i] = 1;
+        const h = d[i + 1];
+        if (h !== 0) {
+            for (let k = 0; k <= i; k++) d[k] = V[k][i + 1] / h;
+            for (let j = 0; j <= i; j++) {
+                let g = 0;
+                for (let k = 0; k <= i; k++) g += V[k][i + 1] * V[k][j];
+                for (let k = 0; k <= i; k++) V[k][j] -= g * d[k];
+            }
+        }
+        for (let k = 0; k <= i; k++) V[k][i + 1] = 0;
+    }
+    for (let j = 0; j < n; j++) { d[j] = V[n - 1][j]; V[n - 1][j] = 0; }
+    V[n - 1][n - 1] = 1;
+    e[0] = 0;
+
+    // Work with eigenvectors as rows from here on, so that each plane
+    // rotation touches two contiguous arrays.
+    const W = Array.from({length: n}, () => new Float64Array(n));
+    for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) W[j][i] = V[i][j];
+
+    // Implicit QL iterations on the tridiagonal matrix (tql2)
+    for (let i = 1; i < n; i++) e[i - 1] = e[i];
+    e[n - 1] = 0;
+    let f = 0, tst1 = 0;
+    const eps = Math.pow(2, -52);
+    for (let l = 0; l < n; l++) {
+        tst1 = Math.max(tst1, Math.abs(d[l]) + Math.abs(e[l]));
+        let m = l;
+        while (m < n - 1 && Math.abs(e[m]) > eps * tst1) m++;
+        if (m > l) {
+            let guard = 0;
+            do {
+                if (++guard > 100) throw new Error('Eigen-decomposition did not converge.');
+                let g = d[l];
+                let p = (d[l + 1] - g) / (2 * e[l]);
+                let r = Math.hypot(p, 1);
+                if (p < 0) r = -r;
+                d[l] = e[l] / (p + r);
+                d[l + 1] = e[l] * (p + r);
+                const dl1 = d[l + 1];
+                let h = g - d[l];
+                for (let i = l + 2; i < n; i++) d[i] -= h;
+                f += h;
+                p = d[m];
+                let c = 1, c2 = 1, c3 = 1, s = 0, s2 = 0;
+                const el1 = e[l + 1];
+                for (let i = m - 1; i >= l; i--) {
+                    c3 = c2; c2 = c; s2 = s;
+                    g = c * e[i];
+                    h = c * p;
+                    r = Math.hypot(p, e[i]);
+                    e[i + 1] = s * r;
+                    s = e[i] / r;
+                    c = p / r;
+                    p = c * d[i] - s * g;
+                    d[i + 1] = h + s * (c * g + s * d[i]);
+                    const wi = W[i], wi1 = W[i + 1];
+                    for (let k = 0; k < n; k++) {
+                        h = wi1[k];
+                        wi1[k] = s * wi[k] + c * h;
+                        wi[k] = c * wi[k] - s * h;
+                    }
+                }
+                p = -s * s2 * c3 * el1 * e[l] / dl1;
+                e[l] = s * p;
+                d[l] = c * p;
+            } while (Math.abs(e[l]) > eps * tst1);
+        }
+        d[l] += f;
+        e[l] = 0;
+    }
+
+    const order = Array.from({length: n}, (_, i) => i).sort((a, b) => d[a] - d[b]);
+    return { values: order.map(i => d[i]), vectors: order.map(i => W[i]) };
+}
+
 /**
  * 3. ALGORITHM IMPLEMENTATIONS
  */
@@ -522,32 +649,28 @@ function runLLE(X, k) {
         for(let a=0; a<k; a++) W[i][neighbors[a]] = wLocal[a] / sumW;
     }
     
-    let I_minus_W = Array.from({length:n}, (_, i) => {
-        let row = new Float64Array(n);
-        for(let j=0; j<n; j++) row[j] = (i===j ? 1 : 0) - W[i][j];
-        return row;
-    });
+    // M = (I - W)'(I - W) = I - W - W' + W'W, assembled from the k nonzero weights per row
     let M = Array.from({length:n}, () => new Float64Array(n));
     for(let i=0; i<n; i++) {
-        for(let j=i; j<n; j++) {
-            let val = 0;
-            for(let a=0; a<n; a++) val += I_minus_W[a][i] * I_minus_W[a][j];
-            M[i][j] = val; M[j][i] = val;
+        M[i][i] += 1;
+        for(let j=0; j<n; j++) {
+            if (W[i][j] !== 0) { M[i][j] -= W[i][j]; M[j][i] -= W[i][j]; }
         }
     }
-    
-    // M has smallest eigenvectors at 0. Since power iteration finds largest, we transform M' = lmax * I - M 
-    let lmax = powerIteration(M, 1).eigenvalues[0] * 1.05;
-    let M_prime = Array.from({length:n}, () => new Float64Array(n));
-    for(let i=0; i<n; i++) {
-        for(let j=0; j<n; j++) M_prime[i][j] = (i===j ? lmax : 0) - M[i][j];
+    for(let a=0; a<n; a++) {
+        let row = W[a], nz = [];
+        for(let j=0; j<n; j++) if (row[j] !== 0) nz.push(j);
+        for (const b of nz) for (const c of nz) M[b][c] += row[b] * row[c];
     }
-    
-    let res = powerIteration(M_prime, 3);
+
+    // The embedding is given by the eigenvectors of M with the 2nd and 3rd smallest
+    // eigenvalues (the smallest belongs to the constant vector). These eigenvalues are
+    // tiny and nearly equal, so power iteration on a shifted matrix cannot separate them.
+    let res = symmetricEigen(M);
     let Y = Array.from({length:n}, () => new Float64Array(2));
     for(let i=0; i<n; i++) {
-        Y[i][0] = res.eigenvectors[1][i];
-        Y[i][1] = res.eigenvectors[2][i];
+        Y[i][0] = res.vectors[1][i];
+        Y[i][1] = res.vectors[2][i];
     }
     return Y;
 }
@@ -580,13 +703,15 @@ function runLE(X, k) {
     let S = Array.from({length:n}, () => new Float64Array(n));
     for(let i=0; i<n; i++) for(let j=0; j<n; j++) S[i][j] = degInvSqrt[i] * W[i][j] * degInvSqrt[j];
     
-    let res = powerIteration(S, 3);
+    // The leading eigenvalues of S all lie close to 1, too close for power iteration
+    // to converge; the exact eigensolver returns them in ascending order.
+    let res = symmetricEigen(S);
     let Y = Array.from({length:n}, () => new Float64Array(2));
     
     // Fixed Bug: Removed redundant *degInvSqrt[i] scaling that caused cluster crunching
     for(let i=0; i<n; i++) {
-        Y[i][0] = res.eigenvectors[1][i]; 
-        Y[i][1] = res.eigenvectors[2][i];
+        Y[i][0] = res.vectors[n - 2][i];
+        Y[i][1] = res.vectors[n - 3][i];
     }
     return Y;
 }
@@ -595,6 +720,10 @@ function runLE(X, k) {
 /**
  * UI & INTERACTION CONTROLLER
  */
+// Plotly has no built-in cyclic color scale, so build one: hue runs once around the
+// color wheel, and 0 and 360 degrees get the same color.
+const HUE_WHEEL = Array.from({length: 13}, (_, i) => [i / 12, `hsl(${i * 30}, 85%, 50%)`]);
+
 const methodConfigs = {
     PCA: [],
     KPCA: [ 
@@ -823,7 +952,7 @@ function runDR() {
                 type: 'scatter',
                 marker: {
                     color: data.angles,
-                    colorscale: 'HSV', cmin: 0, cmax: 360,
+                    colorscale: HUE_WHEEL, cmin: 0, cmax: 360,
                     size: 8, opacity: 0.8,
                     colorbar: { title: 'Angle °' }
                 },
