@@ -487,6 +487,7 @@
   };
 
   const elements = {
+    controlsPanel: document.querySelector('.controls-panel'),
     variableCount: document.getElementById('variable-count'),
     presetSelect: document.getElementById('preset-select'),
     nSlider: document.getElementById('n-slider'),
@@ -1172,6 +1173,11 @@
     document.body.style.overflow = '';
   }
 
+  function syncControlsPosition() {
+    const panel = elements.controlsPanel;
+    panel.classList.toggle('is-static', panel.offsetHeight + 36 > window.innerHeight);
+  }
+
   function initializeControls() {
     state.p = Number(elements.variableCount.value);
     state.n = Number(elements.nSlider.value);
@@ -1231,6 +1237,9 @@
     elements.runButton.disabled = false;
     elements.runButton.textContent = 'Run PCA';
   });
+
+  window.addEventListener('resize', syncControlsPosition);
+  new ResizeObserver(syncControlsPosition).observe(elements.controlsPanel);
 
   initializeControls();
   runAnalysis();

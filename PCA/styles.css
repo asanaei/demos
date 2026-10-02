@@ -128,6 +128,10 @@ h1 {
   top: 18px;
 }
 
+.controls-panel.is-static {
+  position: static;
+}
+
 .panel-header {
   margin-bottom: 16px;
 }
@@ -455,6 +459,10 @@ input[type="range"] {
     grid-column: 1 / -1;
   }
 
+  .controls-panel {
+    position: static;
+  }
+
   .plot-grid {
     grid-template-columns: 1fr;
   }
@@ -471,7 +479,11 @@ input[type="range"] {
   }
 
   .dashboard-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .results-panel {
+    grid-column: auto;
   }
 
   .controls-panel {
@@ -567,7 +579,7 @@ input[type="range"] {
   line-height: 1.45;
   text-align: left;
   white-space: normal;
-  opacity: 0;
+  display: none;
   pointer-events: none;
   z-index: 40;
 }
@@ -581,7 +593,7 @@ input[type="range"] {
   border-width: 6px;
   border-style: solid;
   border-color: transparent transparent #0f172a transparent;
-  opacity: 0;
+  display: none;
   pointer-events: none;
   z-index: 41;
 }
@@ -590,7 +602,7 @@ input[type="range"] {
 .help-dot:hover::before,
 .help-dot:focus-visible::after,
 .help-dot:focus-visible::before {
-  opacity: 1;
+  display: block;
 }
 
 .help-dot:focus-visible {
