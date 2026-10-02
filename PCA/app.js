@@ -939,11 +939,11 @@
     if (state.scale) {
       shapes.push({
         type: 'line',
-        x0: 1,
-        x1: state.p,
+        x0: 0,
+        x1: 1,
         y0: 1,
         y1: 1,
-        xref: 'x',
+        xref: 'paper',
         yref: 'y',
         line: { dash: 'dot', color: '#ef4444', width: 2 }
       });
