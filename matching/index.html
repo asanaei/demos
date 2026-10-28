@@ -1,0 +1,2465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Comparing like with like: matching</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;1,400&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" onload="window.renderTex &amp;&amp; window.renderTex()"></script>
+<style>
+:root {
+  --paper: #EEF1F0;
+  --ink: #1D2A30;
+  --graphite: #57656B;
+  --rule: #CBD2D1;
+  --trt: #C4630A;
+  --ctl: #2A5EA8;
+  --serif: "Spectral", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --sans: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --tint: #E3E8E7;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--paper); color: var(--ink); }
+body { font-family: var(--sans); font-size: 15px; line-height: 1.45; }
+.wrap { max-width: 1340px; margin: 0 auto; padding: 22px 32px 56px; }
+
+header h1 {
+  font-family: var(--serif); font-weight: 500; font-size: 34px; line-height: 1.12;
+  letter-spacing: -0.012em; margin: 0 0 6px;
+}
+header p {
+  font-family: var(--serif); font-size: 17px; line-height: 1.5; color: var(--graphite);
+  max-width: 84ch; margin: 0;
+}
+
+.main { display: grid; grid-template-columns: 222px minmax(0, 1fr); gap: 0 30px; margin-top: 18px; }
+
+/* controls */
+.controls { border-right: 1px solid var(--rule); padding: 2px 26px 0 0; }
+.controls h3 { font-family: var(--serif); font-weight: 500; font-size: 17px; margin: 0 0 12px; }
+.group + .group { margin-top: 6px; padding-top: 16px; border-top: 1px solid var(--rule); }
+.field { margin-bottom: 18px; }
+.field > .label-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 7px; }
+.field .name { font-weight: 500; }
+.field output { font-variant-numeric: tabular-nums; color: var(--graphite); }
+.hint { font-size: 13px; color: var(--graphite); margin: 5px 0 0; }
+
+.seg { display: flex; border: 1px solid var(--ink); border-radius: 7px; overflow: hidden; }
+.seg label { flex: 1; position: relative; }
+.seg input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.seg span {
+  display: block; text-align: center; padding: 6px 0; font-size: 14px; font-variant-numeric: tabular-nums;
+  border-left: 1px solid var(--ink); cursor: pointer; user-select: none;
+}
+.seg label:first-child span { border-left: 0; }
+.seg input:checked + span { background: var(--ink); color: var(--paper); }
+.seg input:focus-visible + span { outline: 2px solid var(--ctl); outline-offset: -4px; }
+.seg.small span { font-size: 13px; }
+.seg.stack { flex-direction: column; }
+.seg.stack span { border-left: 0; border-top: 1px solid var(--ink); text-align: left; padding: 8px 12px; font-size: 15px; }
+.seg.stack label:first-child span { border-top: 0; }
+
+input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 22px; background: transparent; margin: 0; }
+input[type=range]::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: #AEB9B9; }
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%;
+  background: var(--paper); border: 2px solid var(--ink); margin-top: -7px; cursor: pointer;
+}
+input[type=range]::-moz-range-track { height: 4px; border-radius: 2px; background: #AEB9B9; }
+input[type=range]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--paper); border: 2px solid var(--ink); cursor: pointer; }
+input[type=range]:focus-visible { outline: 2px solid var(--ctl); outline-offset: 3px; border-radius: 4px; }
+
+.toggle { display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; }
+.toggle input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.toggle .track {
+  width: 38px; height: 22px; border-radius: 11px; background: #AEB9B9; position: relative;
+  transition: background 0.18s; flex: none;
+}
+.toggle .track::after {
+  content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px;
+  border-radius: 50%; background: var(--paper); transition: transform 0.18s;
+}
+.toggle input:checked + .track { background: var(--ink); }
+.toggle input:checked + .track::after { transform: translateX(16px); }
+.toggle input:focus-visible + .track { outline: 2px solid var(--ctl); outline-offset: 2px; }
+
+.buttons { display: flex; flex-direction: column; gap: 6px; margin-top: -4px; }
+button {
+  font: inherit; font-weight: 500; border-radius: 7px; padding: 10px 14px; cursor: pointer;
+  border: 1px solid var(--ink); background: transparent; color: var(--ink);
+}
+button.primary { background: var(--ink); color: var(--paper); font-size: 16px; padding: 12px 14px; }
+button:focus-visible { outline: 2px solid var(--ctl); outline-offset: 2px; }
+button:disabled { opacity: 0.4; cursor: default; }
+button.quiet { border-color: transparent; color: var(--graphite); padding: 4px 0; text-align: left; text-decoration: underline; text-underline-offset: 3px; font-weight: 400; }
+[hidden] { display: none !important; }
+
+/* stage */
+.legend { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 22px; font-size: 14px; color: var(--graphite); min-height: 24px; }
+.legend .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: -0.5px; }
+.legend .dot.ring { border: 1.5px solid var(--graphite); width: 9px; height: 9px; }
+.stage-wrap { position: relative; height: 480px; margin-top: 6px; }
+#stage { display: block; width: 100%; height: 100%; touch-action: manipulation; }
+.tip {
+  position: absolute; pointer-events: none; background: var(--paper); border: 1px solid var(--ink);
+  border-radius: 6px; padding: 6px 9px; font-size: 13px; line-height: 1.35; white-space: nowrap;
+  font-variant-numeric: tabular-nums; opacity: 0; transition: opacity 0.12s; z-index: 2;
+}
+.tip.on { opacity: 1; }
+.tip b { font-weight: 600; }
+.caption { font-family: var(--serif); font-style: italic; font-size: 16px; color: var(--graphite); margin: 6px 0 0; min-height: 1.5em; }
+
+/* readouts */
+.readouts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 34px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--rule); }
+.readouts h2 { font-family: var(--serif); font-weight: 500; font-size: 20px; margin: 0; }
+.reg-eq { font-size: 14px; color: var(--ink); }
+.reg-eq .katex { font-size: 1.02em; }
+#reg { display: block; width: 100%; }
+.reg-note { font-family: var(--serif); font-size: 15px; line-height: 1.5; color: var(--graphite); margin: 6px 0 0; }
+.key { font-size: 13px; color: var(--graphite); margin: 4px 0 2px; display: flex; gap: 14px; flex-wrap: wrap; }
+.key i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 5px; vertical-align: 0; font-style: normal; }
+.key .hollow { border: 1.5px solid var(--graphite); }
+.key .solid { background: var(--ink); }
+#love, #est { display: block; width: 100%; }
+.readouts .key { margin-bottom: 6px; }
+.counts { margin: 8px 0 0; display: grid; grid-template-columns: 1fr auto; gap: 2px 0; font-size: 14px; }
+.counts dt { color: var(--graphite); }
+.counts dd { margin: 0; padding-left: 10px; text-align: right; font-variant-numeric: tabular-nums; }
+.counts .sum { color: var(--ink); font-weight: 500; border-top: 1px solid var(--rule); padding-top: 3px; }
+.method-note { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--rule); font-family: var(--serif); font-size: 16px; line-height: 1.58; }
+.method-note h3 { font-family: var(--serif); font-weight: 500; font-size: 18px; margin: 0 0 4px; }
+.method-note p { margin: 0 0 8px; max-width: 74ch; }
+.method-note .katex { font-size: 1em; }
+.method-note .r-line { margin: 10px 0 0; display: flex; align-items: baseline; gap: 10px; max-width: none; }
+.r-line .r-label { font-family: var(--sans); font-size: 12.5px; color: var(--graphite); flex: none; }
+.r-line code { font: 13px/1.5 var(--mono); background: var(--tint); padding: 3px 8px; border-radius: 5px; white-space: pre-wrap; word-break: break-word; }
+.r-note { font-family: var(--sans); font-size: 13px; color: var(--graphite); margin: 6px 0 0; }
+.rcode { margin-top: 32px; padding-top: 22px; border-top: 1px solid var(--rule); }
+.rcode-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.rcode h2 { font-family: var(--serif); font-weight: 500; font-size: 20px; margin: 0; }
+.rcode-actions { display: flex; gap: 8px; }
+.rcode-actions button { padding: 6px 14px; font-size: 14px; }
+.rcode-lede { font-family: var(--serif); font-size: 16px; line-height: 1.55; color: var(--graphite); max-width: 82ch; margin: 6px 0 8px; }
+.rcode-lede code { font: 14px var(--mono); }
+.rcode summary { cursor: pointer; font-weight: 500; padding: 6px 0; width: max-content; }
+.rcode summary:focus-visible { outline: 2px solid var(--ctl); outline-offset: 3px; border-radius: 3px; }
+.rcode pre { margin: 6px 0 0; padding: 16px 18px; background: var(--tint); border-radius: 8px; overflow: auto; max-height: 72vh; font: 13px/1.55 var(--mono); color: var(--ink); }
+.rcode .c { color: var(--graphite); font-style: italic; }
+.rcode .s { color: #8A4A0C; }
+
+/* lower */
+.lower { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 56px; margin-top: 34px; padding-top: 24px; border-top: 1px solid var(--rule); }
+.lower h2, .notes h2 { font-family: var(--serif); font-weight: 500; font-size: 20px; margin: 0; }
+.log-head, .rep-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.empty-log { color: var(--graphite); font-size: 14px; margin-top: 10px; }
+.lower > div { min-width: 0; }
+.log-scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; margin-top: 10px; font-size: 14px; font-variant-numeric: tabular-nums; }
+th { font-weight: 500; color: var(--graphite); text-align: right; padding: 4px 8px; border-bottom: 1px solid var(--ink); white-space: nowrap; }
+td { text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--rule); }
+th:first-child, td:first-child { text-align: left; padding-left: 0; }
+td:first-child { white-space: normal; }
+td .sub { display: block; color: var(--graphite); font-size: 12.5px; }
+tr.new td { animation: settle 1.2s ease-out; }
+@keyframes settle { from { background: rgba(29, 42, 48, 0.08); } to { background: transparent; } }
+.rep-head button { padding: 7px 14px; font-size: 14px; }
+.rep-wrap { margin-top: 10px; }
+#rep { display: block; width: 100%; height: 170px; }
+.rep-note { font-size: 13.5px; color: var(--graphite); margin: 6px 0 0; }
+
+.notes { margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--rule); font-family: var(--serif); font-size: 16.5px; line-height: 1.62;
+  columns: 2 30em; column-gap: 56px; }
+.notes h2 { column-span: all; margin-bottom: 4px; }
+.notes p { margin: 0 0 12px; max-width: 66ch; break-inside: avoid; }
+.tex:not(.done) { font-style: italic; }
+.refs { margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--rule); font-family: var(--serif); font-size: 14.5px; line-height: 1.5; }
+.refs h2 { font-family: var(--serif); font-weight: 500; font-size: 17px; margin: 0 0 10px; }
+.refs p { margin: 0 0 6px; padding-left: 2em; text-indent: -2em; max-width: 92ch; }
+
+@media (max-width: 1180px) {
+  .readouts { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 32px; }
+}
+@media (max-width: 860px) {
+  .wrap { padding: 20px 18px 40px; }
+  header h1 { font-size: 29px; }
+  .main { grid-template-columns: minmax(0, 1fr); }
+  .controls { border-right: 0; border-bottom: 1px solid var(--rule); padding: 0 0 8px; margin-bottom: 14px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 0 24px; }
+  .group + .group { margin-top: 0; padding-top: 0; border-top: 0; }
+  .lower { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+}
+@media (max-width: 560px) {
+  .controls { grid-template-columns: 1fr; }
+  .readouts { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+  th, td { padding-left: 5px; padding-right: 5px; }
+  td:first-child { min-width: 9em; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .toggle .track, .toggle .track::after, .tip { transition: none; }
+  tr.new td { animation: none; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Comparing like with like</h1>
+    <p>The respondents who saw a campaign ad are older and more ideologically extreme than those who did not, and both traits shape support for the policy it promotes. Matching builds, from those who did not see the ad, a comparison group that resembles those who did.</p>
+  </header>
+
+  <div class="main">
+    <aside class="controls" id="controls">
+      <div class="group">
+        <h3>Matching</h3>
+        <div class="field">
+          <div class="seg stack" role="radiogroup" aria-label="Matching method">
+            <label><input type="radio" name="method" value="cem"><span>Coarsened exact</span></label>
+            <label><input type="radio" name="method" value="nn" checked><span>Nearest neighbor</span></label>
+            <label><input type="radio" name="method" value="ps"><span>Propensity score</span></label>
+          </div>
+        </div>
+        <div class="buttons field">
+          <button class="primary" id="go">Match</button>
+          <button class="quiet" id="undo" disabled>Undo matching</button>
+        </div>
+
+        <div id="opt-cem" hidden>
+          <div class="field">
+            <div class="label-row"><label class="name" for="bins">Bins per variable</label><output id="bins-out" for="bins"></output></div>
+            <input type="range" id="bins" min="0" max="9" step="1" value="3">
+            <p class="hint">Finer bins approach exact matching.</p>
+          </div>
+        </div>
+
+        <div id="opt-nn">
+          <div class="field">
+            <div class="label-row"><span class="name" id="lbl-dist">Distance</span></div>
+            <div class="seg" role="radiogroup" aria-labelledby="lbl-dist">
+              <label><input type="radio" name="dist" value="maha" checked><span>Mahalanobis</span></label>
+              <label><input type="radio" name="dist" value="raw"><span>Unscaled</span></label>
+            </div>
+          </div>
+        </div>
+
+        <div id="opt-ps" hidden>
+          <div class="field">
+            <div class="label-row"><span class="name" id="lbl-model">Propensity model</span></div>
+            <div class="seg" role="radiogroup" aria-labelledby="lbl-model">
+              <label><input type="radio" name="psmodel" value="lin" checked><span>Linear</span></label>
+              <label><input type="radio" name="psmodel" value="sq"><span>With squares</span></label>
+            </div>
+          </div>
+        </div>
+
+        <div id="opt-pairs">
+          <div class="field">
+            <div class="label-row"><span class="name" id="lbl-ratio">Controls per treated</span></div>
+            <div class="seg" role="radiogroup" aria-labelledby="lbl-ratio">
+              <label><input type="radio" name="ratio" value="1" checked><span>1</span></label>
+              <label><input type="radio" name="ratio" value="2"><span>2</span></label>
+              <label><input type="radio" name="ratio" value="3"><span>3</span></label>
+            </div>
+          </div>
+          <div class="field">
+            <label class="toggle"><input type="checkbox" id="repl"><span class="track"></span><span>With replacement</span></label>
+          </div>
+          <div class="field">
+            <div class="label-row"><label class="name" for="cal">Caliper</label><output id="cal-out" for="cal"></output></div>
+            <input type="range" id="cal" min="0" max="4" step="1" value="0">
+          </div>
+        </div>
+
+      </div>
+      <div class="group">
+        <h3>The survey</h3>
+        <div class="field">
+          <div class="label-row"><span class="name" id="lbl-n">Respondents</span></div>
+          <div class="seg small" role="radiogroup" aria-labelledby="lbl-n">
+            <label><input type="radio" name="nsize" value="100"><span>100</span></label>
+            <label><input type="radio" name="nsize" value="200"><span>200</span></label>
+            <label><input type="radio" name="nsize" value="400" checked><span>400</span></label>
+            <label><input type="radio" name="nsize" value="800"><span>800</span></label>
+            <label><input type="radio" name="nsize" value="1600"><span>1600</span></label>
+          </div>
+        </div>
+        <div class="field">
+          <div class="label-row"><label class="name" for="rate">Share treated</label><output id="rate-out" for="rate"></output></div>
+          <input type="range" id="rate" min="0.1" max="0.5" step="0.05" value="0.2">
+          <p class="hint" id="rate-hint"></p>
+        </div>
+        <div class="field">
+          <div class="label-row"><label class="name" for="tau">True effect</label><output id="tau-out" for="tau"></output></div>
+          <input type="range" id="tau" min="-10" max="15" step="1" value="8">
+        </div>
+        <div class="field">
+          <div class="label-row"><label class="name" for="sel">Selection</label><output id="sel-out" for="sel"></output></div>
+          <input type="range" id="sel" min="0" max="2.5" step="0.05" value="1">
+          <p class="hint">How strongly age and ideology drive exposure.</p>
+        </div>
+        <div class="field">
+          <div class="label-row"><label class="name" for="hid">Hidden confounder</label><output id="hid-out" for="hid"></output></div>
+          <input type="range" id="hid" min="0" max="1" step="0.05" value="0">
+          <p class="hint">Shapes exposure and support; not in the data.</p>
+        </div>
+        <div class="field">
+          <label class="toggle"><input type="checkbox" id="het"><span class="track"></span><span>Varying effect</span></label>
+          <p class="hint" id="het-hint" hidden>The ad persuades moderates more than partisans.</p>
+        </div>
+        <div class="field"><button class="quiet" id="resample">Draw a new sample</button></div>
+      </div>
+
+    </aside>
+
+    <main>
+      <div class="legend">
+        <span><span class="dot" style="background: var(--trt)"></span>Treated: saw the ad</span>
+        <span><span class="dot" style="background: var(--ctl)"></span>Control: did not</span>
+        <span id="hollow-key" hidden><span class="dot ring"></span>Drawn into the matched sample</span>
+      </div>
+      <div class="stage-wrap" id="stage-wrap">
+        <canvas id="stage" aria-label="Respondents plotted by age and ideology, with matched pairs"></canvas>
+        <div class="tip" id="tip" role="status" aria-live="polite"></div>
+      </div>
+      <p class="caption" id="caption"></p>
+      <div class="readouts">
+      <section>
+        <h2>Balance</h2>
+        <p class="key"><span><i class="hollow"></i>before</span><span><i class="solid"></i>after matching</span></p>
+        <canvas id="love" aria-label="Standardized mean differences before and after matching"></canvas>
+      </section>
+      <section>
+        <h2>Estimated effect</h2>
+        <canvas id="est" aria-label="Estimates of the effect of the ad on support"></canvas>
+        <dl class="counts" id="counts"></dl>
+      </section>
+      <section>
+        <h2>Why regression misses</h2>
+        <p class="key reg-eq"><span class="tex" data-tex="\text{support} = a + \tau T + b_1\,\text{age} + b_2\,\text{ideology} + e">support = a + &tau;T + b<sub>1</sub>&thinsp;age + b<sub>2</sub>&thinsp;ideology + e</span></p>
+        <canvas id="reg" aria-label="Support without the ad by ideology, against the regression's straight line"></canvas>
+        <p class="reg-note" id="reg-note"></p>
+      </section>
+      </div>
+      <section class="method-note" id="method-note"></section>
+    </main>
+
+  </div>
+
+  <section class="lower">
+    <div>
+      <div class="log-head"><h2>Completed matches</h2><button class="quiet" id="clear-log" hidden>Clear</button></div>
+      <p class="empty-log" id="empty-log">Each match is recorded here, so that methods can be compared on the same sample.</p>
+      <div class="log-scroll">
+        <table id="log" hidden>
+          <thead><tr><th>Method</th><th>Treated kept</th><th>Worst |SMD|</th><th>Naive</th><th>Matched</th><th>Truth</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+    <div>
+      <div class="rep-head"><h2>Across 200 samples</h2><button id="rep-go">Run 200 samples</button></div>
+      <div class="rep-wrap"><canvas id="rep" aria-label="Estimates across repeated samples"></canvas></div>
+      <p class="rep-note" id="rep-note">A single sample can mislead. Repeating the survey separates bias from chance.</p>
+    </div>
+  </section>
+
+  <section class="notes">
+    <h2>Reading the picture</h2>
+    <p>Each dot is a respondent, placed by age and ideology. Support for the policy without the ad, <span class="tex" data-tex="Y_i(0)">Y<sub>i</sub>(0)</span>, peaks at the ideological center and declines with age, as the regression panel shows. Because the ad reached older and more extreme respondents, the naive difference in support confounds the effect of the ad with the effect of who saw it. The true effect is set in the survey controls, at eight points unless you change it.</p>
+    <p>Matching does not model the outcome. It draws from the original sample a subset, with weights, whose covariate distribution resembles that of the treated, and then compares outcomes (Ho et al. 2007). Compare the marginal curves of the two planes: in the original sample the groups differ, in the matched sample they nearly coincide. The cost is information, since controls without a treated counterpart contribute nothing.</p>
+    <p>Balance, not the estimate, is how one judges a matching, and it must be checked on the functions of the covariates that matter for the outcome. The linear propensity model, <span class="tex" data-tex="e(X) = \Pr(T = 1 \mid X)">e(X) = Pr(T = 1 | X)</span> fitted with straight terms, draws straight contours and cannot see that both extremes were targeted. Matched groups then agree in mean ideology, which was never the problem, and disagree in extremity, which is. Adding squared terms repairs the model. Even so, pairs close in the score may lie far apart in age and ideology, which is why King and Nielsen (2019) argue against matching on it.</p>
+    <p>Raise the selection and common support thins: some treated respondents have no comparable control. Matching one to one without replacement then reaches for distant controls, and the estimate drifts. A caliper, or finer bins, refuses such comparisons, at the price of discarding treated respondents. With the effect varying by person, the estimate then describes only the treated who were kept, which is a different quantity from the effect on all who saw the ad (Iacus, King, and Porro 2012).</p>
+    <p>Now raise the unmeasured confounder. The observed covariates balance as before; the hidden trait does not, and no balance table can reveal it, since it is not in the data. Matching rests on the assumption that exposure is as good as random once the measured covariates are held fixed (Rosenbaum and Rubin 1983). Sensitivity analysis asks how strong a hidden confounder would need to be to overturn a conclusion (Rosenbaum 2002).</p>
+    <p>The repeated samples separate bias from noise. Calipers, finer bins, and replacement lower the bias and widen the spread. Additional controls per treated respondent narrow the spread but, without replacement, admit worse matches. Even good settings leave a small bias, because matches on continuous covariates are never exact (Abadie and Imbens 2006). Raise the share treated toward one half and matching without replacement runs out of good controls; a larger sample shrinks the spread of every estimator but leaves the naive one exactly as biased.</p>
+  </section>
+
+  <section class="rcode" id="in-r">
+    <div class="rcode-head">
+      <h2>The same analysis in R</h2>
+      <div class="rcode-actions"><button id="r-copy">Copy</button><button id="r-download">Download</button></div>
+    </div>
+    <p class="rcode-lede">The script simulates the same survey, fits the naive comparison and the regression, and matches with each method. It needs tidyverse, MatchIt, and cobalt, and runs from top to bottom. Its sample differs from the one above, so its numbers will too; the matching panel shows the <code>matchit()</code> call for the current settings.</p>
+    <details>
+      <summary>Show the script</summary>
+      <pre><code id="r-code"><span class="c"># Matching in practice: the simulated survey behind the matching demo</span>
+<span class="c">#</span>
+<span class="c"># Respondents either saw a campaign ad (treat = 1) or did not (treat = 0).</span>
+<span class="c"># The ad reached older and more ideologically extreme respondents, and both</span>
+<span class="c"># traits shape support for the policy the ad promotes.</span>
+
+library(tidyverse)
+library(MatchIt)
+library(cobalt)
+
+set.seed(42)
+
+
+<span class="c"># ---- 1. Settings and the model of support -----------------------------------------</span>
+
+n             &lt;- 400   <span class="c"># respondents</span>
+share_treated &lt;- 0.20  <span class="c"># about this share sees the ad</span>
+true_effect   &lt;- 8     <span class="c"># effect of the ad on support, in points</span>
+selection     &lt;- 1     <span class="c"># how strongly age and ideology drive exposure (0 = random)</span>
+hidden        &lt;- 0     <span class="c"># strength of an unmeasured confounder (try 1)</span>
+varying       &lt;- 0     <span class="c"># set to 1: the ad persuades moderates more than partisans</span>
+
+<span class="c"># Support for the policy, given a respondent's traits and whether they saw the ad.</span>
+<span class="c"># It peaks at the ideological center, falls with extremity and with age,</span>
+<span class="c"># and rises with the ad.</span>
+support_fn &lt;- function(age, ideology, treat, hidden_trait = 0, noise = 0) {
+  without_ad &lt;- 70 - 6 * ideology^2 - 0.25 * (age - 48)
+  ad_effect  &lt;- true_effect - varying * 3 * (abs(ideology) - 0.8)
+  without_ad + treat * ad_effect - 5 * hidden * hidden_trait + noise
+}
+
+
+<span class="c"># ---- 2. Generate the data -------------------------------------------------------</span>
+
+age &lt;- rnorm(3 * n, mean = 47, sd = 15)
+age &lt;- age[age &gt;= 18 &amp; age &lt;= 88][1:n]   <span class="c"># keep the first n ages between 18 and 88</span>
+
+ideology     &lt;- rnorm(n)   <span class="c"># liberal (negative) to conservative (positive)</span>
+hidden_trait &lt;- rnorm(n)   <span class="c"># shapes exposure and support, but no analyst observes it</span>
+
+<span class="c"># Exposure is more likely for older and for more extreme respondents</span>
+index &lt;- selection * (0.84 * abs(ideology) + 0.024 * (age - 48)) + hidden * hidden_trait
+treat &lt;- rbinom(n, size = 1, prob = plogis(qlogis(share_treated) - mean(index) + index))
+
+<span class="c"># Each respondent's support without and with the ad: the two potential outcomes</span>
+noise     &lt;- rnorm(n, sd = 6)
+support_0 &lt;- support_fn(age, ideology, treat = 0, hidden_trait, noise)
+support_1 &lt;- support_fn(age, ideology, treat = 1, hidden_trait, noise)
+
+effect  &lt;- support_1 - support_0                       <span class="c"># each respondent's effect</span>
+support &lt;- if_else(treat == 1, support_1, support_0)   <span class="c"># what the survey records</span>
+
+survey &lt;- tibble(age, ideology, extremity = abs(ideology), hidden_trait,
+                 treat, support, effect)
+
+<span class="c"># The target: the average effect among those who saw the ad (the ATT)</span>
+true_att &lt;- mean(effect[treat == 1])
+
+survey |&gt; count(treat)
+true_att
+
+
+<span class="c"># ---- 3. Look at the data -----------------------------------------------------------</span>
+
+ggplot(survey, aes(age, ideology, color = factor(treat))) +
+  geom_point()
+
+survey |&gt;
+  pivot_longer(c(age, ideology, extremity), names_to = <span class="s">"covariate"</span>) |&gt;
+  ggplot(aes(value, color = factor(treat))) +
+  geom_density() +
+  facet_wrap(~ covariate, scales = <span class="s">"free"</span>)
+
+<span class="c"># Average support in each group: it peaks at the ideological center</span>
+<span class="c"># and falls steadily with age</span>
+ggplot(survey, aes(ideology, support, color = factor(treat))) +
+  geom_smooth(se = FALSE)
+
+ggplot(survey, aes(age, support, color = factor(treat))) +
+  geom_smooth(se = FALSE)
+
+
+<span class="c"># ---- 4. The naive comparison and the regression ---------------------------------------</span>
+
+fit_naive   &lt;- lm(support ~ treat, data = survey)
+fit_linear  &lt;- lm(support ~ treat + age + ideology, data = survey)
+fit_squared &lt;- lm(support ~ treat + age + ideology + I(ideology^2), data = survey)
+
+coef(fit_naive)[<span class="s">"treat"</span>]     <span class="c"># the naive difference in means</span>
+coef(fit_linear)[<span class="s">"treat"</span>]    <span class="c"># the regression on the slides</span>
+coef(fit_squared)[<span class="s">"treat"</span>]   <span class="c"># adding ideology squared, the true shape of support</span>
+
+<span class="c"># Why the linear regression misses: it fits two parallel straight lines (solid),</span>
+<span class="c"># while support peaks at the ideological center (dashed). Both are drawn at age 48.</span>
+b &lt;- coef(fit_linear)
+
+lines &lt;- expand_grid(ideology = seq(-3, 3, by = 0.05), treat = c(0, 1)) |&gt;
+  mutate(
+    fitted = b[<span class="s">"(Intercept)"</span>] + b[<span class="s">"treat"</span>] * treat + b[<span class="s">"age"</span>] * 48 + b[<span class="s">"ideology"</span>] * ideology,
+    truth  = support_fn(age = 48, ideology, treat)
+  )
+
+ggplot(survey, aes(ideology, support, color = factor(treat))) +
+  geom_point(alpha = 0.3) +
+  geom_line(data = lines, aes(y = fitted)) +
+  geom_line(data = lines, aes(y = truth), linetype = <span class="s">"dashed"</span>)
+
+
+<span class="c"># ---- 5. Matching ---------------------------------------------------------------------------</span>
+<span class="c"># MatchIt's defaults: nearest-neighbor matching, one to one, without replacement,</span>
+<span class="c"># on a propensity score from a logit, estimating the ATT</span>
+
+<span class="c"># Coarsened exact matching. Each covariate is cut into 5 equal-width bins, and</span>
+<span class="c"># respondents are grouped by the cell they share. Cells lacking either treated or</span>
+<span class="c"># control respondents are dropped; in the rest, controls are weighted so that a</span>
+<span class="c"># cell's controls count as much as its treated.</span>
+m_cem &lt;- matchit(treat ~ age + ideology, data = survey,
+                 method = <span class="s">"cem"</span>, cutpoints = list(age = 5, ideology = 5))
+
+<span class="c"># Nearest-neighbor matching on the Mahalanobis distance, which measures age and</span>
+<span class="c"># ideology in standard deviations. Each treated respondent, in turn, is paired</span>
+<span class="c"># with the closest control not yet used.</span>
+m_maha &lt;- matchit(treat ~ age + ideology, data = survey, distance = <span class="s">"mahalanobis"</span>)
+
+<span class="c"># The same with replacement: each treated respondent gets its closest control,</span>
+<span class="c"># even one already used. Bias falls, but reused controls carry more weight,</span>
+<span class="c"># so the variance rises.</span>
+m_maha_repl &lt;- matchit(treat ~ age + ideology, data = survey, distance = <span class="s">"mahalanobis"</span>,
+                       replace = TRUE)
+
+<span class="c"># Propensity score matching. A logit of treatment on age and ideology gives each</span>
+<span class="c"># respondent a score, and respondents are paired on that single number. A logit</span>
+<span class="c"># linear in ideology cannot see that both extremes were targeted.</span>
+m_ps_linear &lt;- matchit(treat ~ age + ideology, data = survey)
+
+<span class="c"># The same with squares and the interaction in the logit, so that the score</span>
+<span class="c"># can rise toward both ideological extremes.</span>
+m_ps_squares &lt;- matchit(treat ~ age + ideology + I(age^2) + I(ideology^2) + age:ideology,
+                        data = survey)
+
+<span class="c"># The same with a caliper: a treated respondent is matched only to a control</span>
+<span class="c"># within 0.2 standard deviations of its score. Those without one are dropped,</span>
+<span class="c"># so the estimate describes only the treated who remain.</span>
+m_ps_caliper &lt;- matchit(treat ~ age + ideology + I(age^2) + I(ideology^2) + age:ideology,
+                        data = survey, caliper = 0.2)
+
+summary(m_ps_linear)
+
+
+<span class="c"># ---- 6. Distributions in the matched samples ---------------------------------------------</span>
+<span class="c"># match.data() keeps the matched units and adds their weights</span>
+
+matched &lt;- bind_rows(
+  <span class="s">"No matching"</span>              = survey |&gt; mutate(weights = 1),
+  <span class="s">"Coarsened exact"</span>          = match.data(m_cem),
+  <span class="s">"Mahalanobis"</span>              = match.data(m_maha),
+  <span class="s">"Mahalanobis, replacement"</span> = match.data(m_maha_repl),
+  <span class="s">"Propensity, linear"</span>       = match.data(m_ps_linear),
+  <span class="s">"Propensity, squares"</span>      = match.data(m_ps_squares),
+  <span class="s">"Propensity, caliper"</span>      = match.data(m_ps_caliper),
+  .id = <span class="s">"method"</span>
+) |&gt;
+  mutate(method = fct_inorder(method))
+
+ggplot(matched, aes(age, color = factor(treat), weight = weights)) +
+  geom_density() +
+  facet_wrap(~ method)
+
+ggplot(matched, aes(extremity, color = factor(treat), weight = weights)) +
+  geom_density() +
+  facet_wrap(~ method)
+
+
+<span class="c"># ---- 7. Results ------------------------------------------------------------------------------</span>
+<span class="c"># truth is the true effect among the treated who were kept; it differs from</span>
+<span class="c"># true_att only when treated respondents are dropped and varying = 1</span>
+
+matched |&gt;
+  group_by(method) |&gt;
+  summarise(
+    treated  = sum(treat == 1),
+    controls = sum(treat == 0),
+    estimate = weighted.mean(support[treat == 1], weights[treat == 1]) -
+               weighted.mean(support[treat == 0], weights[treat == 0]),
+    truth    = mean(effect[treat == 1])
+  )
+
+<span class="c"># Balance for every method. With hidden &lt;- 1, add + hidden_trait to the formula:</span>
+<span class="c"># matching balances what is measured, not what is not</span>
+love.plot(treat ~ age + ideology + extremity, data = survey,
+          weights = list(cem = m_cem, maha = m_maha, maha_repl = m_maha_repl,
+                         ps_linear = m_ps_linear, ps_squares = m_ps_squares,
+                         ps_caliper = m_ps_caliper),
+          s.d.denom = <span class="s">"treated"</span>, abs = TRUE, thresholds = 0.1)</code></pre>
+    </details>
+  </section>
+
+  <section class="refs">
+    <h2>References</h2>
+    <p>Abadie, Alberto, and Guido W. Imbens. 2006. &ldquo;Large Sample Properties of Matching Estimators for Average Treatment Effects.&rdquo; <i>Econometrica</i> 74 (1): 235&ndash;67.</p>
+    <p>Ho, Daniel E., Kosuke Imai, Gary King, and Elizabeth A. Stuart. 2007. &ldquo;Matching as Nonparametric Preprocessing for Reducing Model Dependence in Parametric Causal Inference.&rdquo; <i>Political Analysis</i> 15 (3): 199&ndash;236.</p>
+    <p>Iacus, Stefano M., Gary King, and Giuseppe Porro. 2012. &ldquo;Causal Inference without Balance Checking: Coarsened Exact Matching.&rdquo; <i>Political Analysis</i> 20 (1): 1&ndash;24.</p>
+    <p>King, Gary, and Richard Nielsen. 2019. &ldquo;Why Propensity Scores Should Not Be Used for Matching.&rdquo; <i>Political Analysis</i> 27 (4): 435&ndash;54.</p>
+    <p>Rosenbaum, Paul R. 2002. <i>Observational Studies</i>. 2nd ed. New York: Springer.</p>
+    <p>Rosenbaum, Paul R., and Donald B. Rubin. 1983. &ldquo;The Central Role of the Propensity Score in Observational Studies for Causal Effects.&rdquo; <i>Biometrika</i> 70 (1): 41&ndash;55.</p>
+  </section>
+</div>
+
+<script>
+(function () {
+'use strict';
+/* ---------------------------------------------------------------
+   Core statistics: data, propensity model, matching, balance
+--------------------------------------------------------------- */
+var N = 400;
+var CALIPERS = [Infinity, 1, 0.5, 0.2, 0.1];
+var BINS = [2, 3, 4, 5, 6, 8, 10, 14, 20, 30];
+
+function mulberry32(a) {
+  return function () {
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    var t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+function makeNormal(rng) {
+  var spare = null;
+  return function () {
+    if (spare !== null) { var s = spare; spare = null; return s; }
+    var u, v, r;
+    do { u = rng() * 2 - 1; v = rng() * 2 - 1; r = u * u + v * v; } while (r >= 1 || r === 0);
+    var m = Math.sqrt(-2 * Math.log(r) / r);
+    spare = v * m; return u * m;
+  };
+}
+function plogis(x) { return 1 / (1 + Math.exp(-x)); }
+function qlogis(p) { return Math.log(p / (1 - p)); }
+function baseSupport(age, ideo) { return 70 - 6 * ideo * ideo - 0.25 * (age - 48); }
+function effectAt(ideo, het, tau) { return het ? tau - 3 * (Math.abs(ideo) - 0.8) : tau; }
+
+function genBase(seed, n) {
+  n = n || N;
+  var rng = mulberry32(seed), z = makeNormal(rng);
+  var b = { seed: seed, n: n, age: new Float64Array(n), ideo: new Float64Array(n), U: new Float64Array(n),
+            uT: new Float64Array(n), eps: new Float64Array(n) };
+  for (var i = 0; i < n; i++) {
+    var a; do { a = 47 + 15 * z(); } while (a < 18 || a > 88);
+    var x; do { x = z(); } while (Math.abs(x) > 2.9);
+    b.age[i] = a; b.ideo[i] = x; b.U[i] = z(); b.uT[i] = rng(); b.eps[i] = z();
+  }
+  return b;
+}
+
+/* treatment and outcomes, given the base draws and the data settings */
+function assign(b, cfg) {
+  var n = b.n;
+  var s = cfg.sel, g = 1.0 * cfg.hid, L = new Float64Array(n), i;
+  for (i = 0; i < n; i++) L[i] = s * (0.84 * Math.abs(b.ideo[i]) + 0.024 * (b.age[i] - 48)) + g * b.U[i];
+  var lo = -14, hi = 8;
+  for (var it = 0; it < 50; it++) {
+    var mid = (lo + hi) / 2, m = 0;
+    for (i = 0; i < n; i++) m += plogis(mid + L[i]);
+    if (m / n > cfg.rate) hi = mid; else lo = mid;
+  }
+  var alpha = (lo + hi) / 2;
+  var d = { b: b, n: n, age: b.age, ideo: b.ideo, U: b.U, ext: new Float64Array(n),
+            t: new Uint8Array(n), e: new Float64Array(n), y0: new Float64Array(n),
+            tau: new Float64Array(n), y: new Float64Array(n), T: [], C: [] };
+  for (i = 0; i < n; i++) {
+    d.ext[i] = Math.abs(b.ideo[i]);
+    d.e[i] = plogis(alpha + L[i]);
+    d.t[i] = b.uT[i] < d.e[i] ? 1 : 0;
+    d.y0[i] = baseSupport(b.age[i], b.ideo[i]) - 5 * cfg.hid * b.U[i] + 6 * b.eps[i];
+    d.tau[i] = effectAt(b.ideo[i], cfg.het, cfg.tau);
+    d.y[i] = d.y0[i] + d.t[i] * d.tau[i];
+    (d.t[i] ? d.T : d.C).push(i);
+  }
+  var st = 0; for (i = 0; i < d.T.length; i++) st += d.tau[d.T[i]];
+  d.att = st / d.T.length;
+  /* fixed scales used by balance and calipers */
+  d.sdT = {};
+  ['age', 'ideo', 'ext', 'U'].forEach(function (k) { d.sdT[k] = sd(d[k], d.T); });
+  d.sdAge = sd(d.age, null);
+  return d;
+}
+
+function mean(x, idx, w) {
+  var s = 0, sw = 0, k, i;
+  if (!idx) { for (i = 0; i < x.length; i++) s += x[i]; return s / x.length; }
+  for (k = 0; k < idx.length; k++) { i = idx[k]; var wi = w ? w[i] : 1; s += wi * x[i]; sw += wi; }
+  return sw > 0 ? s / sw : NaN;
+}
+function sd(x, idx) {
+  var m = mean(x, idx), s = 0, n = idx ? idx.length : x.length, k, i;
+  for (k = 0; k < n; k++) { i = idx ? idx[k] : k; s += (x[i] - m) * (x[i] - m); }
+  return Math.sqrt(s / Math.max(1, n - 1));
+}
+
+/* small dense linear solver (Gaussian elimination with partial pivoting) */
+function solve(A, bvec) {
+  var n = bvec.length, M = [], i, j, k;
+  for (i = 0; i < n; i++) { M.push(A[i].slice()); M[i].push(bvec[i]); }
+  for (k = 0; k < n; k++) {
+    var p = k;
+    for (i = k + 1; i < n; i++) if (Math.abs(M[i][k]) > Math.abs(M[p][k])) p = i;
+    var tmp = M[k]; M[k] = M[p]; M[p] = tmp;
+    var piv = M[k][k] || 1e-12;
+    for (i = k + 1; i < n; i++) {
+      var f = M[i][k] / piv;
+      for (j = k; j <= n; j++) M[i][j] -= f * M[k][j];
+    }
+  }
+  var x = new Array(n);
+  for (i = n - 1; i >= 0; i--) {
+    var s = M[i][n];
+    for (j = i + 1; j < n; j++) s -= M[i][j] * x[j];
+    x[i] = s / (M[i][i] || 1e-12);
+  }
+  return x;
+}
+
+/* OLS of y on treatment, age and ideology, as on the slides */
+function olsEffect(d) {
+  var A = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]], v = [0, 0, 0, 0];
+  for (var i = 0; i < d.n; i++) {
+    var x = [1, d.t[i], d.age[i] - 48, d.ideo[i]];
+    for (var r = 0; r < 4; r++) { v[r] += x[r] * d.y[i]; for (var c = 0; c < 4; c++) A[r][c] += x[r] * x[c]; }
+  }
+  return solve(A, v)[1];
+}
+function naiveEffect(d) { return mean(d.y, d.T) - mean(d.y, d.C); }
+
+/* propensity score by logistic regression (IRLS) */
+function psFeatures(d, model) {
+  var ma = mean(d.age), sa = sd(d.age), mi = mean(d.ideo), si = sd(d.ideo);
+  var f = function (age, ideo) {
+    var a = (age - ma) / sa, x = (ideo - mi) / si;
+    return model === 'sq' ? [1, a, x, a * a, x * x, a * x] : [1, a, x];
+  };
+  return f;
+}
+function fitPS(d, model) {
+  var f = psFeatures(d, model), X = [], i, r, c;
+  for (i = 0; i < d.n; i++) X.push(f(d.age[i], d.ideo[i]));
+  var k = X[0].length, beta = new Array(k).fill(0);
+  for (var it = 0; it < 30; it++) {
+    var A = [], v = new Array(k).fill(0);
+    for (r = 0; r < k; r++) A.push(new Array(k).fill(0));
+    for (i = 0; i < d.n; i++) {
+      var eta = 0; for (r = 0; r < k; r++) eta += X[i][r] * beta[r];
+      var p = plogis(eta), w = Math.max(p * (1 - p), 1e-6), z = eta + (d.t[i] - p) / w;
+      for (r = 0; r < k; r++) { v[r] += X[i][r] * w * z; for (c = 0; c < k; c++) A[r][c] += X[i][r] * w * X[i][c]; }
+    }
+    for (r = 0; r < k; r++) A[r][r] += 1e-4;
+    var nb = solve(A, v), delta = 0;
+    for (r = 0; r < k; r++) { delta = Math.max(delta, Math.abs(nb[r] - beta[r])); beta[r] = nb[r]; }
+    if (delta < 1e-8) break;
+  }
+  var lin = new Float64Array(d.n), ps = new Float64Array(d.n);
+  for (i = 0; i < d.n; i++) {
+    var e2 = 0; for (r = 0; r < k; r++) e2 += X[i][r] * beta[r];
+    e2 = Math.max(-9, Math.min(9, e2));
+    lin[i] = e2; ps[i] = plogis(e2);
+  }
+  return { model: model, beta: beta, f: f, lin: lin, ps: ps,
+           at: function (age, ideo) { var x = f(age, ideo), e3 = 0; for (var q = 0; q < k; q++) e3 += x[q] * beta[q]; return plogis(e3); },
+           sdLin: sd(lin, null), sdPs: sd(ps, null) };
+}
+
+/* pooled within-group covariance for Mahalanobis distance */
+function pooledCov(d) {
+  var g = [d.T, d.C], S = [0, 0, 0], df = 0;
+  g.forEach(function (idx) {
+    var ma = mean(d.age, idx), mi = mean(d.ideo, idx);
+    for (var k = 0; k < idx.length; k++) {
+      var i = idx[k], a = d.age[i] - ma, x = d.ideo[i] - mi;
+      S[0] += a * a; S[1] += a * x; S[2] += x * x;
+    }
+    df += idx.length - 1;
+  });
+  S = S.map(function (s) { return s / df; });
+  var det = S[0] * S[2] - S[1] * S[1];
+  return { S: S, inv: [S[2] / det, -S[1] / det, S[0] / det] };
+}
+
+/* the matching methods; each returns weights (0 = pruned) and, for pairs, the event sequence */
+function matchNearest(d, opt) {
+  var dist, cal = CALIPERS[opt.cal], order = d.T.slice(), ps = null;
+  if (opt.method === 'ps') {
+    ps = fitPS(d, opt.psModel);
+    var Ps = ps.ps;
+    dist = function (i, j) { return Math.abs(Ps[i] - Ps[j]); };
+    cal = cal * ps.sdPs;
+  } else if (opt.dist === 'raw') {
+    dist = function (i, j) { var a = d.age[i] - d.age[j], x = d.ideo[i] - d.ideo[j]; return Math.sqrt(a * a + x * x); };
+    cal = cal * d.sdAge;
+  } else {
+    var V = pooledCov(d).inv;
+    dist = function (i, j) {
+      var a = d.age[i] - d.age[j], x = d.ideo[i] - d.ideo[j];
+      return Math.sqrt(Math.max(0, V[0] * a * a + 2 * V[1] * a * x + V[2] * x * x));
+    };
+  }
+  if (opt.showcase && order.length > 8) {
+    /* the first few, animated slowly, come from sparser regions so the search is visible */
+    var sc = order.map(function (i) {
+      var ds = d.C.map(function (j) { return dist(i, j); }).sort(function (a, b) { return a - b; });
+      return { i: i, r: ds[Math.min(3, ds.length - 1)] };
+    });
+    var rs = sc.map(function (x) { return x.r; }).sort(function (a, b) { return a - b; });
+    var lo = rs[Math.floor(0.6 * rs.length)], hi = rs[Math.floor(0.95 * rs.length)];
+    var pool = sc.filter(function (x) { return x.r >= lo && x.r <= hi; }).map(function (x) { return x.i; });
+    var rg = mulberry32((d.b.seed ^ 0x51ED27) >>> 0);
+    for (var z = pool.length - 1; z > 0; z--) { var y = Math.floor(rg() * (z + 1)), tmp = pool[z]; pool[z] = pool[y]; pool[y] = tmp; }
+    var lead = pool.slice(0, 5);
+    order = lead.concat(order.filter(function (i) { return lead.indexOf(i) < 0; }));
+  }
+  var used = new Uint8Array(d.n), mt = {}, events = [], dropped = new Uint8Array(d.n), k, q;
+  order.forEach(function (i) { mt[i] = []; });
+  for (var pass = 0; pass < opt.ratio; pass++) {
+    for (k = 0; k < order.length; k++) {
+      var i = order[k];
+      if (dropped[i] || mt[i].length < pass) continue;
+      var best = -1, bd = Infinity;
+      for (q = 0; q < d.C.length; q++) {
+        var j = d.C[q];
+        if (!opt.repl && used[j]) continue;
+        if (mt[i].indexOf(j) >= 0) continue;
+        var dd = dist(i, j);
+        if (dd < bd) { bd = dd; best = j; }
+      }
+      if (best >= 0 && bd <= cal) {
+        mt[i].push(best); if (!opt.repl) used[best] = 1;
+        events.push({ i: i, j: best, pass: pass, d: bd });
+      } else if (pass === 0) {
+        dropped[i] = 1; events.push({ i: i, j: -1, pass: 0, d: bd });
+      }
+    }
+  }
+  var w = new Float64Array(d.n);
+  order.forEach(function (i) {
+    if (dropped[i] || !mt[i].length) return;
+    w[i] = 1;
+    for (var r = 0; r < mt[i].length; r++) w[mt[i][r]] += 1 / mt[i].length;
+  });
+  return { kind: 'pairs', w: w, events: events, mt: mt, order: order, ps: ps, dist: dist, cal: cal };
+}
+
+function matchCEM(d, opt) {
+  var b = BINS[opt.bins];
+  var r = range(d.age), s = range(d.ideo);
+  var ca = cuts(r, b), ci = cuts(s, b);
+  var cell = new Int32Array(d.n), nT = {}, nC = {}, i;
+  for (i = 0; i < d.n; i++) {
+    var c = binOf(d.age[i], r, b) * b + binOf(d.ideo[i], s, b);
+    cell[i] = c;
+    if (d.t[i]) nT[c] = (nT[c] || 0) + 1; else nC[c] = (nC[c] || 0) + 1;
+  }
+  var w = new Float64Array(d.n);
+  for (i = 0; i < d.n; i++) {
+    var c2 = cell[i];
+    if (!nT[c2] || !nC[c2]) continue;
+    w[i] = d.t[i] ? 1 : nT[c2] / nC[c2];
+  }
+  return { kind: 'cells', w: w, b: b, ra: r, ri: s, cutsA: ca, cutsI: ci, cell: cell, nT: nT, nC: nC };
+}
+function range(x) { var lo = Infinity, hi = -Infinity; for (var i = 0; i < x.length; i++) { if (x[i] < lo) lo = x[i]; if (x[i] > hi) hi = x[i]; } return [lo, hi]; }
+function binOf(v, r, b) { var k = Math.floor((v - r[0]) / (r[1] - r[0]) * b); return k < 0 ? 0 : (k >= b ? b - 1 : k); }
+function cuts(r, b) { var c = []; for (var k = 1; k < b; k++) c.push(r[0] + (r[1] - r[0]) * k / b); return c; }
+
+function runMatch(d, opt) {
+  var m = opt.method === 'cem' ? matchCEM(d, opt) : matchNearest(d, opt);
+  summarize(d, m);
+  return m;
+}
+function summarize(d, m) {
+  var keptT = [], usedC = [], i;
+  for (i = 0; i < d.n; i++) if (m.w[i] > 0) (d.t[i] ? keptT : usedC).push(i);
+  m.keptT = keptT; m.usedC = usedC;
+  m.est = keptT.length && usedC.length ? mean(d.y, keptT) - mean(d.y, usedC, m.w) : NaN;
+  var st = 0; for (i = 0; i < keptT.length; i++) st += d.tau[keptT[i]];
+  m.attKept = keptT.length ? st / keptT.length : NaN;
+  m.smd = balance(d, m.w);
+}
+var BAL_KEYS = ['age', 'ideo', 'ext', 'U'];
+function balance(d, w) {
+  var out = {};
+  BAL_KEYS.forEach(function (k) {
+    var T = w ? d.T.filter(function (i) { return w[i] > 0; }) : d.T;
+    var C = w ? d.C.filter(function (i) { return w[i] > 0; }) : d.C;
+    out[k] = (T.length && C.length) ? Math.abs(mean(d[k], T, w) - mean(d[k], C, w)) / d.sdT[k] : NaN;
+  });
+  return out;
+}
+
+
+/* ---------------------------------------------------------------
+   Presentation constants
+--------------------------------------------------------------- */
+var INK = '#1D2A30', GRAPH = '#57656B', RULE = '#CBD2D1', PAPER = '#EEF1F0';
+var TRT = [196, 99, 10], CTL = [42, 94, 168];
+var TRT_HEX = '#C4630A', CTL_HEX = '#2A5EA8';
+var SERIF = '"Spectral", "Iowan Old Style", "Palatino Linotype", Georgia, serif';
+var SANS = '"Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif';
+var MINUS = '\u2212', ELL = '\u2026', NDASH = '\u2013';
+var REDUCED = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+var AGE_D = [18, 88], IDEO_D = [-3, 3];
+var STRIP = 104, GRID = 90, GROW = 260;
+function estDom(tau) { var lo = 5 * Math.floor((tau - 17) / 5); return [lo, lo + 30]; }
+var CAL_LABEL = ['off', '1 SD', '0.5 SD', '0.2 SD', '0.1 SD'];
+var LEVELS = [0.1, 0.2, 0.35, 0.5, 0.7];
+
+function clamp(x, a, b) { return x < a ? a : (x > b ? b : x); }
+function lerp(a, b, t) { return a + (b - a) * t; }
+function easeInOut(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+function now() { return performance.now(); }
+function signed(x, dp) {
+  if (!isFinite(x)) return NDASH;
+  dp = dp == null ? 1 : dp;
+  var s = Math.abs(x).toFixed(dp);
+  if (Number(s) === 0) return s;
+  return (x < 0 ? MINUS : '+') + s;
+}
+function haloText(g, s, x, y) {
+  g.save(); g.lineWidth = 4; g.lineJoin = 'round'; g.strokeStyle = PAPER; g.strokeText(s, x, y); g.restore();
+  g.fillText(s, x, y);
+}
+function rgba(c, a) { return 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + a.toFixed(3) + ')'; }
+function mixRGB(a, b, t) { return [Math.round(lerp(a[0], b[0], t)), Math.round(lerp(a[1], b[1], t)), Math.round(lerp(a[2], b[2], t))]; }
+function selLabel(s) { return s < 0.05 ? 'none' : s < 0.6 ? 'mild' : s < 1.5 ? 'moderate' : 'strong'; }
+function hidLabel(h) { return h < 0.025 ? 'none' : h < 0.35 ? 'weak' : h < 0.7 ? 'moderate' : 'strong'; }
+
+/* ---------------------------------------------------------------
+   State
+--------------------------------------------------------------- */
+var cfg = { n: 400, rate: 0.2, tau: 8, sel: 1, hid: 0, het: false, method: 'nn', bins: 3, dist: 'maha', psModel: 'lin',
+            ratio: 1, repl: false, cal: 0 };
+var seed = 20261027, sampleNo = 1;
+var base, d, before, psFit, cov, contours, cemPrev, jit;
+var view = { matched: false, m: null, anim: null, lineA: 0, matchA: 0, margA: 0, focusA: 0, bs: '', nar: null, gridA: 0, contA: 0, stripH: 0,
+             hover: -1, hoverC: null, logAt: 0, lmin: -3, lmax: 0 };
+var pm, dlin, ra, rr, inv;
+function allocDisplay() {
+  pm = new Float32Array(N); dlin = new Float32Array(N); ra = new Float32Array(N); rr = new Float32Array(N); inv = new Uint8Array(N);
+}
+allocDisplay();
+var R = 4;
+var disp = null, from = null, to = null, settle = { start: 0, dur: 1 };
+var ageGrid = new Float64Array(GRID), ideoGrid = new Float64Array(GRID);
+for (var gi = 0; gi < GRID; gi++) {
+  ageGrid[gi] = AGE_D[0] + (AGE_D[1] - AGE_D[0]) * gi / (GRID - 1);
+  ideoGrid[gi] = IDEO_D[0] + (IDEO_D[1] - IDEO_D[0]) * gi / (GRID - 1);
+}
+
+function matchOpts() {
+  return { method: cfg.method, bins: cfg.bins, dist: cfg.dist, psModel: cfg.psModel,
+           ratio: cfg.ratio, repl: cfg.repl, cal: cfg.cal };
+}
+function stageOpts() { var o = matchOpts(); o.showcase = true; return o; }
+
+/* ---------------------------------------------------------------
+   Densities and summaries
+--------------------------------------------------------------- */
+function kdeOn(xs, grid, idx, w, h) {
+  var out = new Float64Array(GRID), sw = 0, k, g;
+  for (k = 0; k < idx.length; k++) {
+    var i = idx[k], wi = w ? w[i] : 1;
+    if (!(wi > 0)) continue;
+    sw += wi;
+    for (g = 0; g < GRID; g++) { var u = (grid[g] - xs[i]) / h; if (u > -4 && u < 4) out[g] += wi * Math.exp(-0.5 * u * u); }
+  }
+  if (sw > 0) for (g = 0; g < GRID; g++) out[g] /= sw * h * 2.5066283;
+  return out;
+}
+function densities(dd, w) {
+  var T = w ? dd.T.filter(function (i) { return w[i] > 0; }) : dd.T;
+  var C = w ? dd.C.filter(function (i) { return w[i] > 0; }) : dd.C;
+  return { aT: kdeOn(dd.age, ageGrid, T, null, dd.hA), aC: kdeOn(dd.age, ageGrid, C, w, dd.hA),
+           iT: kdeOn(dd.ideo, ideoGrid, T, null, dd.hI), iC: kdeOn(dd.ideo, ideoGrid, C, w, dd.hI) };
+}
+function maxOf(a) { var m = 0; for (var i = 0; i < a.length; i++) if (a[i] > m) m = a[i]; return m; }
+function stateOf(smd, est, dens) {
+  return { smd: { age: smd.age, ideo: smd.ideo, ext: smd.ext, U: smd.U }, est: est,
+           aT: Float64Array.from(dens.aT), aC: Float64Array.from(dens.aC),
+           iT: Float64Array.from(dens.iT), iC: Float64Array.from(dens.iC) };
+}
+function beforeState() { return stateOf(before.smd, before.naive, before.dens); }
+function cloneState(s) { return stateOf(s.smd, s.est, s); }
+function setTarget(tgt, start, dur) {
+  from = cloneState(disp); to = tgt; settle.start = start; settle.dur = Math.max(1, dur);
+}
+function applySettle(t) {
+  var p = clamp((t - settle.start) / settle.dur, 0, 1), e = easeInOut(p), k, g;
+  BAL_KEYS.forEach(function (key) {
+    var a = from.smd[key], b = to.smd[key];
+    disp.smd[key] = isFinite(a) && isFinite(b) ? lerp(a, b, e) : b;
+  });
+  disp.est = isFinite(from.est) && isFinite(to.est) ? lerp(from.est, to.est, e) : to.est;
+  var keys = ['aT', 'aC', 'iT', 'iC'];
+  for (k = 0; k < 4; k++) {
+    var f = from[keys[k]], tt = to[keys[k]], o = disp[keys[k]];
+    for (g = 0; g < GRID; g++) o[g] = lerp(f[g], tt[g], e);
+  }
+  return p < 1;
+}
+
+function computeBefore(dd) {
+  var dens = densities(dd, null);
+  var sm = balance(dd, null);
+  return { smd: sm, naive: naiveEffect(dd), ols: olsEffect(dd), olsB: olsCoef(dd), dens: dens,
+           scaleA: 1.12 * Math.max(maxOf(dens.aT), maxOf(dens.aC)),
+           scaleI: 1.12 * Math.max(maxOf(dens.iT), maxOf(dens.iC)),
+           loveMax: Math.min(2, Math.max(0.5, Math.ceil(Math.max(sm.age, sm.ideo, sm.ext, dd === d && cfg.hid > 0 ? sm.U : 0) * 1.15 / 0.25) * 0.25)) };
+}
+
+function cemGrid(dd, bi) {
+  var b = BINS[bi], ra = range(dd.age), ri = range(dd.ideo);
+  return { b: b, ra: ra, ri: ri, cutsA: cuts(ra, b), cutsI: cuts(ri, b) };
+}
+
+/* marching squares for the propensity contours, in data coordinates */
+var MS = [null, [[0, 3]], [[0, 1]], [[1, 3]], [[1, 2]], [[0, 3], [1, 2]], [[0, 2]], [[2, 3]],
+          [[2, 3]], [[0, 2]], [[0, 1], [2, 3]], [[1, 2]], [[1, 3]], [[0, 1]], [[0, 3]], null];
+var CG = null;
+function contourGrid(fit) {
+  var nx = 71, ny = 61, v = new Float64Array(nx * ny);
+  for (var j = 0; j < ny; j++) for (var i = 0; i < nx; i++) {
+    v[j * nx + i] = fit.at(AGE_D[0] + (AGE_D[1] - AGE_D[0]) * i / (nx - 1), IDEO_D[0] + (IDEO_D[1] - IDEO_D[0]) * j / (ny - 1));
+  }
+  return { nx: nx, ny: ny, v: v, da: (AGE_D[1] - AGE_D[0]) / (nx - 1), di: (IDEO_D[1] - IDEO_D[0]) / (ny - 1) };
+}
+function traceLevel(G, lv) {
+  var segs = [], nx = G.nx, ny = G.ny, v = G.v;
+  for (var j = 0; j < ny - 1; j++) for (var i = 0; i < nx - 1; i++) {
+    var v0 = v[j * nx + i], v1 = v[j * nx + i + 1], v2 = v[(j + 1) * nx + i + 1], v3 = v[(j + 1) * nx + i];
+    var c = (v0 > lv ? 1 : 0) | (v1 > lv ? 2 : 0) | (v2 > lv ? 4 : 0) | (v3 > lv ? 8 : 0);
+    var tab = MS[c];
+    if (!tab) continue;
+    var a0 = AGE_D[0] + i * G.da, i0 = IDEO_D[0] + j * G.di;
+    for (var q = 0; q < tab.length; q++) {
+      var p1 = edgePt(tab[q][0]), p2 = edgePt(tab[q][1]);
+      segs.push(p1[0], p1[1], p2[0], p2[1]);
+    }
+  }
+  return segs;
+  function edgePt(e) {
+    var t;
+    if (e === 0) { t = (lv - v0) / (v1 - v0); return [a0 + t * G.da, i0]; }
+    if (e === 1) { t = (lv - v1) / (v2 - v1); return [a0 + G.da, i0 + t * G.di]; }
+    if (e === 2) { t = (lv - v2) / (v3 - v2); return [a0 + G.da - t * G.da, i0 + G.di]; }
+    t = (lv - v3) / (v0 - v3); return [a0, i0 + G.di - t * G.di];
+  }
+}
+function computeContours(fit) {
+  CG = contourGrid(fit);
+  return LEVELS.map(function (lv) {
+    var s = traceLevel(CG, lv), lab = null, best = -Infinity;
+    for (var k = 0; k < s.length; k += 4) {
+      var mi = (s[k + 1] + s[k + 3]) / 2, ma = (s[k] + s[k + 2]) / 2;
+      if (mi < 2.6 && ma > 22 && ma < 84 && mi > best) { best = mi; lab = [ma, mi]; }
+    }
+    return { level: lv, segs: s, lab: lab };
+  });
+}
+
+/* ---------------------------------------------------------------
+   Building and rebuilding the sample
+--------------------------------------------------------------- */
+function makeJitter() {
+  var rng = mulberry32(seed ^ 0x5bd1e995);
+  jit = new Float32Array(N);
+  for (var i = 0; i < N; i++) jit[i] = rng();
+}
+function refitPS() {
+  psFit = fitPS(d, cfg.psModel);
+  contours = computeContours(psFit);
+  view.hoverC = null;
+  var lo = Infinity, hi = -Infinity;
+  for (var i = 0; i < N; i++) { if (psFit.ps[i] < lo) lo = psFit.ps[i]; if (psFit.ps[i] > hi) hi = psFit.ps[i]; }
+  view.tlmin = Math.max(0, lo - 0.03); view.tlmax = Math.min(1, hi + 0.03);
+}
+function rebuild(kind) {
+  if (kind === 'new') { base = genBase(seed, N); makeJitter(); }
+  d = assign(base, cfg);
+  d.hA = 0.9 * 1.06 * sd(d.age, null) * Math.pow(N, -0.2);
+  d.hI = 0.9 * 1.06 * sd(d.ideo, null) * Math.pow(N, -0.2);
+  before = computeBefore(d);
+  cov = pooledCov(d);
+  refitPS();
+  cemPrev = cemGrid(d, cfg.bins);
+  if (kind === 'new' || !disp) {
+    for (var i = 0; i < N; i++) { ra[i] = 0; rr[i] = R; pm[i] = d.t[i]; dlin[i] = psFit.ps[i]; }
+    view.lmin = view.tlmin; view.lmax = view.tlmax;
+    view.matched = false; view.m = null; view.anim = null; view.lineA = 0; view.matchA = 0; view.margA = 0; view.logAt = 0;
+    disp = beforeState(); from = cloneState(disp); to = cloneState(disp); settle.start = 0; settle.dur = 1;
+  }
+  sizeLove();
+  updateRegNote();
+  if (view.matched) doMatch('quick', false);
+  else setTarget(beforeState(), now(), 320);
+  updateCounts(); updateCaption();
+  kick();
+}
+
+/* ---------------------------------------------------------------
+   Matching and its animation timeline
+--------------------------------------------------------------- */
+/* The first few steps run slowly so the mechanics can be followed; the rest run fast. */
+var SLOW = [1, 0.78, 0.6, 0.46, 0.36];
+function seededShuffle(arr, s) {
+  var rng = mulberry32(s), a = arr.slice();
+  for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(rng() * (i + 1)), x = a[i]; a[i] = a[j]; a[j] = x; }
+  return a;
+}
+function candidates(m, i, taken, n) {
+  var list = [];
+  for (var q = 0; q < d.C.length; q++) {
+    var j = d.C[q];
+    if (!m.opts.repl && taken[j]) continue;
+    list.push({ j: j, d: m.dist(i, j) });
+  }
+  list.sort(function (a, b) { return a.d - b.d; });
+  return list.slice(0, n);
+}
+function buildAnim(m, kind, t0) {
+  var quick = kind === 'quick', i;
+  var A = { kind: kind, t0: t0, arrive: new Float64Array(N), gone: new Float64Array(N), flights: [], fails: [], steps: [], lineT: null };
+  for (i = 0; i < N; i++) { A.arrive[i] = Infinity; A.gone[i] = Infinity; }
+  var t = t0 + (quick ? 0 : 250), tLast = t;
+  if (m.kind === 'pairs') {
+    var E = m.events.length, K = quick ? 0 : Math.min(SLOW.length, E), taken = new Uint8Array(N);
+    var per = quick ? 0 : clamp(2400 / Math.max(1, E - K), 1.5, 45);
+    A.lineT = new Float64Array(E);
+    for (var k = 0; k < E; k++) {
+      var ev = m.events[k], te, dur, lag;
+      if (k < K) {
+        var s = SLOW[k], st = { kind: 'pair', i: ev.i, j: ev.j, s: s };
+        st.tF = t; st.tS = t + 550 * s; st.tP = st.tS + 1200 * s; st.tFly = st.tP + 500 * s;
+        st.fly = Math.max(FLY, 800 * s);
+        st.cand = candidates(m, ev.i, taken, 4);
+        var far = st.cand.length ? st.cand[st.cand.length - 1].d : 0;
+        st.rPick = ev.j >= 0 ? m.dist(ev.i, ev.j) : m.cal;
+        st.rMax = isFinite(m.cal) ? Math.max(st.rPick, Math.min(far, m.cal)) : far;
+        st.cal = m.cal;
+        A.steps.push(st);
+        te = st.tFly; dur = st.fly; lag = 2 * LAG;
+        t = st.tFly + 260 * s;
+      } else { te = t; dur = FLY; lag = LAG; t += per; }
+      if (quick) { te = t0; dur = 0; lag = 0; }
+      tLast = Math.max(tLast, te + dur + lag);
+      if (ev.j < 0) { A.fails.push({ i: ev.i, t: te }); A.lineT[k] = Infinity; continue; }
+      if (A.arrive[ev.i] === Infinity) { A.arrive[ev.i] = te + dur; A.gone[ev.i] = te; if (!quick) A.flights.push({ i: ev.i, t: te, dur: dur }); }
+      var tj = te + lag;
+      if (!quick) A.flights.push({ i: ev.j, t: tj, dur: dur });
+      if (A.arrive[ev.j] === Infinity) A.arrive[ev.j] = tj + dur;
+      if (!m.opts.repl) { taken[ev.j] = 1; if (A.gone[ev.j] === Infinity) A.gone[ev.j] = tj; }
+      A.lineT[k] = Math.max(A.arrive[ev.i], tj + dur);
+    }
+  } else {
+    var cells = {}, list = [];
+    for (i = 0; i < N; i++) {
+      var c = m.cell[i];
+      if (!cells[c]) cells[c] = { c: c, T: [], C: [] };
+      (d.t[i] ? cells[c].T : cells[c].C).push(i);
+    }
+    for (var key in cells) if (cells[key].T.length) list.push(cells[key]);
+    list.sort(function (p, q) { return p.c - q.c; });
+    list = seededShuffle(list, seed ^ 0x2545F491);
+    var pz = -1;
+    for (i = 0; i < list.length; i++) if (!list[i].C.length) { pz = i; break; }
+    if (pz > 2) list.splice(2, 0, list.splice(pz, 1)[0]);
+    var KC = quick ? 0 : Math.min(4, list.length), perC = quick ? 0 : clamp(1800 / Math.max(1, list.length - KC), 4, 90);
+    for (var q = 0; q < list.length; q++) {
+      var cell = list[q], kept = cell.C.length > 0, tc, durC;
+      if (q < KC) {
+        var sc = SLOW[q], sc0 = { kind: 'cell', cell: cell.c, nT: cell.T.length, nC: cell.C.length, kept: kept, members: cell.T.concat(cell.C), s: sc };
+        sc0.tF = t; sc0.tS = t + 500 * sc; sc0.tP = sc0.tS + 1000 * sc; sc0.tFly = sc0.tP + 450 * sc;
+        sc0.fly = Math.max(FLY, 800 * sc);
+        A.steps.push(sc0);
+        tc = sc0.tFly; durC = sc0.fly; t = sc0.tFly + 300 * sc;
+      } else { tc = t; durC = FLY; t += perC; }
+      if (quick) { tc = t0; durC = 0; }
+      if (!kept) { cell.T.forEach(function (u) { A.fails.push({ i: u, t: tc }); }); continue; }
+      cell.T.concat(cell.C).forEach(function (u, r) {
+        var s0 = tc + (quick || q < KC ? 0 : Math.min(160, r * 10));
+        A.arrive[u] = s0 + durC; A.gone[u] = s0;
+        if (!quick) A.flights.push({ i: u, t: s0, dur: durC });
+        tLast = Math.max(tLast, s0 + durC);
+      });
+    }
+  }
+  A.flights.sort(function (p, q) { return p.t - q.t; });
+  for (i = 0; i < A.steps.length; i++) A.steps[i].tNext = i + 1 < A.steps.length ? A.steps[i + 1].tF : A.steps[i].tFly + A.steps[i].fly;
+  A.slowEnd = A.steps.length ? A.steps[A.steps.length - 1].tNext : t0;
+  A.settleStart = quick ? t0 : tLast + 160;
+  A.settleDur = quick ? 380 : 700;
+  A.end = A.settleStart + A.settleDur;
+  return A;
+}
+function activeStep(t) {
+  var A = view.anim;
+  if (!view.matched || !A || A.kind !== 'full') return null;
+  for (var k = 0; k < A.steps.length; k++) { var st = A.steps[k]; if (t >= st.tF && t < st.tNext) return st; }
+  return null;
+}
+function doMatch(kind, logAtEnd) {
+  if (REDUCED) kind = 'quick';
+  var m = runMatch(d, stageOpts());
+  m.dens = densities(d, m.w);
+  m.opts = matchOpts();
+  var t = now();
+  var wasMatched = view.matched;
+  view.m = m; view.matched = true; view.nar = null;
+  view.anim = buildAnim(m, kind, t);
+  setTarget(stateOf(m.smd, isFinite(m.est) ? m.est : before.naive, m.dens), view.anim.settleStart, view.anim.settleDur);
+  if (!wasMatched) from.est = before.naive;
+  view.logAt = logAtEnd ? (kind === 'quick' ? t : view.anim.end) : 0;
+  view.countsAt = kind === 'quick' ? 0 : view.anim.settleStart;
+  updateCounts();
+  updateCaption(); updateButtons();
+  kick();
+}
+function unmatch() {
+  view.matched = false; view.logAt = 0; view.countsAt = 0;
+  setTarget(beforeState(), now(), 450);
+  updateCounts(); updateCaption(); updateButtons();
+  kick();
+}
+function wSize(m, w) {
+  var wn = w * m.usedC.length / Math.max(1, m.keptT.length);
+  return clamp(Math.sqrt(wn), 0.55, 2.4);
+}
+
+/* ---------------------------------------------------------------
+   Canvases
+--------------------------------------------------------------- */
+var el = {
+  stage: document.getElementById('stage'), wrap: document.getElementById('stage-wrap'), tip: document.getElementById('tip'),
+  love: document.getElementById('love'), est: document.getElementById('est'), rep: document.getElementById('rep'),
+  caption: document.getElementById('caption'), counts: document.getElementById('counts'),
+  note: document.getElementById('method-note'), hollowKey: document.getElementById('hollow-key'),
+  reg: document.getElementById('reg'), regNote: document.getElementById('reg-note'),
+  rate: document.getElementById('rate'), rateOut: document.getElementById('rate-out'), rateHint: document.getElementById('rate-hint'),
+  tau: document.getElementById('tau'), tauOut: document.getElementById('tau-out'),
+  sel: document.getElementById('sel'), selOut: document.getElementById('sel-out'),
+  hid: document.getElementById('hid'), hidOut: document.getElementById('hid-out'),
+  het: document.getElementById('het'), hetHint: document.getElementById('het-hint'),
+  resample: document.getElementById('resample'),
+  bins: document.getElementById('bins'), binsOut: document.getElementById('bins-out'),
+  repl: document.getElementById('repl'), cal: document.getElementById('cal'), calOut: document.getElementById('cal-out'),
+  go: document.getElementById('go'), undo: document.getElementById('undo'),
+  optCem: document.getElementById('opt-cem'), optNn: document.getElementById('opt-nn'),
+  optPs: document.getElementById('opt-ps'), optPairs: document.getElementById('opt-pairs'),
+  log: document.getElementById('log'), emptyLog: document.getElementById('empty-log'), clearLog: document.getElementById('clear-log'),
+  repGo: document.getElementById('rep-go'), repNote: document.getElementById('rep-note')
+};
+var dpr = 1, S = {}, LV = {}, ES = {}, RP = {}, RG = {};
+function fit(cv, store, h) {
+  var w = cv.clientWidth || cv.parentNode.clientWidth;
+  if (h == null) h = cv.clientHeight;
+  cv.style.height = h + 'px';
+  cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+  store.cv = cv; store.g = cv.getContext('2d'); store.w = w; store.h = h;
+}
+function loveRows() { return cfg.hid > 0 ? ['age', 'ideo', 'ext', 'U'] : ['age', 'ideo', 'ext']; }
+function sizeLove() {
+  var h = 14 + loveRows().length * 34 + 36;
+  if (LV.h !== h && LV.cv) fit(el.love, LV, h);
+}
+function setR() { R = clamp(S.w / 175, 3.1, 4.4) * clamp(Math.sqrt(400 / N), 0.6, 1.45); }
+function sizeCanvases() {
+  dpr = Math.min(window.devicePixelRatio || 1, 2);
+  var w = el.wrap.clientWidth, vh = window.innerHeight || 900;
+  el.wrap.style.height = (w < 680 ? 2 * clamp(0.5 * vh, 340, 420) + 18 : clamp(0.56 * vh, 400, 540)) + 'px';
+  fit(el.stage, S, el.wrap.clientHeight);
+  fit(el.love, LV, 14 + loveRows().length * 34 + 36);
+  fit(el.est, ES, 22 + 3 * 44 + 38);
+  fit(el.reg, RG, 330);
+  fit(el.rep, RP, 170);
+  setR();
+  kick();
+}
+
+/* ---------------------------------------------------------------
+   Two planes: the original sample and the matched sample drawn from it
+--------------------------------------------------------------- */
+var FLY = 520, LAG = 70;
+
+function layout() {
+  var W = S.w, H = S.h, L = { W: W, H: H, vertical: W < 680, planes: [] }, sh = view.stripH;
+  for (var p = 0; p < 2; p++) {
+    var P = { p: p }, half, hh;
+    if (!L.vertical) { half = (W - 30) / 2; P.bx0 = p ? half + 30 : 0; P.bx1 = P.bx0 + half; P.by0 = 0; P.by1 = H; }
+    else { hh = (H - 18) / 2; P.bx0 = 0; P.bx1 = W; P.by0 = p ? hh + 18 : 0; P.by1 = P.by0 + hh; }
+    P.full = p === 0 || L.vertical;
+    P.x0 = P.bx0 + (P.full ? 50 : 32);
+    P.x1 = P.bx1 - 40;
+    P.y0 = P.by0 + 26 + 32 + 6;
+    P.y1 = P.by1 - 38 - sh;
+    P.sTop = P.by1 - sh;
+    (function (P) {
+      P.sx = function (a) { return P.x0 + (a - AGE_D[0]) / (AGE_D[1] - AGE_D[0]) * (P.x1 - P.x0); };
+      P.sy = function (v) { return P.y1 - (v - IDEO_D[0]) / (IDEO_D[1] - IDEO_D[0]) * (P.y1 - P.y0); };
+      P.px = function (l) { return P.x0 + (l - view.lmin) / (view.lmax - view.lmin) * (P.x1 - P.x0); };
+    })(P);
+    L.planes.push(P);
+  }
+  return L;
+}
+function px(P, i) { return P.sx(d.age[i]); }
+function py(P, i) { return P.sy(d.ideo[i]); }
+function qx(P, i) { return P.px(dlin[i]); }
+function qy(P, i) { return d.t[i] ? P.sTop + 42 - jit[i] * 22 : P.sTop + 54 + jit[i] * 22; }
+function onRight(i) { return ra[i] > 0.3; }
+
+/* ---------------------------------------------------------------
+   Per-frame update
+--------------------------------------------------------------- */
+function easeKey(obj, key, target, k, eps) {
+  var v = obj[key], dv = target - v;
+  if (Math.abs(dv) < eps) { obj[key] = target; return false; }
+  obj[key] = v + dv * k; return true;
+}
+function narration(t) {
+  var A = view.anim, m = view.m;
+  if (!view.matched || !A || A.kind !== 'full' || t >= A.settleStart || !A.steps.length || t < A.steps[0].tF) return null;
+  var st = activeStep(t);
+  if (!st) return m.kind === 'cells' ? 'The same check, cell by cell, for the rest of the sample.' : 'The same steps, repeated for every treated respondent.';
+  var ph = t < st.tS ? 0 : t < st.tP ? 1 : 2;
+  if (st.kind === 'cell') {
+    if (ph === 0) return 'Take one cell of the grid.';
+    if (ph === 1) return 'It holds ' + st.nT + ' treated and ' + st.nC + (st.nC === 1 ? ' control.' : ' controls.');
+    return st.kept ? 'Both groups are present, so the whole cell moves to the matched sample.' : 'No control shares this cell, so its treated respondents are dropped.';
+  }
+  if (ph === 0) return 'Take one treated respondent.';
+  if (ph === 1) return m.opts.method === 'ps' ? 'Find the controls with the closest propensity score, wherever they sit in the plane.'
+    : 'Widen the search until it reaches the nearest ' + (m.opts.repl ? '' : 'available ') + 'controls.';
+  if (st.j < 0) return 'No control lies within the caliper, so this respondent is dropped.';
+  return 'Choose the closest, and move the pair to the matched sample.';
+}
+function update(t, dt) {
+  var k = 1 - Math.exp(-dt / 75), busy = false, i;
+  busy = easeKey(view, 'gridA', cfg.method === 'cem' ? 1 : 0, k, 0.004) || busy;
+  busy = easeKey(view, 'contA', cfg.method === 'ps' ? 1 : 0, k, 0.004) || busy;
+  busy = easeKey(view, 'stripH', cfg.method === 'ps' ? STRIP : 0, k, 0.3) || busy;
+  busy = easeKey(view, 'lineA', view.matched ? 1 : 0, k, 0.004) || busy;
+  busy = easeKey(view, 'matchA', view.matched ? 1 : 0, k, 0.004) || busy;
+  busy = easeKey(view, 'margA', view.matched && t >= settle.start ? 1 : 0, k, 0.004) || busy;
+  var st = activeStep(t);
+  busy = easeKey(view, 'focusA', st ? 1 : 0, k, 0.004) || busy;
+  inv.fill(0);
+  if (st) {
+    if (st.kind === 'pair') { inv[st.i] = 1; st.cand.forEach(function (c) { inv[c.j] = 1; }); }
+    else st.members.forEach(function (u) { inv[u] = 1; });
+  }
+  var nar = narration(t);
+  if (nar && nar !== view.nar) { view.nar = nar; el.caption.textContent = nar; }
+  else if (!nar && view.nar) { view.nar = null; updateCaption(); }
+  var bs = (view.matched && view.anim && view.anim.kind === 'full' && t < view.anim.settleStart) ? 'skip' : (view.matched ? 'again' : 'match');
+  if (bs !== view.bs) { view.bs = bs; el.go.textContent = bs === 'skip' ? 'Skip animation' : bs === 'again' ? 'Match again' : 'Match'; }
+  busy = easeKey(view, 'lmin', view.tlmin, k, 0.002) || busy;
+  busy = easeKey(view, 'lmax', view.tlmax, k, 0.002) || busy;
+  var m = view.m, A = view.anim, kp = 1 - Math.exp(-dt / 60), maxd = 0;
+  for (i = 0; i < N; i++) {
+    var a = 0, r = R;
+    if (view.matched && m && m.w[i] > 0 && t >= A.arrive[i]) {
+      a = 1;
+      if (!d.t[i] && t >= A.settleStart) r = R * wSize(m, m.w[i]);
+      if (A.kind === 'full' && ra[i] < 1) ra[i] = 1;
+    }
+    var d1 = a - ra[i], d2 = r - rr[i], d3 = d.t[i] - pm[i], d4 = psFit.ps[i] - dlin[i];
+    ra[i] += d1 * kp; rr[i] += d2 * kp; pm[i] += d3 * kp; dlin[i] += d4 * k;
+    if (Math.abs(d1) > maxd) maxd = Math.abs(d1);
+    if (Math.abs(d2) / 8 > maxd) maxd = Math.abs(d2) / 8;
+    if (Math.abs(d3) > maxd) maxd = Math.abs(d3);
+    if (Math.abs(d4) * 10 > maxd) maxd = Math.abs(d4) * 10;
+  }
+  if (maxd > 0.003) busy = true;
+  if (applySettle(t)) busy = true;
+  if (A && t < A.end + 120) busy = true;
+  if (view.countsAt && t >= view.countsAt) { view.countsAt = 0; updateCounts(); }
+  if (view.logAt && t >= view.logAt) { view.logAt = 0; logRun(); }
+  return busy;
+}
+
+/* ---------------------------------------------------------------
+   Drawing
+--------------------------------------------------------------- */
+function drawStage(t) {
+  var g = S.g, L = layout();
+  g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  g.clearRect(0, 0, S.w, S.h);
+  L.planes.forEach(function (P) {
+    var pw = P.x1 - P.x0, ph = P.y1 - P.y0;
+    drawTitle(g, P, t);
+    g.save();
+    g.beginPath(); g.rect(P.x0, P.y0, pw, ph); g.clip();
+    drawCEM(g, P);
+    drawContours(g, P);
+    if (P.p === 0) drawHoverMetric(g, P);
+    if (P.p === 1) drawPairLines(g, P, t, false);
+    drawPoints(g, P, false, t);
+    if (P.p === 0) { drawSources(g, P, t, false); drawFails(g, P, t, false); drawStep(g, P, t, false); }
+    drawHoverMark(g, P, false);
+    g.restore();
+    g.strokeStyle = RULE; g.lineWidth = 1;
+    g.strokeRect(P.x0 + 0.5, P.y0 + 0.5, pw - 1, ph - 1);
+    if (P.p === 1 && view.matchA < 0.02) {
+      g.fillStyle = GRAPH; g.font = 'italic 15px ' + SERIF; g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.fillText('Press Match to draw the matched sample', (P.x0 + P.x1) / 2, (P.y0 + P.y1) / 2);
+    }
+    drawAxes(g, P);
+    drawMarginals(g, P);
+    if (view.stripH > 1) drawStrip(g, P, t);
+  });
+  drawFlights(g, L, t);
+}
+
+function drawTitle(g, P, t) {
+  var y = P.by0 + 15;
+  g.textBaseline = 'alphabetic';
+  g.fillStyle = INK; g.font = '500 16px ' + SERIF; g.textAlign = 'left';
+  g.fillText(P.p === 0 ? 'Original sample' : 'Matched sample', P.x0, y);
+  var tw = g.measureText(P.p === 0 ? 'Original sample' : 'Matched sample').width, m = view.m, opts = [];
+  if (P.p === 0) opts = [N + ' respondents, ' + d.T.length + ' treated', 'N = ' + N + ', ' + d.T.length + ' treated'];
+  else if (view.matched && m && !view.countsAt) {
+    var wtd = m.kind === 'cells' || m.opts.repl || m.opts.ratio > 1;
+    opts = [m.keptT.length + ' treated, ' + m.usedC.length + ' controls' + (wtd ? ', weighted' : ''), m.keptT.length + ' treated, ' + m.usedC.length + ' controls'];
+  }
+  g.fillStyle = GRAPH; g.font = '12.5px ' + SANS; g.textAlign = 'right';
+  for (var k = 0; k < opts.length; k++) {
+    if (P.x0 + tw + 14 + g.measureText(opts[k]).width <= P.x1) { g.fillText(opts[k], P.x1, y); break; }
+  }
+}
+
+function drawCEM(g, P) {
+  if (view.gridA < 0.01) return;
+  var grid = cemPrev, k;
+  g.strokeStyle = 'rgba(87,101,107,' + (0.5 * view.gridA).toFixed(3) + ')';
+  g.lineWidth = 1;
+  g.beginPath();
+  for (k = 0; k < grid.cutsA.length; k++) { var x = Math.round(P.sx(grid.cutsA[k])) + 0.5; g.moveTo(x, P.y0); g.lineTo(x, P.y1); }
+  for (k = 0; k < grid.cutsI.length; k++) { var y = Math.round(P.sy(grid.cutsI[k])) + 0.5; g.moveTo(P.x0, y); g.lineTo(P.x1, y); }
+  g.stroke();
+}
+
+function drawContours(g, P) {
+  if (view.contA < 0.01 || !contours) return;
+  var f = P.p === 0 ? 1 : 0.55;
+  g.save();
+  g.setLineDash([5, 4]); g.lineWidth = 1.2;
+  contours.forEach(function (c, ci) {
+    if (!c.segs.length) return;
+    g.strokeStyle = rgba(TRT, (0.3 + 0.08 * ci) * view.contA * f);
+    g.beginPath();
+    for (var k = 0; k < c.segs.length; k += 4) {
+      g.moveTo(P.sx(c.segs[k]), P.sy(c.segs[k + 1])); g.lineTo(P.sx(c.segs[k + 2]), P.sy(c.segs[k + 3]));
+    }
+    g.stroke();
+  });
+  g.setLineDash([]);
+  if (P.p === 0) {
+    g.font = '500 11.5px ' + SANS; g.textAlign = 'left'; g.textBaseline = 'middle';
+    contours.forEach(function (c) {
+      if (!c.lab) return;
+      var x = P.sx(c.lab[0]) + 5, y = P.sy(c.lab[1]) - 7;
+      g.fillStyle = rgba(TRT, 0.9 * view.contA); haloText(g, String(c.level), x, y);
+    });
+  }
+  if (view.hoverC && view.hover >= 0) {
+    g.strokeStyle = rgba(TRT, 0.95); g.lineWidth = 2;
+    g.beginPath();
+    var s2 = view.hoverC;
+    for (var q = 0; q < s2.length; q += 4) { g.moveTo(P.sx(s2[q]), P.sy(s2[q + 1])); g.lineTo(P.sx(s2[q + 2]), P.sy(s2[q + 3])); }
+    g.stroke();
+  }
+  g.restore();
+}
+
+function drawPairLines(g, P, t, strip) {
+  var m = view.m, A = view.anim;
+  if (!m || m.kind !== 'pairs' || view.lineA < 0.01) return;
+  var hv = view.hover, hot = [];
+  g.lineWidth = 1.2;
+  g.strokeStyle = 'rgba(29,42,48,' + (0.45 * view.lineA).toFixed(3) + ')';
+  g.beginPath();
+  for (var k = 0; k < m.events.length; k++) {
+    var ev = m.events[k], tl = A.lineT[k];
+    if (ev.j < 0 || t < tl) continue;
+    var u = A.kind === 'quick' ? 1 : easeOut(clamp((t - tl) / 200, 0, 1));
+    var x1 = strip ? qx(P, ev.i) : px(P, ev.i), y1 = strip ? qy(P, ev.i) : py(P, ev.i);
+    var x2 = strip ? qx(P, ev.j) : px(P, ev.j), y2 = strip ? qy(P, ev.j) : py(P, ev.j);
+    var xe = lerp(x1, x2, u), ye = lerp(y1, y2, u);
+    if (hv === ev.i || hv === ev.j) { hot.push([x1, y1, xe, ye]); continue; }
+    g.moveTo(x1, y1); g.lineTo(xe, ye);
+  }
+  g.stroke();
+  if (hot.length) {
+    g.lineWidth = 1.8; g.strokeStyle = 'rgba(29,42,48,' + (0.95 * view.lineA).toFixed(3) + ')';
+    g.beginPath();
+    hot.forEach(function (h) { g.moveTo(h[0], h[1]); g.lineTo(h[2], h[3]); });
+    g.stroke();
+  }
+}
+
+function drawPoints(g, P, strip, t) {
+  var right = P.p === 1, A = view.anim, i, dim = 1 - 0.75 * view.focusA;
+  for (var pass = 0; pass < 2; pass++) {
+    for (i = 0; i < N; i++) {
+      if ((pm[i] >= 0.5) !== (pass === 1)) continue;
+      var a = right ? ra[i] : (inv[i] ? 1 : dim);
+      if (a < 0.01) continue;
+      var x = strip ? qx(P, i) : px(P, i), y = strip ? qy(P, i) : py(P, i);
+      var r = right ? rr[i] : R;
+      if (strip) r = Math.min(r, R * 1.4) * 0.85;
+      var c = mixRGB(CTL, TRT, clamp(pm[i], 0, 1));
+      var hollow = !right && view.matched && A && t >= A.gone[i];
+      g.beginPath(); g.arc(x, y, hollow ? Math.max(1, r - 0.7) : r, 0, 6.2832);
+      if (hollow) { g.lineWidth = 1.3; g.strokeStyle = rgba(c, 0.85 * a); g.stroke(); continue; }
+      g.fillStyle = rgba(c, a); g.fill();
+      if (a > 0.5) { g.lineWidth = R > 3 ? 0.8 : 0.5; g.strokeStyle = 'rgba(238,241,240,0.85)'; g.stroke(); }
+    }
+  }
+}
+
+/* a faint ring marks where a unit is being drawn from */
+function drawSources(g, P, t, strip) {
+  var A = view.anim;
+  if (!view.matched || !A || A.kind !== 'full') return;
+  g.lineWidth = 1.2;
+  for (var k = 0; k < A.flights.length; k++) {
+    var f = A.flights[k], u = (t - f.t) / f.dur;
+    if (u < 0) break;
+    if (u > 1) continue;
+    var x = strip ? qx(P, f.i) : px(P, f.i), y = strip ? qy(P, f.i) : py(P, f.i);
+    g.strokeStyle = 'rgba(29,42,48,' + (0.55 * (1 - u)).toFixed(3) + ')';
+    g.beginPath(); g.arc(x, y, R + 3, 0, 6.2832); g.stroke();
+  }
+}
+function drawFails(g, P, t, strip) {
+  var A = view.anim;
+  if (!view.matched || !A || A.kind !== 'full') return;
+  g.lineWidth = 1.3;
+  for (var k = 0; k < A.fails.length; k++) {
+    var f = A.fails[k], u = (t - f.t) / 600;
+    if (u < 0 || u > 1) continue;
+    var x = strip ? qx(P, f.i) : px(P, f.i), y = strip ? qy(P, f.i) : py(P, f.i);
+    g.strokeStyle = 'rgba(87,101,107,' + (0.7 * (1 - u)).toFixed(3) + ')';
+    g.beginPath(); g.arc(x, y, R + 2 + 14 * easeOut(u), 0, 6.2832); g.stroke();
+  }
+}
+
+/* the focused step: pick a treated unit, search, choose */
+function drawEllipse(g, P, i, r, dashed, fill) {
+  var S0 = cov.S, l11 = Math.sqrt(S0[0]), l21 = S0[1] / l11, l22 = Math.sqrt(Math.max(1e-9, S0[2] - l21 * l21)), raw = view.m && view.m.opts.dist === 'raw';
+  g.beginPath();
+  for (var k = 0; k <= 72; k++) {
+    var th = k / 72 * 6.2832, c = Math.cos(th), s = Math.sin(th), da, di;
+    if (raw) { da = r * c; di = r * s; } else { da = r * l11 * c; di = r * (l21 * c + l22 * s); }
+    var x = P.sx(d.age[i] + da), y = P.sy(d.ideo[i] + di);
+    if (k === 0) g.moveTo(x, y); else g.lineTo(x, y);
+  }
+  if (fill) { g.fillStyle = fill; g.fill(); }
+  if (dashed) g.setLineDash([4, 3]);
+  g.stroke(); g.setLineDash([]);
+}
+function drawLevelSegs(g, P, segs) {
+  g.beginPath();
+  for (var q = 0; q < segs.length; q += 4) { g.moveTo(P.sx(segs[q]), P.sy(segs[q + 1])); g.lineTo(P.sx(segs[q + 2]), P.sy(segs[q + 3])); }
+  g.stroke();
+}
+function drawStep(g, P, t, strip) {
+  var st = activeStep(t), m = view.m;
+  if (!st || t >= st.tFly) return;
+  var ph = t < st.tS ? 0 : t < st.tP ? 1 : 2;
+  if (st.kind === 'cell') {
+    if (strip) return;
+    var b = m.b, col = Math.floor(st.cell / b), row = st.cell % b;
+    var eA = [AGE_D[0]].concat(m.cutsA, [AGE_D[1]]), eI = [IDEO_D[0]].concat(m.cutsI, [IDEO_D[1]]);
+    var xa = P.sx(eA[col]), xb = P.sx(eA[col + 1]), ya = P.sy(eI[row + 1]), yb = P.sy(eI[row]);
+    g.fillStyle = 'rgba(29,42,48,' + (ph ? 0.07 : 0.03).toFixed(3) + ')'; g.fillRect(xa, ya, xb - xa, yb - ya);
+    g.strokeStyle = ph === 2 && !st.kept ? GRAPH : INK; g.lineWidth = 2; g.strokeRect(xa, ya, xb - xa, yb - ya);
+    if (ph >= 1) {
+      var lab = st.nT + ' treated, ' + st.nC + (st.nC === 1 ? ' control' : ' controls');
+      g.font = '500 12.5px ' + SANS; g.textBaseline = 'bottom'; g.textAlign = 'left'; g.fillStyle = INK;
+      haloText(g, lab, clamp(xa, P.x0 + 2, P.x1 - g.measureText(lab).width - 2), Math.max(P.y0 + 14, ya - 4));
+    }
+    return;
+  }
+  var i = st.i, ps = m.opts.method === 'ps';
+  var fx = strip ? qx(P, i) : px(P, i), fy = strip ? qy(P, i) : py(P, i);
+  var r = 0, pickU = ph === 2 ? clamp((t - st.tP) / (0.6 * (st.tFly - st.tP)), 0, 1) : 0;
+  if (ph === 1) r = st.rMax * easeInOut((t - st.tS) / (st.tP - st.tS));
+  else if (ph === 2) r = lerp(st.rMax, st.j >= 0 ? st.rPick : st.rMax, easeInOut(pickU));
+  if (ph >= 1) {
+    g.strokeStyle = 'rgba(29,42,48,0.75)'; g.lineWidth = 1.4;
+    if (ps) {
+      var l = psFit.ps[i];
+      if (strip) {
+        var xa2 = P.px(l - r), xb2 = P.px(l + r);
+        g.fillStyle = 'rgba(29,42,48,0.07)'; g.fillRect(xa2, P.sTop + 18, xb2 - xa2, 62);
+        g.beginPath(); g.moveTo(xa2, P.sTop + 18); g.lineTo(xa2, P.sTop + 80); g.moveTo(xb2, P.sTop + 18); g.lineTo(xb2, P.sTop + 80); g.stroke();
+        if (isFinite(st.cal)) {
+          g.strokeStyle = GRAPH; g.setLineDash([3, 3]);
+          g.beginPath(); g.moveTo(P.px(l - st.cal), P.sTop + 18); g.lineTo(P.px(l - st.cal), P.sTop + 80);
+          g.moveTo(P.px(l + st.cal), P.sTop + 18); g.lineTo(P.px(l + st.cal), P.sTop + 80); g.stroke(); g.setLineDash([]);
+        }
+      } else if (CG) {
+        g.strokeStyle = rgba(TRT, 0.95); g.lineWidth = 1.8; drawLevelSegs(g, P, traceLevel(CG, l));
+        if (r > 1e-4) {
+          g.strokeStyle = 'rgba(29,42,48,0.6)'; g.lineWidth = 1.2; g.setLineDash([4, 3]);
+          drawLevelSegs(g, P, traceLevel(CG, l - r)); drawLevelSegs(g, P, traceLevel(CG, l + r));
+          g.setLineDash([]);
+        }
+      }
+    } else if (!strip) {
+      if (isFinite(st.cal)) { g.strokeStyle = GRAPH; g.lineWidth = 1.2; drawEllipse(g, P, i, st.cal, true, null); }
+      g.strokeStyle = 'rgba(29,42,48,0.8)'; g.lineWidth = 1.5;
+      if (r > 1e-4) drawEllipse(g, P, i, r, false, 'rgba(29,42,48,0.05)');
+    }
+    st.cand.forEach(function (c) {
+      var chosen = c.j === st.j, a;
+      if (c.d > r + 1e-9 && !(ph === 2 && chosen)) return;
+      a = ph === 2 && !chosen ? 1 - pickU : 1;
+      if (a < 0.02) return;
+      var cx = strip ? qx(P, c.j) : px(P, c.j), cy = strip ? qy(P, c.j) : py(P, c.j);
+      var strong = ph === 2 && chosen;
+      g.strokeStyle = 'rgba(29,42,48,' + (strong ? 0.95 : 0.6 * a).toFixed(3) + ')';
+      g.lineWidth = strong ? 2 : 1.2;
+      if (!strong) g.setLineDash([3, 3]);
+      g.beginPath(); g.moveTo(fx, fy); g.lineTo(cx, cy); g.stroke(); g.setLineDash([]);
+      g.lineWidth = strong ? 2.2 : 1.4;
+      g.beginPath(); g.arc(cx, cy, R + (strong ? 4 : 3), 0, 6.2832); g.stroke();
+    });
+  }
+  var pulse = 1 + 0.25 * Math.sin((t - st.tF) / 110);
+  g.strokeStyle = ph === 2 && st.j < 0 ? GRAPH : TRT_HEX; g.lineWidth = 2.4;
+  g.beginPath(); g.arc(fx, fy, (R + 4) * pulse, 0, 6.2832); g.stroke();
+}
+
+/* units travel from the original plane to the matched plane */
+function drawFlights(g, L, t) {
+  var A = view.anim;
+  if (!view.matched || !A || A.kind !== 'full') return;
+  var P0 = L.planes[0], P1 = L.planes[1];
+  for (var k = 0; k < A.flights.length; k++) {
+    var f = A.flights[k], u = (t - f.t) / f.dur;
+    if (u < 0) break;
+    if (u >= 1) continue;
+    var e = easeInOut(u), i = f.i;
+    var x = lerp(px(P0, i), px(P1, i), e), y = lerp(py(P0, i), py(P1, i), e);
+    var lift = Math.sin(Math.PI * e) * 26;
+    if (L.vertical) x += lift; else y -= lift;
+    var c = d.t[i] ? TRT : CTL;
+    g.beginPath(); g.arc(x, y, R * 1.05, 0, 6.2832);
+    g.fillStyle = rgba(c, 0.95); g.fill();
+    g.lineWidth = 0.8; g.strokeStyle = 'rgba(238,241,240,0.9)'; g.stroke();
+  }
+}
+
+function drawHoverMark(g, P, strip) {
+  var i = view.hover;
+  if (i < 0 || (P.p === 1 && !onRight(i))) return;
+  var x = strip ? qx(P, i) : px(P, i), y = strip ? qy(P, i) : py(P, i);
+  var r = P.p === 1 ? rr[i] : R;
+  g.strokeStyle = INK; g.lineWidth = 1.6;
+  g.beginPath(); g.arc(x, y, Math.max(r, R) + 3.5, 0, 6.2832); g.stroke();
+}
+
+/* the distance that defines "nearest" around the hovered treated unit */
+function nearestInfo(i) {
+  var m = view.m;
+  if (view.matched && m && m.kind === 'pairs' && m.opts.method === 'nn') {
+    var mt = m.mt[i];
+    if (mt && mt.length) {
+      var r = 0; for (var k = 0; k < mt.length; k++) r = Math.max(r, m.dist(i, mt[k]));
+      return { r: r, j: -1 };
+    }
+    return isFinite(m.cal) ? { r: m.cal, j: -1 } : null;
+  }
+  if (view.matched) return null;
+  var best = -1, bd = Infinity;
+  for (var q = 0; q < d.C.length; q++) {
+    var j = d.C[q], dd = distRaw(i, j);
+    if (dd < bd) { bd = dd; best = j; }
+  }
+  return { r: bd, j: best };
+}
+function distRaw(i, j) {
+  var a = d.age[i] - d.age[j], x = d.ideo[i] - d.ideo[j];
+  if (cfg.dist === 'raw') return Math.sqrt(a * a + x * x);
+  var V = cov.inv;
+  return Math.sqrt(Math.max(0, V[0] * a * a + 2 * V[1] * a * x + V[2] * x * x));
+}
+function drawHoverMetric(g, P) {
+  var i = view.hover;
+  if (i < 0 || !d.t[i] || cfg.method !== 'nn') return;
+  var info = nearestInfo(i);
+  if (!info || !isFinite(info.r)) return;
+  var S0 = cov.S, l11 = Math.sqrt(S0[0]), l21 = S0[1] / l11, l22 = Math.sqrt(Math.max(1e-9, S0[2] - l21 * l21));
+  g.beginPath();
+  for (var k = 0; k <= 72; k++) {
+    var th = k / 72 * 6.2832, c = Math.cos(th), s = Math.sin(th), da, di;
+    if (cfg.dist === 'raw') { da = info.r * c; di = info.r * s; }
+    else { da = info.r * l11 * c; di = info.r * (l21 * c + l22 * s); }
+    var x = P.sx(d.age[i] + da), y = P.sy(d.ideo[i] + di);
+    if (k === 0) g.moveTo(x, y); else g.lineTo(x, y);
+  }
+  g.fillStyle = 'rgba(29,42,48,0.05)'; g.fill();
+  g.setLineDash([4, 3]); g.strokeStyle = 'rgba(29,42,48,0.7)'; g.lineWidth = 1.2; g.stroke(); g.setLineDash([]);
+  if (info.j >= 0) {
+    g.strokeStyle = INK; g.lineWidth = 1.6;
+    g.beginPath(); g.moveTo(px(P, i), py(P, i)); g.lineTo(px(P, info.j), py(P, info.j)); g.stroke();
+    g.beginPath(); g.arc(px(P, info.j), py(P, info.j), R + 3.5, 0, 6.2832); g.stroke();
+  }
+}
+
+function drawAxes(g, P) {
+  g.fillStyle = GRAPH; g.strokeStyle = GRAPH; g.lineWidth = 1;
+  g.font = '12px ' + SANS; g.textAlign = 'center'; g.textBaseline = 'top';
+  g.beginPath();
+  for (var a = 20; a <= 80; a += 10) {
+    var x = Math.round(P.sx(a)) + 0.5;
+    g.moveTo(x, P.y1); g.lineTo(x, P.y1 + 4);
+    g.fillText(String(a), x, P.y1 + 7);
+  }
+  g.stroke();
+  g.fillStyle = INK; g.font = '13px ' + SANS;
+  g.fillText('Age', (P.x0 + P.x1) / 2, P.y1 + 22);
+  g.fillStyle = GRAPH; g.font = '12px ' + SANS; g.textAlign = 'right'; g.textBaseline = 'middle';
+  g.beginPath();
+  for (var v = -2; v <= 2; v++) {
+    var y = Math.round(P.sy(v)) + 0.5;
+    g.moveTo(P.x0 - 4, y); g.lineTo(P.x0, y);
+    g.fillText(v === 0 ? '0' : (v < 0 ? MINUS : '+') + Math.abs(v), P.x0 - 7, y);
+  }
+  g.stroke();
+  if (!P.full) return;
+  g.save();
+  g.translate(P.bx0 + 13, (P.y0 + P.y1) / 2); g.rotate(-Math.PI / 2);
+  var half = (P.y1 - P.y0) / 2;
+  g.textAlign = 'center'; g.fillStyle = INK; g.font = '13px ' + SANS; g.fillText('Ideology', 0, 0);
+  g.font = 'italic 12px ' + SERIF; g.fillStyle = GRAPH;
+  g.textAlign = 'left'; g.fillText('liberal', -half + 2, 0);
+  g.textAlign = 'right'; g.fillText('conservative', half - 2, 0);
+  g.restore();
+}
+
+function drawMarginals(g, P) {
+  var dens = P.p === 0 ? before.dens : (view.m ? view.m.dens : null), a = P.p === 0 ? 1 : view.margA;
+  if (!dens || a < 0.01) return;
+  var yb = P.y0 - 3, bh = 30, xb = P.x1 + 3, bw = 32;
+  var sA = bh / before.scaleA, sI = bw / before.scaleI;
+  g.save();
+  g.beginPath(); g.rect(P.x0, yb - bh - 1, P.x1 - P.x0, bh + 1); g.clip();
+  [['aC', CTL], ['aT', TRT]].forEach(function (q) {
+    var arr = dens[q[0]], k;
+    g.beginPath(); g.moveTo(P.sx(ageGrid[0]), yb);
+    for (k = 0; k < GRID; k++) g.lineTo(P.sx(ageGrid[k]), yb - arr[k] * sA);
+    g.lineTo(P.sx(ageGrid[GRID - 1]), yb);
+    g.fillStyle = rgba(q[1], 0.07 * a); g.fill();
+    g.beginPath();
+    for (k = 0; k < GRID; k++) { var y = yb - arr[k] * sA; if (k === 0) g.moveTo(P.sx(ageGrid[k]), y); else g.lineTo(P.sx(ageGrid[k]), y); }
+    g.strokeStyle = rgba(q[1], a); g.lineWidth = 1.5; g.stroke();
+  });
+  g.restore();
+  g.save();
+  g.beginPath(); g.rect(xb, P.y0, bw + 1, P.y1 - P.y0); g.clip();
+  [['iC', CTL], ['iT', TRT]].forEach(function (q) {
+    var arr = dens[q[0]], k;
+    g.beginPath(); g.moveTo(xb, P.sy(ideoGrid[0]));
+    for (k = 0; k < GRID; k++) g.lineTo(xb + arr[k] * sI, P.sy(ideoGrid[k]));
+    g.lineTo(xb, P.sy(ideoGrid[GRID - 1]));
+    g.fillStyle = rgba(q[1], 0.07 * a); g.fill();
+    g.beginPath();
+    for (k = 0; k < GRID; k++) { var x = xb + arr[k] * sI; if (k === 0) g.moveTo(x, P.sy(ideoGrid[k])); else g.lineTo(x, P.sy(ideoGrid[k])); }
+    g.strokeStyle = rgba(q[1], a); g.lineWidth = 1.5; g.stroke();
+  });
+  g.restore();
+  g.strokeStyle = RULE; g.lineWidth = 1;
+  g.beginPath(); g.moveTo(P.x0, yb + 0.5); g.lineTo(P.x1, yb + 0.5); g.moveTo(xb - 0.5, P.y0); g.lineTo(xb - 0.5, P.y1); g.stroke();
+}
+
+function drawStrip(g, P, t) {
+  var f = clamp(view.stripH / STRIP, 0, 1);
+  g.save();
+  g.beginPath(); g.rect(P.bx0, P.sTop, P.bx1 - P.bx0, view.stripH); g.clip();
+  g.globalAlpha = f;
+  var yAx = P.sTop + 48;
+  g.fillStyle = INK; g.font = '13px ' + SANS; g.textAlign = 'left'; g.textBaseline = 'alphabetic';
+  g.fillText('Propensity score', P.x0, P.sTop + 13);
+  if (P.p === 0) {
+    g.fillStyle = GRAPH; g.font = '12px ' + SANS; g.textAlign = 'right';
+    g.fillText(cfg.psModel === 'lin' ? 'linear model' : 'model with squares', P.x1, P.sTop + 13);
+  }
+  g.strokeStyle = GRAPH; g.lineWidth = 1;
+  g.beginPath(); g.moveTo(P.x0, yAx + 0.5); g.lineTo(P.x1, yAx + 0.5); g.stroke();
+  var probs = [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.6, 0.7, 0.8, 0.9, 1], lastX = -1e9;
+  g.fillStyle = GRAPH; g.font = '12px ' + SANS; g.textAlign = 'center';
+  probs.forEach(function (p) {
+    var x = P.px(p);
+    if (x < P.x0 + 4 || x > P.x1 - 4 || x - lastX < 34) return;
+    lastX = x;
+    g.beginPath(); g.moveTo(x, yAx - 3); g.lineTo(x, yAx + 3); g.stroke();
+    g.fillText(String(p), x, P.sTop + STRIP - 3);
+  });
+  if (P.p === 1) drawPairLines(g, P, t, true);
+  drawPoints(g, P, true, t);
+  if (P.p === 0) { drawSources(g, P, t, true); drawFails(g, P, t, true); drawStep(g, P, t, true); }
+  drawHoverMark(g, P, true);
+  g.restore();
+}
+
+/* ---------------------------------------------------------------
+   Why the regression misses: the outcome surface against its linear fit
+--------------------------------------------------------------- */
+function olsCoef(dd) {
+  var A = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]], v = [0, 0, 0, 0];
+  for (var i = 0; i < dd.n; i++) {
+    var x = [1, dd.t[i], dd.age[i] - 48, dd.ideo[i]];
+    for (var r = 0; r < 4; r++) { v[r] += x[r] * dd.y[i]; for (var c = 0; c < 4; c++) A[r][c] += x[r] * x[c]; }
+  }
+  return solve(A, v);
+}
+function drawReg() {
+  if (!RG.g) return;
+  var g = RG.g, W = RG.w, H = RG.h, b = before.olsB, k, i;
+  g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+  var x0 = 40, x1 = W - 4, top = 20, mid = 30, axisH = 26;
+  var ph = (H - top - mid - axisH) / 2;
+  var panes = [{ y0: top, y1: top + ph, fit: true }, { y0: top + ph + mid, y1: top + 2 * ph + mid, fit: false }];
+  var ya = new Float64Array(N), srt = [];
+  for (i = 0; i < N; i++) { ya[i] = d.y[i] - b[2] * (d.age[i] - 48); srt.push(ya[i]); }
+  srt.sort(function (p, q) { return p - q; });
+  var lo = 5 * Math.floor((Math.min(srt[Math.floor(0.02 * N)], baseSupport(48, 2.4)) - 2) / 5), hi = 5 * Math.ceil((srt[Math.floor(0.98 * N)] + 2) / 5);
+  function X(v) { return x0 + (v - IDEO_D[0]) / (IDEO_D[1] - IDEO_D[0]) * (x1 - x0); }
+  var rad = N > 800 ? 1.3 : N > 300 ? 1.7 : 2.3, xb = 1.75;
+  function ctl(v, fit) { return fit ? b[0] + b[3] * v : baseSupport(48, v); }
+  function trt(v, fit) { return fit ? b[0] + b[1] + b[3] * v : baseSupport(48, v) + effectAt(v, cfg.het, cfg.tau); }
+  panes.forEach(function (pn) {
+    function Y(v) { return pn.y1 - (v - lo) / (hi - lo) * (pn.y1 - pn.y0); }
+    g.textBaseline = 'alphabetic'; g.textAlign = 'left'; g.fillStyle = INK; g.font = '500 13px ' + SANS;
+    g.fillText(pn.fit ? 'Regression: parallel straight lines' : 'Truth: support peaks at the center', x0, pn.y0 - 6);
+    g.save(); g.beginPath(); g.rect(x0, pn.y0, x1 - x0, pn.y1 - pn.y0); g.clip();
+    for (var pass = 0; pass < 2; pass++) {
+      g.fillStyle = pass ? rgba(TRT, 0.55) : rgba(CTL, 0.3);
+      for (i = 0; i < N; i++) {
+        if (d.t[i] !== pass) continue;
+        g.beginPath(); g.arc(X(d.ideo[i]), Y(ya[i]), rad, 0, 6.2832); g.fill();
+      }
+    }
+    [[ctl, CTL], [trt, TRT]].forEach(function (q) {
+      g.beginPath();
+      for (k = 0; k < GRID; k++) { var xx = X(ideoGrid[k]), yy = Y(q[0](ideoGrid[k], pn.fit)); if (k === 0) g.moveTo(xx, yy); else g.lineTo(xx, yy); }
+      g.strokeStyle = rgba(q[1], 1); g.lineWidth = 2.2; g.stroke();
+    });
+    var yc = Y(ctl(xb, pn.fit)), yt = Y(trt(xb, pn.fit)), xx2 = X(xb);
+    g.strokeStyle = INK; g.lineWidth = 1.4;
+    g.beginPath(); g.moveTo(xx2, yc); g.lineTo(xx2, yt); g.moveTo(xx2 - 4, yc); g.lineTo(xx2 + 4, yc); g.moveTo(xx2 - 4, yt); g.lineTo(xx2 + 4, yt); g.stroke();
+    var gapv = pn.fit ? b[1] : (cfg.het ? d.att : cfg.tau);
+    g.fillStyle = INK; g.font = '500 13px ' + SANS; g.textAlign = 'right'; g.textBaseline = 'middle';
+    haloText(g, (pn.fit ? 'gap ' : (cfg.het ? 'average gap ' : 'gap ')) + signed(gapv), xx2 - 8, (yc + yt) / 2);
+    g.restore();
+    g.strokeStyle = RULE; g.lineWidth = 1; g.strokeRect(x0 + 0.5, pn.y0 + 0.5, x1 - x0 - 1, pn.y1 - pn.y0 - 1);
+    g.fillStyle = GRAPH; g.font = '11.5px ' + SANS; g.textAlign = 'right'; g.textBaseline = 'middle';
+    g.fillText(String(lo), x0 - 4, pn.y1 - 5); g.fillText(String(hi), x0 - 4, pn.y0 + 5);
+  });
+  var yA = panes[1].y1;
+  g.fillStyle = GRAPH; g.font = '12px ' + SANS; g.textBaseline = 'top'; g.textAlign = 'center';
+  g.fillText('ideology', X(0), yA + 5);
+  g.font = 'italic 12px ' + SERIF;
+  g.textAlign = 'left'; g.fillText('liberal', x0, yA + 5);
+  g.textAlign = 'right'; g.fillText('conservative', x1, yA + 5);
+  g.save(); g.translate(9, (panes[0].y0 + panes[1].y1) / 2); g.rotate(-Math.PI / 2);
+  g.textAlign = 'center'; g.textBaseline = 'middle'; g.font = '11.5px ' + SANS; g.fillStyle = GRAPH;
+  g.fillText('support, net of age', 0, 0);
+  g.restore();
+}
+function updateRegNote() {
+  var ols = before.ols, truth = d.att;
+  el.regNote.innerHTML = Math.abs(ols - truth) < 1
+    ? 'Straight lines cannot follow support that peaks at the center, but with exposure unrelated to ideology both groups share the misfit, and the gap stays close to the truth.'
+    : 'Straight lines cannot follow support that peaks at the center. Because the treated sit mostly at the extremes, the gap between the lines, which is the regression&rsquo;s estimate, comes out at ' + signed(ols) + ' rather than ' + signed(truth) + '.';
+}
+
+/* ---------------------------------------------------------------
+   Balance and estimate panels
+--------------------------------------------------------------- */
+var ROWNAME = { age: ['Age', ''], ideo: ['Ideology', ''], ext: ['Extremity', '|ideology|'], U: ['Unmeasured', 'not in the data'] };
+function drawLove(t) {
+  var g = LV.g, W = LV.w, rows = loveRows(), rowH = 34, top = 14;
+  g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, LV.h);
+  var x0 = 96, x1 = W - 18, xmax = before.loveMax;
+  if (cfg.hid > 0) xmax = Math.min(2, Math.max(xmax, Math.ceil(Math.max(before.smd.U, disp.smd.U || 0) * 1.15 / 0.25) * 0.25));
+  function X(v) { return x0 + clamp(v, 0, xmax) / xmax * (x1 - x0); }
+  var yEnd = top + rows.length * rowH;
+  g.strokeStyle = GRAPH; g.lineWidth = 1; g.setLineDash([3, 3]);
+  var xt = Math.round(X(0.1)) + 0.5;
+  g.beginPath(); g.moveTo(xt, 2); g.lineTo(xt, yEnd); g.stroke(); g.setLineDash([]);
+  var showAfter = view.matchA > 0.01 && t >= settle.start - 1;
+  rows.forEach(function (key, r) {
+    var y = top + r * rowH + rowH / 2, hidden = key === 'U';
+    g.textAlign = 'left'; g.textBaseline = 'middle';
+    g.fillStyle = hidden ? GRAPH : INK; g.font = (hidden ? 'italic 14px ' + SERIF : '14px ' + SANS);
+    var nm = ROWNAME[key];
+    g.fillText(nm[0], 0, nm[1] ? y - 6 : y);
+    if (nm[1]) { g.fillStyle = GRAPH; g.font = '11.5px ' + SANS; g.fillText(nm[1], 0, y + 9); }
+    g.strokeStyle = RULE; g.beginPath(); g.moveTo(x0, y + 0.5); g.lineTo(x1, y + 0.5); g.stroke();
+    var vb = before.smd[key], va = disp.smd[key];
+    if (showAfter && isFinite(va)) {
+      g.strokeStyle = 'rgba(29,42,48,' + (0.4 * view.matchA).toFixed(3) + ')'; g.lineWidth = 2;
+      g.beginPath(); g.moveTo(X(vb), y); g.lineTo(X(va), y); g.stroke(); g.lineWidth = 1;
+    }
+    g.beginPath(); g.arc(X(vb), y, 5, 0, 6.2832); g.fillStyle = PAPER; g.fill();
+    g.strokeStyle = GRAPH; g.lineWidth = 1.5; g.stroke(); g.lineWidth = 1;
+    if (showAfter && isFinite(va)) {
+      g.beginPath(); g.arc(X(va), y, 5, 0, 6.2832);
+      g.fillStyle = hidden ? rgba([87, 101, 107], view.matchA) : rgba([29, 42, 48], view.matchA); g.fill();
+    }
+  });
+  g.fillStyle = GRAPH; g.font = '12px ' + SANS; g.textAlign = 'center'; g.textBaseline = 'top';
+  g.strokeStyle = GRAPH;
+  var step = xmax > 1.25 ? 0.5 : 0.25;
+  g.beginPath(); g.moveTo(x0, yEnd + 0.5); g.lineTo(x1, yEnd + 0.5); g.stroke();
+  for (var v = 0; v <= xmax + 1e-9; v += step) {
+    var x = Math.round(X(v)) + 0.5;
+    g.beginPath(); g.moveTo(x, yEnd); g.lineTo(x, yEnd + 4); g.stroke();
+    g.textAlign = x > W - 16 ? 'right' : 'center';
+    g.fillText(v === 0 ? '0' : String(+v.toFixed(2)), Math.min(x, W), yEnd + 6);
+  }
+  g.textAlign = 'center';
+  g.textAlign = 'right'; g.fillText('|standardized mean difference|', x1, yEnd + 20);
+  g.textAlign = 'left'; g.textBaseline = 'top'; g.fillText('0.1', xt + 3, 0);
+}
+
+function drawEst(t) {
+  var g = ES.g, W = ES.w, rowH = 44, top = 22;
+  g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, ES.h);
+  var x0 = 8, x1 = W - 52, D = estDom(cfg.tau);
+  function X(v) { return x0 + (clamp(v, D[0], D[1]) - D[0]) / (D[1] - D[0]) * (x1 - x0); }
+  var yEnd = top + 3 * rowH;
+  g.strokeStyle = RULE; g.lineWidth = 1;
+  var xz = Math.round(X(0)) + 0.5;
+  g.beginPath(); g.moveTo(xz, top + 16); g.lineTo(xz, yEnd); g.stroke();
+  var xt = Math.round(X(d.att)) + 0.5;
+  g.strokeStyle = INK; g.lineWidth = 1.4;
+  g.beginPath(); g.moveTo(xt, top - 4); g.lineTo(xt, yEnd); g.stroke();
+  g.fillStyle = INK; g.font = '500 12.5px ' + SANS; g.textAlign = 'center'; g.textBaseline = 'alphabetic';
+  g.fillText((cfg.het ? 'true effect on the treated ' : 'true effect ') + signed(d.att), clamp(xt, x0 + 80, x1 - 70), top - 8);
+  var rows = [
+    { name: 'Naive', sub: 'no matching: difference in means', v: before.naive, solid: false },
+    { name: 'Regression', sub: 'linear in age and ideology', v: before.ols, solid: false },
+    { name: 'Matched', sub: methodShort(), v: disp.est, solid: true }
+  ];
+  rows.forEach(function (row, r) {
+    var yl = top + r * rowH + 12, y = top + r * rowH + 30;
+    g.textAlign = 'left'; g.textBaseline = 'middle';
+    g.font = '14px ' + SANS;
+    var wName = g.measureText(row.name).width;
+    g.font = '12px ' + SANS;
+    var wSub = g.measureText(row.sub).width;
+    g.fillStyle = PAPER; g.fillRect(0, yl - 9, wName + 8 + wSub + 4, 18);
+    g.fillStyle = INK; g.font = '14px ' + SANS; g.fillText(row.name, 0, yl);
+    g.fillStyle = GRAPH; g.font = '12px ' + SANS; g.fillText(row.sub, wName + 8, yl);
+    g.strokeStyle = RULE; g.lineWidth = 1;
+    g.beginPath(); g.moveTo(x0, y + 0.5); g.lineTo(x1, y + 0.5); g.stroke();
+    var a = row.solid ? view.matchA * (view.matched && t < settle.start ? 0.25 : 1) : 1;
+    if (row.solid && (a < 0.01 || !isFinite(row.v))) return;
+    var x = X(row.v);
+    if (row.solid) {
+      g.beginPath(); g.arc(x, y, 6, 0, 6.2832); g.fillStyle = rgba([29, 42, 48], a); g.fill();
+    } else {
+      g.beginPath(); g.arc(x, y, 5.5, 0, 6.2832); g.fillStyle = PAPER; g.fill();
+      g.strokeStyle = GRAPH; g.lineWidth = 1.6; g.stroke();
+    }
+    var showVal = !row.solid || (view.matched ? t >= settle.start : a > 0.05);
+    if (showVal) {
+      g.textAlign = 'right'; g.fillStyle = rgba([29, 42, 48], row.solid ? view.matchA : 1); g.font = '500 15px ' + SANS;
+      g.fillText(signed(row.v), W, y);
+    }
+  });
+  g.fillStyle = GRAPH; g.font = '12px ' + SANS; g.textAlign = 'center'; g.textBaseline = 'top';
+  g.strokeStyle = GRAPH; g.lineWidth = 1;
+  g.beginPath(); g.moveTo(x0, yEnd + 0.5); g.lineTo(x1, yEnd + 0.5); g.stroke();
+  for (var v = D[0]; v <= D[1]; v += 5) {
+    var xv = Math.round(X(v)) + 0.5, major = v % 10 === 0;
+    g.beginPath(); g.moveTo(xv, yEnd); g.lineTo(xv, yEnd + (major ? 5 : 3)); g.stroke();
+    if (major) g.fillText(v === 0 ? '0' : (v < 0 ? MINUS : '+') + Math.abs(v), xv, yEnd + 7);
+  }
+  g.textAlign = 'center'; g.fillText('points of support', (x0 + x1) / 2, yEnd + 21);
+}
+
+function methodShort(o) {
+  o = o || (view.m && view.matched ? view.m.opts : matchOpts());
+  if (o.method === 'cem') return 'coarsened, ' + BINS[o.bins] + ' bins';
+  var s = o.method === 'ps' ? (o.psModel === 'lin' ? 'propensity, linear' : 'propensity, squares') : (o.dist === 'maha' ? 'Mahalanobis' : 'unscaled distance');
+  return s + ', ' + o.ratio + ':1' + (o.repl ? ', reuse' : '') + (o.cal ? ', caliper ' + CAL_LABEL[o.cal] : '');
+}
+function methodLong(o) {
+  if (o.method === 'cem') return { main: 'Coarsened exact', sub: BINS[o.bins] + ' bins per variable' };
+  var parts = [];
+  if (o.method === 'ps') parts.push(o.psModel === 'lin' ? 'linear model' : 'model with squares');
+  else parts.push(o.dist === 'maha' ? 'Mahalanobis' : 'unscaled');
+  parts.push(o.ratio + ':1');
+  if (o.repl) parts.push('with replacement');
+  parts.push(o.cal ? 'caliper ' + CAL_LABEL[o.cal] : 'no caliper');
+  return { main: o.method === 'ps' ? 'Propensity score' : 'Nearest neighbor', sub: parts.join(', ') };
+}
+
+function updateCounts() {
+  var m = view.m, rows = [];
+  if (view.matched && m && !view.countsAt) {
+    rows.push(['Treated kept', m.keptT.length + ' of ' + d.T.length]);
+    rows.push(['Controls used', m.usedC.length + ' of ' + d.C.length]);
+    rows.push(['Kept treated, mean', mean(d.y, m.keptT).toFixed(1)]);
+    rows.push(['Matched controls, mean', mean(d.y, m.usedC, m.w).toFixed(1)]);
+    rows.push(['Matched difference', signed(m.est)]);
+    if (cfg.het) rows.push(['True effect on those kept', signed(m.attKept)]);
+  } else {
+    rows.push(['Treated, mean', mean(d.y, d.T).toFixed(1)]);
+    rows.push(['Controls, mean', mean(d.y, d.C).toFixed(1)]);
+    rows.push(['Naive difference', signed(before.naive)]);
+  }
+  el.counts.innerHTML = rows.map(function (r, k) {
+    var cls = /difference/.test(r[0]) ? ' class="sum"' : '';
+    return '<dt' + cls + '>' + r[0] + '</dt><dd' + cls + '>' + r[1] + '</dd>';
+  }).join('');
+  el.counts.hidden = false;
+  updateNote();
+}
+
+/* ---------------------------------------------------------------
+   The explanation of the chosen method, rewritten as options change
+--------------------------------------------------------------- */
+function tx(latex, fb) {
+  return '<span class="tex" data-tex="' + latex.replace(/&/g, '&amp;').replace(/"/g, '&quot;') + '">' + fb + '</span>';
+}
+function pairsText(o, ps) {
+  var k = o.ratio, s;
+  if (!o.repl && k === 1) s = 'Each control is used at most once. The algorithm is greedy, so order matters: treated respondents matched late choose from a depleted pool.';
+  else if (!o.repl) s = 'Each treated respondent receives ' + k + ' controls, each weighted 1/' + k + '. More controls reduce variance, but without replacement the later picks come from a depleted pool and make worse matches.';
+  else if (k === 1) s = 'Controls may be reused, so every treated respondent gets its nearest control. Bias falls, but reused controls carry more weight, which raises the variance; larger dots mark heavier controls.';
+  else s = 'Controls may be reused, and each treated respondent receives its ' + k + ' nearest, each weighted 1/' + k + '; larger dots mark controls that serve several treated respondents.';
+  if (!o.repl && d && d.C.length < 2 * k * d.T.length) {
+    s += ' Here only ' + d.C.length + ' controls are available for ' + d.T.length + ' treated respondents' + (k > 1 ? ' asking for ' + k + ' each' : '') +
+      (d.C.length < k * d.T.length ? ', so the pool runs out before every treated respondent is served' : ', so the pool thins quickly and late matches are poor') +
+      '; matching with replacement avoids this.';
+  }
+  var short = !o.repl && d && d.C.length < k * d.T.length;
+  if (!o.cal) s += short ? ' Without a caliper, each treated respondent takes the best control left, however distant.'
+                         : ' Without a caliper, every treated respondent is matched, however distant its best control.';
+  else {
+    s += ' The caliper rejects any match more than ' + CALIPERS[o.cal] + ' standard deviations away' +
+      (ps ? ' of the score' : (o.dist === 'raw' ? ' in age' : ', in Mahalanobis units')) +
+      '. Treated respondents with no control inside it are dropped, which removes poor comparisons but changes the population the estimate describes.';
+  }
+  return s;
+}
+function rCall(o) {
+  var f = o.method === 'ps' && o.psModel === 'sq' ? 'treat ~ age + ideology + I(age^2) + I(ideology^2) + age:ideology' : 'treat ~ age + ideology';
+  var a = [f, 'data = survey'];
+  if (o.method === 'cem') a.push('method = "cem"', 'cutpoints = list(age = ' + BINS[o.bins] + ', ideology = ' + BINS[o.bins] + ')');
+  else {
+    if (o.method === 'nn') a.push(o.dist === 'maha' ? 'distance = "mahalanobis"' : 'distance = "euclidean"');
+    if (o.ratio > 1) a.push('ratio = ' + o.ratio);
+    if (o.repl) a.push('replace = TRUE');
+    if (o.cal) a.push(o.method === 'ps' ? 'caliper = ' + CALIPERS[o.cal] : 'caliper = c(age = ' + CALIPERS[o.cal] + ', ideology = ' + CALIPERS[o.cal] + ')');
+  }
+  return 'matchit(' + a.join(', ') + ')';
+}
+function escHtml(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+var noteCache = '';
+function updateNote() {
+  var o = matchOpts(), m = (view.matched && view.m && !view.countsAt) ? view.m : null, title, p = [];
+  if (o.method === 'cem') {
+    var b = BINS[o.bins];
+    title = 'Coarsened exact matching';
+    p.push('Each covariate is cut into ' + b + ' equal-width bins, and respondents are grouped by the cell they share. Cells that lack either a treated or a control respondent are discarded. Within a kept cell ' +
+      tx('s', 's') + ', each control receives weight proportional to ' + tx('n^T_s / n^C_s', 'n<sub>s</sub><sup>T</sup>/n<sub>s</sub><sup>C</sup>') +
+      ', so the estimate averages within-cell differences, weighting each cell by its number of treated respondents (Iacus, King, and Porro 2012).');
+    if (b <= 3) p.push('With only ' + b + ' bins the cells are wide: respondents who differ substantially in ideology count as equivalent, and imbalance survives inside each cell.');
+    else if (b <= 8) p.push('Finer bins tighten each comparison but discard more cells; coarser bins keep more respondents and leave more imbalance within cells.');
+    else p.push('Bins this fine approach exact matching. Few cells hold both groups, so many treated respondents are discarded, and the estimate describes only those who remain.');
+    if (m) p[p.length - 1] += ' In this sample, ' + m.keptT.length + ' of ' + d.T.length + ' treated and ' + m.usedC.length + ' of ' + d.C.length + ' control respondents fall in cells that hold both groups.';
+  } else if (o.method === 'nn') {
+    title = 'Nearest-neighbor matching';
+    var dist = o.dist === 'maha'
+      ? 'Closeness is the Mahalanobis distance, ' + tx('d_{ij} = \\sqrt{(x_i - x_j)^{\\top} S^{-1} (x_i - x_j)}', 'd<sub>ij</sub> = &radic;[(x<sub>i</sub> &minus; x<sub>j</sub>)&prime; S<sup>&minus;1</sup> (x<sub>i</sub> &minus; x<sub>j</sub>)]') +
+        ', where ' + tx('S', 'S') + ' is the pooled covariance of age and ideology. It measures both covariates in standard deviations and discounts their correlation. Hover over a treated respondent to see the ellipse of equal distance around it.'
+      : 'Closeness is plain Euclidean distance in years and ideology points. Age spans some seventy years and ideology about six points, so age dominates: matches agree in age and differ in ideology, the covariate that matters most for support. Hover over a treated respondent to see how elongated the region of equal distance is.';
+    p.push('Treated respondents are taken one at a time, in random order, and each is paired with the closest available control. ' + dist);
+    p.push(pairsText(o, false));
+  } else {
+    title = 'Propensity score matching';
+    var model = o.psModel === 'lin'
+      ? 'The linear model, ' + tx('\\operatorname{logit} e(X) = \\beta_0 + \\beta_1\\,\\text{age} + \\beta_2\\,\\text{ideology}', 'logit e(X) = &beta;<sub>0</sub> + &beta;<sub>1</sub> age + &beta;<sub>2</sub> ideology') +
+        ', lets the score rise in only one direction of ideology. Because the ad targeted both extremes, the fitted score misses extremity, and matching on it leaves extremity imbalanced; the straight contours show the problem.'
+      : 'The model with squares adds ' + tx('\\text{age}^2', 'age<sup>2</sup>') + ', ' + tx('\\text{ideology}^2', 'ideology<sup>2</sup>') +
+        ', and their product, which lets the score rise toward both ideological extremes; the contours bend accordingly.';
+    p.push('The propensity score, ' + tx('e(X) = \\Pr(T = 1 \\mid X)', 'e(X) = Pr(T = 1 | X)') + ', is estimated by logistic regression, and treated respondents, taken in random order, are matched on it (MatchIt starts from the highest score by default). ' + model);
+    p.push('One number cannot pin down two covariates. Many combinations of age and ideology share a score, so matched pairs can lie far apart in the plot; hover over a respondent to see everyone with the same estimated score. The true score balances covariates across many pairs, not within any one (Rosenbaum and Rubin 1983), which is why King and Nielsen (2019) argue against matching on it.');
+    p.push(pairsText(o, true));
+  }
+  if (m && m.kind === 'pairs') p[p.length - 1] += ' In this sample, ' + m.keptT.length + ' of ' + d.T.length + ' treated respondents are matched to ' + m.usedC.length + ' distinct controls.';
+  var html = '<h3>' + title + '</h3>' + p.map(function (s) { return '<p>' + s + '</p>'; }).join('') +
+    '<p class="r-line"><span class="r-label">In R</span><code>' + escHtml(rCall(o)) + '</code></p>' +
+    (o.method === 'nn' && o.cal ? '<p class="r-note">MatchIt cannot put a caliper on this distance; it applies one to each covariate instead, so its matches differ slightly from those shown here.</p>' : '');
+  if (html === noteCache) return;
+  noteCache = html;
+  el.note.innerHTML = html;
+  renderTexIn(el.note);
+}
+
+function updateCaption() {
+  var m = view.m, s;
+  if (!view.matched || !m) {
+    s = cfg.method === 'cem' ? 'The grid coarsens age and ideology into bins; only cells holding both groups pass to the matched sample.'
+      : cfg.method === 'ps' ? 'Contours trace the estimated propensity score; the strip ranks everyone by it.'
+      : 'Hover over a treated respondent to see its nearest control.';
+  } else {
+    var drop = d.T.length - m.keptT.length;
+    var dropTxt = drop ? ' ' + drop + ' treated ' + (drop === 1 ? 'respondent finds' : 'respondents find') + ' no match.' : '';
+    if (m.kind === 'cells') s = 'Larger dots are controls weighted up to their cell\u2019s treated count.' + dropTxt;
+    else if (m.opts.method === 'ps') s = 'Pairs are close in the score, not always in age and ideology.' + dropTxt;
+    else s = 'Lines join each treated respondent to ' + (m.opts.ratio > 1 ? 'its controls' : 'its control') + '.' + dropTxt;
+  }
+  el.caption.textContent = s;
+  updateNote();
+}
+function updateButtons() {
+  el.undo.disabled = !view.matched;
+  el.hollowKey.hidden = !view.matched;
+  view.bs = '';
+  kick();
+}
+
+/* ---------------------------------------------------------------
+   Log of completed matches
+--------------------------------------------------------------- */
+var lastLogKey = '';
+function dataLabel(c) {
+  return 'N ' + (c.n || N) + ', ' + Math.round(100 * c.rate) + '% treated, ' + selLabel(c.sel) + ' selection' +
+    (c.hid > 0 ? ', ' + hidLabel(c.hid) + ' hidden confounder' : '') + (c.het ? ', varying effect' : '');
+}
+function logRun() {
+  var m = view.m;
+  if (!view.matched || !m) return;
+  var key = JSON.stringify([seed, N, cfg.rate, cfg.tau, cfg.sel, cfg.hid, cfg.het, m.opts]);
+  if (key === lastLogKey) return;
+  lastLogKey = key;
+  var lab = methodLong(m.opts), worst = Math.max(m.smd.age, m.smd.ideo, m.smd.ext);
+  var dataSub = dataLabel(cfg);
+  var tr = document.createElement('tr');
+  tr.className = 'new';
+  tr.innerHTML = '<td>' + lab.main + '<span class="sub">' + lab.sub + '; ' + dataSub + '</span></td>' +
+    '<td>' + m.keptT.length + ' of ' + d.T.length + '</td>' +
+    '<td>' + (isFinite(worst) ? worst.toFixed(2) : NDASH) + '</td>' +
+    '<td>' + signed(before.naive) + '</td>' +
+    '<td>' + signed(m.est) + '</td>' +
+    '<td>' + signed(m.attKept) + '</td>';
+  var tb = el.log.querySelector('tbody');
+  tb.insertBefore(tr, tb.firstChild);
+  while (tb.children.length > 10) tb.removeChild(tb.lastChild);
+  el.log.hidden = false; el.emptyLog.hidden = true; el.clearLog.hidden = false;
+}
+function clearLog() {
+  el.log.querySelector('tbody').innerHTML = '';
+  el.log.hidden = true; el.emptyLog.hidden = false; el.clearLog.hidden = true; lastLogKey = '';
+}
+
+/* ---------------------------------------------------------------
+   Repeated samples
+--------------------------------------------------------------- */
+var rep = { running: false, res: null, label: '', key: '' };
+function repKey() { return JSON.stringify([N, cfg.rate, cfg.tau, cfg.sel, cfg.hid, cfg.het, matchOpts()]); }
+function runReps() {
+  if (rep.running) return;
+  var c0 = { n: N, rate: cfg.rate, tau: cfg.tau, sel: cfg.sel, hid: cfg.hid, het: cfg.het }, o = matchOpts(), total = 200, done = 0;
+  rep.dom = estDom(c0.tau);
+  var s0 = Math.floor(Math.random() * 1e9);
+  rep.running = true; rep.res = { raw: [], ols: [], m: [], att: [], kept: [] };
+  var lab = methodLong(o);
+  rep.label = lab.main + ', ' + lab.sub + '; ' + dataLabel(c0);
+  rep.key = repKey();
+  el.repGo.disabled = true; el.repGo.textContent = 'Running' + ELL;
+  function step() {
+    var per = REDUCED ? total : Math.max(1, Math.round(3200 / c0.n));
+    for (var q = 0; q < per && done < total; q++, done++) {
+      var dd = assign(genBase(s0 + done * 7919, c0.n), c0);
+      var mm = runMatch(dd, o);
+      rep.res.raw.push(naiveEffect(dd)); rep.res.ols.push(olsEffect(dd)); rep.res.m.push(mm.est);
+      rep.res.att.push(dd.att); rep.res.kept.push(mm.keptT.length / dd.T.length);
+    }
+    drawRep();
+    if (done < total) requestAnimationFrame(step);
+    else { rep.running = false; el.repGo.disabled = false; el.repGo.textContent = 'Run 200 again'; updateRepNote(); drawRep(); }
+  }
+  updateRepNote();
+  requestAnimationFrame(step);
+}
+function msd(a) {
+  var b = a.filter(isFinite), n = b.length;
+  if (!n) return [NaN, NaN];
+  var mu = 0; for (var i = 0; i < n; i++) mu += b[i]; mu /= n;
+  var v = 0; for (i = 0; i < n; i++) v += (b[i] - mu) * (b[i] - mu);
+  return [mu, Math.sqrt(v / Math.max(1, n - 1))];
+}
+function updateRepNote() {
+  if (!rep.res) return;
+  var stale = rep.key !== repKey() ? ' These results are for earlier settings.' : '';
+  var kept = msd(rep.res.kept)[0];
+  var keptTxt = kept < 0.995 ? ' On average ' + Math.round(100 * kept) + ' percent of treated respondents were kept.' : '';
+  el.repNote.textContent = 'Matched: ' + rep.label + '.' + keptTxt + stale;
+}
+function drawRep() {
+  var g = RP.g, W = RP.w, H = RP.h, top = 26, rowH = 36;
+  g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+  var x0 = W < 520 ? 112 : 122, x1 = W - 118, D = rep.dom || estDom(cfg.tau);
+  function X(v) { return x0 + (clamp(v, D[0], D[1]) - D[0]) / (D[1] - D[0]) * (x1 - x0); }
+  var yEnd = top + 3 * rowH, res = rep.res;
+  var names = [['Naive', 'raw'], ['Regression', 'ols'], ['Matched', 'm']];
+  g.fillStyle = GRAPH; g.font = '12px ' + SANS; g.textAlign = 'right'; g.textBaseline = 'alphabetic';
+  g.fillText('average', W - 52, top - 8); g.fillText('SD', W, top - 8);
+  g.strokeStyle = RULE; g.lineWidth = 1;
+  g.beginPath(); var xz = Math.round(X(0)) + 0.5; g.moveTo(xz, top - 2); g.lineTo(xz, yEnd); g.stroke();
+  if (res && res.att.length) {
+    var at = msd(res.att)[0], xt = Math.round(X(at)) + 0.5;
+    g.strokeStyle = INK; g.lineWidth = 1.4;
+    g.beginPath(); g.moveTo(xt, top - 6); g.lineTo(xt, yEnd); g.stroke();
+    g.fillStyle = INK; g.font = '500 12.5px ' + SANS; g.textAlign = 'center';
+    g.fillText('true ' + signed(at), clamp(xt, x0 + 24, x1 - 24), top - 10);
+  }
+  names.forEach(function (nm, r) {
+    var y = top + r * rowH + rowH / 2;
+    g.textAlign = 'left'; g.textBaseline = 'middle'; g.fillStyle = INK; g.font = '14px ' + SANS;
+    g.fillText(nm[0], 0, y);
+    g.strokeStyle = RULE; g.lineWidth = 1;
+    g.beginPath(); g.moveTo(x0, y + 0.5); g.lineTo(x1, y + 0.5); g.stroke();
+    if (!res) return;
+    var arr = res[nm[1]], col = nm[1] === 'm' ? [29, 42, 48] : [87, 101, 107];
+    g.fillStyle = rgba(col, 0.22);
+    for (var k = 0; k < arr.length; k++) {
+      if (!isFinite(arr[k])) continue;
+      var jy = ((k * 0.6180339887) % 1 - 0.5) * 18;
+      g.beginPath(); g.arc(X(arr[k]), y + jy, 2.4, 0, 6.2832); g.fill();
+    }
+    if (!rep.running && arr.length) {
+      var s = msd(arr), xm = X(s[0]);
+      g.strokeStyle = rgba(col, 1); g.lineWidth = 2;
+      g.beginPath(); g.moveTo(X(s[0] - s[1]), y); g.lineTo(X(s[0] + s[1]), y); g.stroke();
+      g.beginPath(); g.moveTo(xm, y - 11); g.lineTo(xm, y + 11); g.stroke(); g.lineWidth = 1;
+      g.textAlign = 'right'; g.fillStyle = INK; g.font = '500 14px ' + SANS;
+      g.fillText(signed(s[0]), W - 52, y); g.fillText(s[1].toFixed(1), W, y);
+    }
+  });
+  g.fillStyle = GRAPH; g.font = '12px ' + SANS; g.textAlign = 'center'; g.textBaseline = 'top';
+  g.strokeStyle = GRAPH; g.lineWidth = 1;
+  g.beginPath(); g.moveTo(x0, yEnd + 0.5); g.lineTo(x1, yEnd + 0.5); g.stroke();
+  var tight = (x1 - x0) < 320;
+  for (var v = D[0]; v <= D[1]; v += 5) {
+    var xv = Math.round(X(v)) + 0.5, major = !tight || v % 10 === 0;
+    g.beginPath(); g.moveTo(xv, yEnd); g.lineTo(xv, yEnd + (major ? 5 : 3)); g.stroke();
+    if (major) g.fillText(v === 0 ? '0' : (v < 0 ? MINUS : '+') + Math.abs(v), xv, yEnd + 7);
+  }
+}
+
+/* ---------------------------------------------------------------
+   Animation loop
+--------------------------------------------------------------- */
+var running = false, lastT = 0;
+function kick() { if (!running) { running = true; lastT = now(); requestAnimationFrame(tick); } }
+function tick(t) {
+  if (!d || !disp) { running = false; return; }
+  var dt = Math.min(64, Math.max(1, t - lastT)); lastT = t;
+  var busy = update(t, dt);
+  drawStage(t); drawLove(t); drawEst(t); drawReg();
+  if (busy) requestAnimationFrame(tick); else running = false;
+}
+
+/* ---------------------------------------------------------------
+   Hover and tooltip
+--------------------------------------------------------------- */
+function findNearest(mx, my) {
+  var L = layout(), best = -1, bd = 12 * 12;
+  L.planes.forEach(function (P) {
+    var inStrip = view.stripH > 40 && my > P.sTop && my < P.by1;
+    var inPlane = mx >= P.bx0 && mx <= P.bx1 && my >= P.by0 && my <= P.by1;
+    if (!inPlane) return;
+    for (var i = 0; i < N; i++) {
+      if (P.p === 1 && !onRight(i)) continue;
+      var x = inStrip ? qx(P, i) : px(P, i), y = inStrip ? qy(P, i) : py(P, i);
+      var dx = x - mx, dy = y - my, dd = dx * dx + dy * dy;
+      if (dd < bd) { bd = dd; best = i; }
+    }
+  });
+  return { i: best };
+}
+function showTip(i, mx, my) {
+  if (i < 0) { el.tip.classList.remove('on'); return; }
+  var m = view.m, A = view.anim, set = view.matched && m && m.w[i] === 0 && A && now() >= A.settleStart;
+  var lines = ['<b>' + (d.t[i] ? 'Treated' : 'Control') + '</b>' + (set ? ', not in the matched sample' : ''),
+               'Age ' + Math.round(d.age[i]) + ', ideology ' + signed(d.ideo[i]),
+               'Support ' + Math.round(d.y[i])];
+  if (cfg.method === 'ps') lines[2] += ', score ' + psFit.ps[i].toFixed(2);
+  if (cfg.method === 'cem' && cemPrev) {
+    var c = binOf(d.age[i], cemPrev.ra, cemPrev.b) * cemPrev.b + binOf(d.ideo[i], cemPrev.ri, cemPrev.b), nt = 0, nc = 0;
+    for (var q = 0; q < N; q++) {
+      if (binOf(d.age[q], cemPrev.ra, cemPrev.b) * cemPrev.b + binOf(d.ideo[q], cemPrev.ri, cemPrev.b) === c) { if (d.t[q]) nt++; else nc++; }
+    }
+    lines.push('Its cell: ' + nt + ' treated, ' + nc + ' control');
+  }
+  if (view.matched && m && !d.t[i] && m.w[i] > 0 && (m.kind === 'cells' || m.opts.repl || m.opts.ratio > 1)) {
+    lines.push('Weight ' + (m.w[i] * m.usedC.length / Math.max(1, m.keptT.length)).toFixed(2));
+  }
+  el.tip.innerHTML = lines.join('<br>');
+  el.tip.classList.add('on');
+  var tw = el.tip.offsetWidth, th = el.tip.offsetHeight;
+  var x = mx + 14, y = my - th - 10;
+  if (x + tw > S.w) x = mx - tw - 14;
+  if (y < 0) y = my + 14;
+  el.tip.style.left = x + 'px'; el.tip.style.top = y + 'px';
+}
+function onMove(e) {
+  var rect = el.stage.getBoundingClientRect(), mx = e.clientX - rect.left, my = e.clientY - rect.top;
+  var f = findNearest(mx, my);
+  if (f.i !== view.hover) {
+    view.hover = f.i;
+    view.hoverC = (f.i >= 0 && cfg.method === 'ps' && CG) ? traceLevel(CG, psFit.ps[f.i]) : null;
+  }
+  showTip(f.i, mx, my);
+  kick();
+}
+el.stage.addEventListener('mousemove', onMove);
+el.stage.addEventListener('mouseleave', function () { view.hover = -1; view.hoverC = null; showTip(-1); kick(); });
+el.stage.addEventListener('click', onMove);
+
+/* ---------------------------------------------------------------
+   Controls
+--------------------------------------------------------------- */
+function syncOutputs() {
+  el.selOut.textContent = selLabel(cfg.sel);
+  el.rateOut.textContent = Math.round(100 * cfg.rate) + '%';
+  el.tauOut.textContent = signed(cfg.tau, 0) + ' points';
+  if (d) el.rateHint.textContent = d.T.length + ' treated and ' + d.C.length + ' control in this sample.';
+  el.hidOut.textContent = hidLabel(cfg.hid);
+  el.binsOut.textContent = BINS[cfg.bins];
+  el.calOut.textContent = CAL_LABEL[cfg.cal];
+  el.hetHint.hidden = !cfg.het;
+  el.optCem.hidden = cfg.method !== 'cem';
+  el.optNn.hidden = cfg.method !== 'nn';
+  el.optPs.hidden = cfg.method !== 'ps';
+  el.optPairs.hidden = cfg.method === 'cem';
+  if (rep.res && !rep.running) updateRepNote();
+}
+function optionChanged(log) {
+  syncOutputs();
+  cemPrev = cemGrid(d, cfg.bins);
+  if (view.matched) doMatch('quick', log);
+  else { updateCaption(); kick(); }
+}
+function dataChanged(log) {
+  syncOutputs();
+  var prevRows = loveRows().length;
+  rebuild('data');
+  syncOutputs();
+  if (log && view.matched) logRun();
+  if (loveRows().length !== prevRows) sizeLove();
+}
+
+el.sel.addEventListener('input', function () { cfg.sel = +el.sel.value; dataChanged(false); });
+el.rate.addEventListener('input', function () { cfg.rate = +el.rate.value; dataChanged(false); });
+el.rate.addEventListener('change', function () { if (view.matched) logRun(); });
+el.tau.addEventListener('input', function () { cfg.tau = +el.tau.value; dataChanged(false); });
+el.tau.addEventListener('change', function () { if (view.matched) logRun(); });
+Array.prototype.forEach.call(document.querySelectorAll('input[name=nsize]'), function (r) {
+  r.addEventListener('change', function () {
+    N = cfg.n = +r.value;
+    allocDisplay(); setR();
+    seed = Math.floor(Math.random() * 1e9); sampleNo++;
+    view.hover = -1; view.hoverC = null; showTip(-1);
+    clearLog();
+    rebuild('new');
+    syncOutputs(); updateButtons(); drawRep();
+  });
+});
+el.sel.addEventListener('change', function () { if (view.matched) logRun(); });
+el.hid.addEventListener('input', function () { cfg.hid = +el.hid.value; dataChanged(false); });
+el.hid.addEventListener('change', function () { if (view.matched) logRun(); });
+el.het.addEventListener('change', function () { cfg.het = el.het.checked; dataChanged(true); });
+el.resample.addEventListener('click', function () {
+  seed = Math.floor(Math.random() * 1e9); sampleNo++;
+  clearLog();
+  rebuild('new');
+  syncOutputs(); updateButtons();
+});
+Array.prototype.forEach.call(document.querySelectorAll('input[name=method]'), function (r) {
+  r.addEventListener('change', function () {
+    cfg.method = r.value; syncOutputs();
+    cemPrev = cemGrid(d, cfg.bins);
+    view.hover = -1; view.hoverC = null; showTip(-1);
+    if (view.matched) doMatch('full', true); else { updateCaption(); kick(); }
+  });
+});
+el.bins.addEventListener('input', function () { cfg.bins = +el.bins.value; optionChanged(false); });
+el.bins.addEventListener('change', function () { if (view.matched) logRun(); });
+Array.prototype.forEach.call(document.querySelectorAll('input[name=dist]'), function (r) {
+  r.addEventListener('change', function () { cfg.dist = r.value; optionChanged(true); });
+});
+Array.prototype.forEach.call(document.querySelectorAll('input[name=psmodel]'), function (r) {
+  r.addEventListener('change', function () { cfg.psModel = r.value; refitPS(); optionChanged(true); });
+});
+Array.prototype.forEach.call(document.querySelectorAll('input[name=ratio]'), function (r) {
+  r.addEventListener('change', function () { cfg.ratio = +r.value; optionChanged(true); });
+});
+el.repl.addEventListener('change', function () { cfg.repl = el.repl.checked; optionChanged(true); });
+el.cal.addEventListener('input', function () { cfg.cal = +el.cal.value; optionChanged(false); });
+el.cal.addEventListener('change', function () { if (view.matched) logRun(); });
+el.go.addEventListener('click', function () { view.hover = -1; showTip(-1); doMatch(view.bs === 'skip' ? 'quick' : 'full', true); });
+el.undo.addEventListener('click', unmatch);
+el.clearLog.addEventListener('click', clearLog);
+el.repGo.addEventListener('click', runReps);
+var rT = 0;
+window.addEventListener('resize', function () { clearTimeout(rT); rT = setTimeout(function () { sizeCanvases(); drawRep(); }, 80); });
+
+function renderTexIn(root) {
+  if (!window.katex) return;
+  Array.prototype.forEach.call(root.querySelectorAll('.tex[data-tex]'), function (n) {
+    try { window.katex.render(n.getAttribute('data-tex'), n, { throwOnError: false }); n.classList.add('done'); } catch (e) {}
+  });
+}
+var rCode = document.getElementById('r-code');
+function rText() { return rCode.textContent.replace(/\s*$/, '\n'); }
+if (rCode) {
+  document.getElementById('r-copy').addEventListener('click', function () {
+    var btn = this, txt = rText();
+    function done() { btn.textContent = 'Copied'; setTimeout(function () { btn.textContent = 'Copy'; }, 1400); }
+    function fallback() {
+      var ta = document.createElement('textarea'); ta.value = txt; document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); done(); } catch (e) {}
+      document.body.removeChild(ta);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done, fallback); else fallback();
+  });
+  document.getElementById('r-download').addEventListener('click', function () {
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([rText()], { type: 'text/plain' }));
+    a.download = 'matching_demo.R'; document.body.appendChild(a); a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 0);
+  });
+}
+window.renderTex = function () {
+  if (!window.katex) return;
+  Array.prototype.forEach.call(document.querySelectorAll('.tex[data-tex]'), function (n) {
+    try { window.katex.render(n.getAttribute('data-tex'), n, { throwOnError: false, displayMode: n.classList.contains('eq') }); n.classList.add('done'); } catch (e) {}
+  });
+};
+
+/* ---------------------------------------------------------------
+   Start
+--------------------------------------------------------------- */
+function start() {
+  el.sel.value = cfg.sel; el.hid.value = cfg.hid; el.bins.value = cfg.bins; el.cal.value = cfg.cal;
+  el.rate.value = cfg.rate; el.tau.value = cfg.tau;
+  syncOutputs();
+  sizeCanvases();
+  rebuild('new');
+  syncOutputs(); updateButtons();
+  drawRep();
+  if (window.katex) window.renderTex();
+}
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { kick(); drawRep(); });
+start();
+
+})();
+</script>
+</body>
+</html>
