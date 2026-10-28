@@ -368,12 +368,12 @@ tr.new td { animation: settle 1.2s ease-out; }
 
   <section class="notes">
     <h2>Reading the picture</h2>
-    <p>Each dot is a respondent, placed by age and ideology. Support for the policy without the ad, <span class="tex" data-tex="Y_i(0)">Y<sub>i</sub>(0)</span>, peaks at the ideological center and declines with age, as the regression panel shows. Because the ad reached older and more extreme respondents, the naive difference in support confounds the effect of the ad with the effect of who saw it. The true effect is set in the survey controls, at eight points unless you change it.</p>
-    <p>Matching does not model the outcome. It draws from the original sample a subset, with weights, whose covariate distribution resembles that of the treated, and then compares outcomes (Ho et al. 2007). Compare the marginal curves of the two planes: in the original sample the groups differ, in the matched sample they nearly coincide. The cost is information, since controls without a treated counterpart contribute nothing.</p>
-    <p>Balance, not the estimate, is how one judges a matching, and it must be checked on the functions of the covariates that matter for the outcome. The linear propensity model, <span class="tex" data-tex="e(X) = \Pr(T = 1 \mid X)">e(X) = Pr(T = 1 | X)</span> fitted with straight terms, draws straight contours and cannot see that both extremes were targeted. Matched groups then agree in mean ideology, which was never the problem, and disagree in extremity, which is. Adding squared terms repairs the model. Even so, pairs close in the score may lie far apart in age and ideology, which is why King and Nielsen (2019) argue against matching on it.</p>
+    <p>Each dot is a respondent, placed by age and ideology. Support for the policy without the ad, <span class="tex" data-tex="Y_i(0)">Y<sub>i</sub>(0)</span>, peaks at the ideological center, as the regression panel shows, and declines with age. Because the ad reached older and more extreme respondents, the naive difference in support confounds the effect of the ad with the effect of who saw it. The true effect is set in the survey controls, at eight points unless you change it.</p>
+    <p>Matching does not model the outcome. It draws from the original sample a subset, with weights, whose covariate distribution resembles that of the treated, and compares outcomes there. Because the subset is chosen before any outcome model is fit, the analysis that follows depends less on that model&rsquo;s form (Ho et al. 2007). Compare the marginal curves of the two planes: in the original sample the groups differ, in the matched sample they nearly coincide. The cost is information, since controls without a treated counterpart contribute nothing.</p>
+    <p>Balance, not the estimate, is how one judges a matching, and it must be checked on the functions of the covariates that matter for the outcome. The linear propensity model, <span class="tex" data-tex="e(X) = \Pr(T = 1 \mid X)">e(X) = Pr(T = 1 | X)</span> fitted with straight terms, draws straight contours and cannot see that both extremes were targeted. Matched groups then agree in mean ideology, which selection never moved except by chance, and disagree in extremity, which it did. Adding squared terms repairs the model. Even so, pairs close in the score may lie far apart in age and ideology, which is why King and Nielsen (2019) argue against matching on it.</p>
     <p>Raise the selection and common support thins: some treated respondents have no comparable control. Matching one to one without replacement then reaches for distant controls, and the estimate drifts. A caliper, or finer bins, refuses such comparisons, at the price of discarding treated respondents. With the effect varying by person, the estimate then describes only the treated who were kept, which is a different quantity from the effect on all who saw the ad (Iacus, King, and Porro 2012).</p>
     <p>Now raise the unmeasured confounder. The observed covariates balance as before; the hidden trait does not, and no balance table can reveal it, since it is not in the data. Matching rests on the assumption that exposure is as good as random once the measured covariates are held fixed (Rosenbaum and Rubin 1983). Sensitivity analysis asks how strong a hidden confounder would need to be to overturn a conclusion (Rosenbaum 2002).</p>
-    <p>The repeated samples separate bias from noise. Calipers, finer bins, and replacement lower the bias and widen the spread. Additional controls per treated respondent narrow the spread but, without replacement, admit worse matches. Even good settings leave a small bias, because matches on continuous covariates are never exact (Abadie and Imbens 2006). Raise the share treated toward one half and matching without replacement runs out of good controls; a larger sample shrinks the spread of every estimator but leaves the naive one exactly as biased.</p>
+    <p>The repeated samples separate bias from noise. Calipers and finer bins lower the bias. At first they also narrow the spread, because fewer poor matches leave less imbalance to vary from sample to sample; once they discard most of the treated, the spread grows again. Replacement lowers the bias most when good controls are scarce, and neither a caliper nor replacement repairs a propensity model that cannot see extremity. Extra controls per treated respondent narrow the spread only when good controls are plentiful: the later picks are worse matches, and without replacement the spread can widen as well. Even good settings leave some bias, because matches on continuous covariates are never exact (Abadie and Imbens 2006). Raise the share treated toward one half and matching without replacement runs out of good controls. A larger sample shrinks the spread of every estimator, but the naive estimate stays as biased.</p>
   </section>
 
   <section class="rcode" id="in-r">
@@ -394,13 +394,13 @@ library(tidyverse)
 library(MatchIt)
 library(cobalt)
 
-set.seed(42)
+set.seed(110)
 
 
 <span class="c"># ---- 1. Settings and the model of support -----------------------------------------</span>
 
 n             &lt;- 400   <span class="c"># respondents</span>
-share_treated &lt;- 0.20  <span class="c"># about this share sees the ad</span>
+share_treated &lt;- 0.20  <span class="c"># the expected share who see the ad</span>
 true_effect   &lt;- 8     <span class="c"># effect of the ad on support, in points</span>
 selection     &lt;- 1     <span class="c"># how strongly age and ideology drive exposure (0 = random)</span>
 hidden        &lt;- 0     <span class="c"># strength of an unmeasured confounder (try 1)</span>
@@ -421,12 +421,15 @@ support_fn &lt;- function(age, ideology, treat, hidden_trait = 0, noise = 0) {
 age &lt;- rnorm(3 * n, mean = 47, sd = 15)
 age &lt;- age[age &gt;= 18 &amp; age &lt;= 88][1:n]   <span class="c"># keep the first n ages between 18 and 88</span>
 
-ideology     &lt;- rnorm(n)   <span class="c"># liberal (negative) to conservative (positive)</span>
+ideology     &lt;- rnorm(3 * n)
+ideology     &lt;- ideology[abs(ideology) &lt;= 2.9][1:n]   <span class="c"># liberal (negative) to conservative (positive), within 2.9 SD</span>
 hidden_trait &lt;- rnorm(n)   <span class="c"># shapes exposure and support, but no analyst observes it</span>
 
-<span class="c"># Exposure is more likely for older and for more extreme respondents</span>
+<span class="c"># Exposure is more likely for older and for more extreme respondents. The intercept</span>
+<span class="c"># is set so that the average chance of exposure equals share_treated.</span>
 index &lt;- selection * (0.84 * abs(ideology) + 0.024 * (age - 48)) + hidden * hidden_trait
-treat &lt;- rbinom(n, size = 1, prob = plogis(qlogis(share_treated) - mean(index) + index))
+alpha &lt;- uniroot(function(a) mean(plogis(a + index)) - share_treated, c(-14, 8))$root
+treat &lt;- rbinom(n, size = 1, prob = plogis(alpha + index))
 
 <span class="c"># Each respondent's support without and with the ad: the two potential outcomes</span>
 noise     &lt;- rnorm(n, sd = 6)
@@ -510,7 +513,7 @@ m_maha &lt;- matchit(treat ~ age + ideology, data = survey, distance = <span cla
 
 <span class="c"># The same with replacement: each treated respondent gets its closest control,</span>
 <span class="c"># even one already used. Bias falls, but reused controls carry more weight,</span>
-<span class="c"># so the variance rises.</span>
+<span class="c"># which can raise the variance.</span>
 m_maha_repl &lt;- matchit(treat ~ age + ideology, data = survey, distance = <span class="s">"mahalanobis"</span>,
                        replace = TRUE)
 
@@ -679,8 +682,9 @@ function mean(x, idx, w) {
 }
 function sd(x, idx) {
   var m = mean(x, idx), s = 0, n = idx ? idx.length : x.length, k, i;
+  if (n < 2) return NaN;
   for (k = 0; k < n; k++) { i = idx ? idx[k] : k; s += (x[i] - m) * (x[i] - m); }
-  return Math.sqrt(s / Math.max(1, n - 1));
+  return Math.sqrt(s / (n - 1));
 }
 
 /* small dense linear solver (Gaussian elimination with partial pivoting) */
@@ -691,7 +695,8 @@ function solve(A, bvec) {
     var p = k;
     for (i = k + 1; i < n; i++) if (Math.abs(M[i][k]) > Math.abs(M[p][k])) p = i;
     var tmp = M[k]; M[k] = M[p]; M[p] = tmp;
-    var piv = M[k][k] || 1e-12;
+    var piv = M[k][k];
+    if (Math.abs(piv) < 1e-12) return new Array(n).fill(NaN);
     for (i = k + 1; i < n; i++) {
       var f = M[i][k] / piv;
       for (j = k; j <= n; j++) M[i][j] -= f * M[k][j];
@@ -701,7 +706,7 @@ function solve(A, bvec) {
   for (i = n - 1; i >= 0; i--) {
     var s = M[i][n];
     for (j = i + 1; j < n; j++) s -= M[i][j] * x[j];
-    x[i] = s / (M[i][i] || 1e-12);
+    x[i] = s / M[i][i];
   }
   return x;
 }
@@ -909,6 +914,7 @@ function signed(x, dp) {
   if (Number(s) === 0) return s;
   return (x < 0 ? MINUS : '+') + s;
 }
+function fix1(x) { return isFinite(x) ? x.toFixed(1) : NDASH; }
 function haloText(g, s, x, y) {
   g.save(); g.lineWidth = 4; g.lineJoin = 'round'; g.strokeStyle = PAPER; g.strokeText(s, x, y); g.restore();
   g.fillText(s, x, y);
@@ -1200,7 +1206,7 @@ function doMatch(kind, logAtEnd) {
   var wasMatched = view.matched;
   view.m = m; view.matched = true; view.nar = null;
   view.anim = buildAnim(m, kind, t);
-  setTarget(stateOf(m.smd, isFinite(m.est) ? m.est : before.naive, m.dens), view.anim.settleStart, view.anim.settleDur);
+  setTarget(stateOf(m.smd, m.est, m.dens), view.anim.settleStart, view.anim.settleDur);
   if (!wasMatched) from.est = before.naive;
   view.logAt = logAtEnd ? (kind === 'quick' ? t : view.anim.end) : 0;
   view.countsAt = kind === 'quick' ? 0 : view.anim.settleStart;
@@ -1842,7 +1848,8 @@ function drawReg() {
       for (k = 0; k < GRID; k++) { var xx = X(ideoGrid[k]), yy = Y(q[0](ideoGrid[k], pn.fit)); if (k === 0) g.moveTo(xx, yy); else g.lineTo(xx, yy); }
       g.strokeStyle = rgba(q[1], 1); g.lineWidth = 2.2; g.stroke();
     });
-    var yc = Y(ctl(xb, pn.fit)), yt = Y(trt(xb, pn.fit)), xx2 = X(xb);
+    var xbp = !pn.fit && cfg.het ? clamp(0.8 + (cfg.tau - d.att) / 3, 0.3, 2.9) : xb;
+    var yc = Y(ctl(xbp, pn.fit)), yt = Y(trt(xbp, pn.fit)), xx2 = X(xbp);
     g.strokeStyle = INK; g.lineWidth = 1.4;
     g.beginPath(); g.moveTo(xx2, yc); g.lineTo(xx2, yt); g.moveTo(xx2 - 4, yc); g.lineTo(xx2 + 4, yc); g.moveTo(xx2 - 4, yt); g.lineTo(xx2 + 4, yt); g.stroke();
     var gapv = pn.fit ? b[1] : (cfg.het ? d.att : cfg.tau);
@@ -1865,10 +1872,16 @@ function drawReg() {
   g.restore();
 }
 function updateRegNote() {
-  var ols = before.ols, truth = d.att;
-  el.regNote.innerHTML = Math.abs(ols - truth) < 1
-    ? 'Straight lines cannot follow support that peaks at the center, but with exposure unrelated to ideology both groups share the misfit, and the gap stays close to the truth.'
-    : 'Straight lines cannot follow support that peaks at the center. Because the treated sit mostly at the extremes, the gap between the lines, which is the regression&rsquo;s estimate, comes out at ' + signed(ols) + ' rather than ' + signed(truth) + '.';
+  var ols = before.ols, truth = d.att, lead = 'Straight lines cannot follow support that peaks at the center.', t;
+  if (cfg.sel >= 0.05) {
+    t = lead + ' Because the treated ' + (cfg.sel < 0.6 ? 'lean toward' : 'sit mostly at') + ' the extremes, the gap between the lines, which is the regression&rsquo;s estimate, comes out at ' + signed(ols) + ' rather than ' + signed(truth) + '.';
+    if (cfg.hid > 0) t += ' The unmeasured trait pulls it further, and no regression on age and ideology can adjust for it.';
+  } else if (cfg.hid > 0) {
+    t = lead + ' Exposure here does not depend on ideology or age, so both groups share the misfit. The gap, ' + signed(ols) + ' against a truth of ' + signed(truth) + ', is off because of the unmeasured trait, which no regression on age and ideology can adjust for.';
+  } else {
+    t = lead + ' With exposure unrelated to ideology, both groups share the misfit, and the gap, ' + signed(ols) + ' against a truth of ' + signed(truth) + ', differs from the truth only by chance.';
+  }
+  el.regNote.innerHTML = t;
 }
 
 /* ---------------------------------------------------------------
@@ -1953,6 +1966,10 @@ function drawEst(t) {
     g.strokeStyle = RULE; g.lineWidth = 1;
     g.beginPath(); g.moveTo(x0, y + 0.5); g.lineTo(x1, y + 0.5); g.stroke();
     var a = row.solid ? view.matchA * (view.matched && t < settle.start ? 0.25 : 1) : 1;
+    if (row.solid && a >= 0.01 && !isFinite(row.v) && view.matched && t >= settle.start) {
+      g.textAlign = 'right'; g.fillStyle = INK; g.font = '500 13px ' + SANS;
+      g.fillText('none kept', W, y);
+    }
     if (row.solid && (a < 0.01 || !isFinite(row.v))) return;
     var x = X(row.v);
     if (row.solid) {
@@ -2000,8 +2017,8 @@ function updateCounts() {
   if (view.matched && m && !view.countsAt) {
     rows.push(['Treated kept', m.keptT.length + ' of ' + d.T.length]);
     rows.push(['Controls used', m.usedC.length + ' of ' + d.C.length]);
-    rows.push(['Kept treated, mean', mean(d.y, m.keptT).toFixed(1)]);
-    rows.push(['Matched controls, mean', mean(d.y, m.usedC, m.w).toFixed(1)]);
+    rows.push(['Kept treated, mean', fix1(mean(d.y, m.keptT))]);
+    rows.push(['Matched controls, mean', fix1(mean(d.y, m.usedC, m.w))]);
     rows.push(['Matched difference', signed(m.est)]);
     if (cfg.het) rows.push(['True effect on those kept', signed(m.attKept)]);
   } else {
@@ -2026,8 +2043,8 @@ function tx(latex, fb) {
 function pairsText(o, ps) {
   var k = o.ratio, s;
   if (!o.repl && k === 1) s = 'Each control is used at most once. The algorithm is greedy, so order matters: treated respondents matched late choose from a depleted pool.';
-  else if (!o.repl) s = 'Each treated respondent receives ' + k + ' controls, each weighted 1/' + k + '. More controls reduce variance, but without replacement the later picks come from a depleted pool and make worse matches.';
-  else if (k === 1) s = 'Controls may be reused, so every treated respondent gets its nearest control. Bias falls, but reused controls carry more weight, which raises the variance; larger dots mark heavier controls.';
+  else if (!o.repl) s = 'Each treated respondent receives ' + k + ' controls, each weighted 1/' + k + '. Extra controls reduce variance only when good ones are plentiful: the later picks are worse matches, and without replacement they come from a depleted pool.';
+  else if (k === 1) s = 'Controls may be reused, so every treated respondent gets its nearest control. Bias falls, most when good controls are scarce, but a control used by several treated respondents carries more weight, which can raise the variance; larger dots mark heavier controls.';
   else s = 'Controls may be reused, and each treated respondent receives its ' + k + ' nearest, each weighted 1/' + k + '; larger dots mark controls that serve several treated respondents.';
   if (!o.repl && d && d.C.length < 2 * k * d.T.length) {
     s += ' Here only ' + d.C.length + ' controls are available for ' + d.T.length + ' treated respondents' + (k > 1 ? ' asking for ' + k + ' each' : '') +
@@ -2038,8 +2055,8 @@ function pairsText(o, ps) {
   if (!o.cal) s += short ? ' Without a caliper, each treated respondent takes the best control left, however distant.'
                          : ' Without a caliper, every treated respondent is matched, however distant its best control.';
   else {
-    s += ' The caliper rejects any match more than ' + CALIPERS[o.cal] + ' standard deviations away' +
-      (ps ? ' of the score' : (o.dist === 'raw' ? ' in age' : ', in Mahalanobis units')) +
+    s += ' The caliper rejects any match more than ' + CALIPERS[o.cal] + (CALIPERS[o.cal] === 1 ? ' standard deviation' : ' standard deviations') + ' apart' +
+      (ps ? ' in the score' : (o.dist === 'raw' ? ' in age' : ', in Mahalanobis units')) +
       '. Treated respondents with no control inside it are dropped, which removes poor comparisons but changes the population the estimate describes.';
   }
   return s;
@@ -2052,7 +2069,9 @@ function rCall(o) {
     if (o.method === 'nn') a.push(o.dist === 'maha' ? 'distance = "mahalanobis"' : 'distance = "euclidean"');
     if (o.ratio > 1) a.push('ratio = ' + o.ratio);
     if (o.repl) a.push('replace = TRUE');
-    if (o.cal) a.push(o.method === 'ps' ? 'caliper = ' + CALIPERS[o.cal] : 'caliper = c(age = ' + CALIPERS[o.cal] + ', ideology = ' + CALIPERS[o.cal] + ')');
+    if (o.cal) a.push(o.method === 'ps' ? 'caliper = ' + CALIPERS[o.cal]
+      : o.dist === 'raw' ? 'caliper = c(age = ' + CALIPERS[o.cal] + ')'
+      : 'caliper = c(age = ' + CALIPERS[o.cal] + ', ideology = ' + CALIPERS[o.cal] + ')');
   }
   return 'matchit(' + a.join(', ') + ')';
 }
@@ -2068,7 +2087,7 @@ function updateNote() {
       ', so the estimate averages within-cell differences, weighting each cell by its number of treated respondents (Iacus, King, and Porro 2012).');
     if (b <= 3) p.push('With only ' + b + ' bins the cells are wide: respondents who differ substantially in ideology count as equivalent, and imbalance survives inside each cell.');
     else if (b <= 8) p.push('Finer bins tighten each comparison but discard more cells; coarser bins keep more respondents and leave more imbalance within cells.');
-    else p.push('Bins this fine approach exact matching. Few cells hold both groups, so many treated respondents are discarded, and the estimate describes only those who remain.');
+    else p.push('Bins this fine approach exact matching. Fewer cells hold both groups, so treated respondents are discarded, more of them the finer the bins, and the estimate describes only those who remain.');
     if (m) p[p.length - 1] += ' In this sample, ' + m.keptT.length + ' of ' + d.T.length + ' treated and ' + m.usedC.length + ' of ' + d.C.length + ' control respondents fall in cells that hold both groups.';
   } else if (o.method === 'nn') {
     title = 'Nearest-neighbor matching';
@@ -2076,7 +2095,7 @@ function updateNote() {
       ? 'Closeness is the Mahalanobis distance, ' + tx('d_{ij} = \\sqrt{(x_i - x_j)^{\\top} S^{-1} (x_i - x_j)}', 'd<sub>ij</sub> = &radic;[(x<sub>i</sub> &minus; x<sub>j</sub>)&prime; S<sup>&minus;1</sup> (x<sub>i</sub> &minus; x<sub>j</sub>)]') +
         ', where ' + tx('S', 'S') + ' is the pooled covariance of age and ideology. It measures both covariates in standard deviations and discounts their correlation. Hover over a treated respondent to see the ellipse of equal distance around it.'
       : 'Closeness is plain Euclidean distance in years and ideology points. Age spans some seventy years and ideology about six points, so age dominates: matches agree in age and differ in ideology, the covariate that matters most for support. Hover over a treated respondent to see how elongated the region of equal distance is.';
-    p.push('Treated respondents are taken one at a time, in random order, and each is paired with the closest available control. ' + dist);
+    p.push('Treated respondents are taken one at a time, in the order they appear in the sample (the animation starts with a few from sparse regions, so that the search is visible), and each is paired with the closest available control. ' + dist);
     p.push(pairsText(o, false));
   } else {
     title = 'Propensity score matching';
@@ -2085,14 +2104,16 @@ function updateNote() {
         ', lets the score rise in only one direction of ideology. Because the ad targeted both extremes, the fitted score misses extremity, and matching on it leaves extremity imbalanced; the straight contours show the problem.'
       : 'The model with squares adds ' + tx('\\text{age}^2', 'age<sup>2</sup>') + ', ' + tx('\\text{ideology}^2', 'ideology<sup>2</sup>') +
         ', and their product, which lets the score rise toward both ideological extremes; the contours bend accordingly.';
-    p.push('The propensity score, ' + tx('e(X) = \\Pr(T = 1 \\mid X)', 'e(X) = Pr(T = 1 | X)') + ', is estimated by logistic regression, and treated respondents, taken in random order, are matched on it (MatchIt starts from the highest score by default). ' + model);
+    p.push('The propensity score, ' + tx('e(X) = \\Pr(T = 1 \\mid X)', 'e(X) = Pr(T = 1 | X)') + ', is estimated by logistic regression, and treated respondents, taken in the order they appear in the sample, with a few from sparse regions first in the animation, are matched on it (MatchIt starts from the highest score by default). ' + model);
     p.push('One number cannot pin down two covariates. Many combinations of age and ideology share a score, so matched pairs can lie far apart in the plot; hover over a respondent to see everyone with the same estimated score. The true score balances covariates across many pairs, not within any one (Rosenbaum and Rubin 1983), which is why King and Nielsen (2019) argue against matching on it.');
     p.push(pairsText(o, true));
   }
   if (m && m.kind === 'pairs') p[p.length - 1] += ' In this sample, ' + m.keptT.length + ' of ' + d.T.length + ' treated respondents are matched to ' + m.usedC.length + ' distinct controls.';
   var html = '<h3>' + title + '</h3>' + p.map(function (s) { return '<p>' + s + '</p>'; }).join('') +
     '<p class="r-line"><span class="r-label">In R</span><code>' + escHtml(rCall(o)) + '</code></p>' +
-    (o.method === 'nn' && o.cal ? '<p class="r-note">MatchIt cannot put a caliper on this distance; it applies one to each covariate instead, so its matches differ slightly from those shown here.</p>' : '');
+    (o.method === 'nn' && o.cal ? '<p class="r-note">' + (o.dist === 'raw'
+      ? 'MatchIt allows no caliper on this distance; the call puts it on age, which dominates the distance, and its matches agree closely with those shown here, a little less so at the narrowest caliper.'
+      : 'MatchIt allows no caliper on a Mahalanobis distance; the call puts one on each covariate, and its matches differ slightly from those shown here.') + '</p>' : '');
   if (html === noteCache) return;
   noteCache = html;
   el.note.innerHTML = html;
@@ -2107,6 +2128,7 @@ function updateCaption() {
       : 'Hover over a treated respondent to see its nearest control.';
   } else {
     var drop = d.T.length - m.keptT.length;
+    if (!m.keptT.length) { el.caption.textContent = 'No treated respondent has a match, so nothing is drawn into the matched sample.'; updateNote(); return; }
     var dropTxt = drop ? ' ' + drop + ' treated ' + (drop === 1 ? 'respondent finds' : 'respondents find') + ' no match.' : '';
     if (m.kind === 'cells') s = 'Larger dots are controls weighted up to their cell\u2019s treated count.' + dropTxt;
     else if (m.opts.method === 'ps') s = 'Pairs are close in the score, not always in age and ideology.' + dropTxt;
@@ -2165,8 +2187,8 @@ function runReps() {
   if (rep.running) return;
   var c0 = { n: N, rate: cfg.rate, tau: cfg.tau, sel: cfg.sel, hid: cfg.hid, het: cfg.het }, o = matchOpts(), total = 200, done = 0;
   rep.dom = estDom(c0.tau);
-  var s0 = Math.floor(Math.random() * 1e9);
-  rep.running = true; rep.res = { raw: [], ols: [], m: [], att: [], kept: [] };
+  var s0 = (seed + 1000003) >>> 0;
+  rep.running = true; rep.het = c0.het; rep.res = { raw: [], ols: [], m: [], att: [], attK: [], kept: [] };
   var lab = methodLong(o);
   rep.label = lab.main + ', ' + lab.sub + '; ' + dataLabel(c0);
   rep.key = repKey();
@@ -2177,11 +2199,11 @@ function runReps() {
       var dd = assign(genBase(s0 + done * 7919, c0.n), c0);
       var mm = runMatch(dd, o);
       rep.res.raw.push(naiveEffect(dd)); rep.res.ols.push(olsEffect(dd)); rep.res.m.push(mm.est);
-      rep.res.att.push(dd.att); rep.res.kept.push(mm.keptT.length / dd.T.length);
+      rep.res.att.push(dd.att); rep.res.attK.push(mm.attKept); rep.res.kept.push(mm.keptT.length / dd.T.length);
     }
     drawRep();
     if (done < total) requestAnimationFrame(step);
-    else { rep.running = false; el.repGo.disabled = false; el.repGo.textContent = 'Run 200 again'; updateRepNote(); drawRep(); }
+    else { rep.running = false; el.repGo.disabled = false; el.repGo.textContent = 'Run 200 samples'; updateRepNote(); drawRep(); }
   }
   updateRepNote();
   requestAnimationFrame(step);
@@ -2198,7 +2220,11 @@ function updateRepNote() {
   var stale = rep.key !== repKey() ? ' These results are for earlier settings.' : '';
   var kept = msd(rep.res.kept)[0];
   var keptTxt = kept < 0.995 ? ' On average ' + Math.round(100 * kept) + ' percent of treated respondents were kept.' : '';
-  el.repNote.textContent = 'Matched: ' + rep.label + '.' + keptTxt + stale;
+  var none = rep.res.m.filter(function (v) { return !isFinite(v); }).length;
+  var noneTxt = none ? ' In ' + none + ' of ' + rep.res.m.length + ' samples no treated respondent was kept; those samples are left out of the Matched row.' : '';
+  var ak = msd(rep.res.attK)[0], at = msd(rep.res.att)[0];
+  var hetTxt = rep.het && isFinite(ak) && Math.abs(ak - at) >= 0.1 ? ' With the effect varying, the matched estimate describes the treated who were kept, whose true effect averaged ' + signed(ak) + ', against ' + signed(at) + ' for all treated.' : '';
+  el.repNote.textContent = 'Matched: ' + rep.label + '. Every method runs on the same 200 surveys until a new sample is drawn.' + keptTxt + noneTxt + hetTxt + stale;
 }
 function drawRep() {
   var g = RP.g, W = RP.w, H = RP.h, top = 26, rowH = 36;
