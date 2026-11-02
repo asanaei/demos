@@ -17,9 +17,9 @@
   --rule: #CBD2D1;
   --card: #F7F9F8;
   --tint: #E3E8E7;
-  --a: #4F7A1E;
+  --a: #46781F;
   --b: #8E2F6B;
-  --a-fill: rgba(79, 122, 30, 0.85);
+  --a-fill: rgba(70, 120, 31, 0.85);
   --b-fill: rgba(142, 47, 107, 0.85);
   --b-tint: rgba(142, 47, 107, 0.1);
   --serif: "Spectral", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
@@ -51,18 +51,19 @@ output { font-variant-numeric: tabular-nums; color: var(--graphite); text-align:
 .seg label:first-child span { border-left: 0; }
 .seg input:checked + span { background: var(--ink); color: var(--paper); }
 .seg input:focus-visible + span { outline: 2px solid var(--ink); outline-offset: -4px; }
+.seg input:checked:focus-visible + span { outline-color: var(--paper); }
 .seg.stack { flex-direction: column; }
 .seg.stack span { border-left: 0; border-top: 1px solid var(--ink); text-align: left; padding: 8px 12px; font-size: 15px; }
 .seg.stack label:first-child span { border-top: 0; }
 input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 22px; background: transparent; margin: 0; }
-input[type=range]::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: #AEB9B9; }
+input[type=range]::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: #7F8B8B; }
 input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--paper); border: 2px solid var(--ink); margin-top: -7px; cursor: pointer; }
-input[type=range]::-moz-range-track { height: 4px; border-radius: 2px; background: #AEB9B9; }
+input[type=range]::-moz-range-track { height: 4px; border-radius: 2px; background: #7F8B8B; }
 input[type=range]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--paper); border: 2px solid var(--ink); cursor: pointer; }
 input[type=range]:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; border-radius: 4px; }
 .toggle { display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; }
 .toggle input { position: absolute; opacity: 0; width: 1px; height: 1px; }
-.toggle .track { width: 38px; height: 22px; border-radius: 11px; background: #AEB9B9; position: relative; transition: background 0.18s; flex: none; }
+.toggle .track { width: 38px; height: 22px; border-radius: 11px; background: #7F8B8B; position: relative; transition: background 0.18s; flex: none; }
 .toggle .track::after { content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: var(--paper); transition: transform 0.18s; }
 .toggle input:checked + .track { background: var(--ink); }
 .toggle input:checked + .track::after { transform: translateX(16px); }
@@ -130,7 +131,7 @@ button.quiet { border-color: transparent; color: var(--graphite); padding: 4px 0
 .bin i { display: block; width: 100%; height: 0; border-radius: 2px 2px 0 0; }
 #hist-a .bin i { background: var(--a-fill); }
 #hist-b .bin i { background: var(--b-fill); }
-.bin.na::after { content: "n/a"; position: absolute; bottom: 4px; width: 100%; text-align: center; font-size: 11px; color: #9AA6A6; }
+.bin.na::after { content: "n/a"; position: absolute; bottom: 4px; width: 100%; text-align: center; font-size: 12px; color: var(--graphite); }
 .bin.reveal i { background: repeating-linear-gradient(135deg, rgba(142, 47, 107, 0.95) 0 4px, rgba(142, 47, 107, 0.45) 4px 7px) !important; }
 .axis { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; font-size: 12px; color: var(--graphite); text-align: center; margin-top: 3px; font-variant-numeric: tabular-nums; }
 .mean-row { position: relative; height: 22px; }
@@ -176,10 +177,14 @@ button.quiet { border-color: transparent; color: var(--graphite); padding: 4px 0
 .refs h2 { font-family: var(--serif); font-weight: 500; font-size: 17px; margin: 0 0 10px; }
 .refs p { margin: 0 0 6px; padding-left: 2em; text-indent: -2em; max-width: 92ch; }
 
+@media (max-width: 1240px) {
+  .trow { grid-template-columns: 108px minmax(0, 1fr) 64px; gap: 8px; }
+}
 @media (max-width: 1180px) {
   .readouts { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 32px; }
 }
-@media (max-width: 900px) {
+@media (max-width: 1100px) {
+  .trow { grid-template-columns: 130px minmax(0, 1fr) 84px; gap: 10px; }
   .stage { grid-template-columns: minmax(0, 1fr); }
   .priv { padding-right: 0; }
   .rec { padding-left: 0; border-left: 0; border-top: 1.5px dashed var(--graphite); margin-top: 18px; padding-top: 14px; }
@@ -209,7 +214,7 @@ button.quiet { border-color: transparent; color: var(--graphite); padding: 4px 0
 <div class="wrap">
   <header>
     <h1>Learning the share without learning who</h1>
-    <p>Some respondents will not admit that a woman serving as president would upset them. The item count technique and the crosswise model let each respondent keep that answer private while still revealing how common it is. Both depend on respondents following the instructions. The panels on the left break that assumption, then repair it.</p>
+    <p>Some respondents will not admit that a woman serving as president would upset them. The item count technique and the crosswise model let each respondent keep that answer private while still revealing how common it is. Both depend on respondents following the instructions. Under "What can go wrong" you can break that assumption, and under "Safeguards" repair it.</p>
   </header>
 
   <div class="main">
@@ -262,20 +267,20 @@ button.quiet { border-color: transparent; color: var(--graphite); padding: 4px 0
         </div>
         <div class="field" data-m="ict">
           <label class="toggle"><input type="checkbox" id="ceil"><span class="track"></span><span>Mostly upsetting list</span></label>
-          <p class="hint">Control items that most people find upsetting, so many on version B have every item apply.</p>
+          <p class="hint" id="ceil-hint">Control items that most people find upsetting, so many on version B have every item apply.</p>
         </div>
         <div class="field" data-m="ict">
           <div class="label-row"><label class="name" for="hide">Hold back at the ceiling</label><output id="hide-out" for="hide"></output></div>
           <input type="range" id="hide" min="0" max="1" step="0.05" value="0">
-          <p class="hint">Share of holders who would report every item on version B and report one fewer.</p>
+          <p class="hint">Share of holders for whom every item applies who report one fewer.</p>
         </div>
         <div class="field" data-m="ict">
           <div class="label-row"><label class="name" for="dsg">Sensitive item shifts the rest</label><output id="dsg-out" for="dsg"></output></div>
           <input type="range" id="dsg" min="0" max="0.2" step="0.01" value="0">
-          <p class="hint">Share on version B who count one fewer of the other items after reading it.</p>
+          <p class="hint">Share on version B who count one fewer of the other items, when at least one applies.</p>
         </div>
         <div class="field" data-m="cm" hidden>
-          <div class="label-row"><label class="name" for="dev">B more common than assumed</label><output id="dev-out" for="dev"></output></div>
+          <div class="label-row"><label class="name" for="dev">Statement B off by</label><output id="dev-out" for="dev"></output></div>
           <input type="range" id="dev" min="-0.1" max="0.1" step="0.01" value="0">
           <p class="hint" id="dev-hint"></p>
         </div>
@@ -288,14 +293,14 @@ button.quiet { border-color: transparent; color: var(--graphite); padding: 4px 0
 
       <details class="drawer" id="guard">
         <summary><span>Safeguards</span><span class="count" id="gcount" hidden></span></summary>
-        <p class="hint dhint">Designs that cut bias or variance. The estimates show the result with and without them.</p>
+        <p class="hint dhint">What each repair buys, and what it costs, shows in the estimates with and without it.</p>
         <div class="field" data-m="ict">
           <label class="toggle"><input type="checkbox" id="paired"><span class="track"></span><span>Opposed control items</span></label>
-          <p class="hint">Pairs that rarely upset the same person, such as speed limits raised and lowered. Replaces the list.</p>
+          <p class="hint">Pairs that rarely upset the same person, such as speed limits raised and lowered. A best case, and it replaces the list.</p>
         </div>
         <div class="field" data-m="cm" hidden>
           <label class="toggle"><input type="checkbox" id="placebo"><span class="track"></span><span>Placebo statement</span></label>
-          <p class="hint">A second question about a statement no one can truthfully endorse. Whatever it finds is error.</p>
+          <p class="hint">A second question about a statement no one can truthfully endorse. What it finds is false positives, which the estimate then removes.</p>
         </div>
         <div class="field" data-m="cm" hidden>
           <label class="toggle"><input type="checkbox" id="calib"><span class="track"></span><span>Measure statement B</span></label>
@@ -303,7 +308,7 @@ button.quiet { border-color: transparent; color: var(--graphite); padding: 4px 0
         </div>
         <div class="field">
           <label class="toggle"><input type="checkbox" id="screen"><span class="track"></span><span>Screen out careless respondents</span></label>
-          <p class="hint">Drops 70% of careless respondents and 10% of careful ones before the analysis.</p>
+          <p class="hint">Assumes a screen that catches 70% of careless respondents and wrongly drops 10% of careful ones.</p>
         </div>
       </details>
     </aside>
@@ -336,7 +341,7 @@ button.quiet { border-color: transparent; color: var(--graphite); padding: 4px 0
       <div class="readouts">
         <section>
           <h2>Estimates</h2>
-          <canvas id="est" aria-label="Estimated share against the truth"></canvas>
+          <canvas id="est" role="img" aria-label="Estimated share against the truth"></canvas>
           <p class="note" id="est-note"></p>
         </section>
         <section>
@@ -345,8 +350,8 @@ button.quiet { border-color: transparent; color: var(--graphite); padding: 4px 0
         </section>
         <section>
           <div class="rep-head"><h2>Across 200 surveys</h2><button id="rep-go">Run 200</button></div>
-          <canvas id="rep" aria-label="Estimates across repeated surveys"></canvas>
-          <p class="note" id="rep-note">Each dot is one survey. The same 200 surveys are used each time, so a change in the dots comes from the settings.</p>
+          <canvas id="rep" role="img" aria-label="Estimates across repeated surveys"></canvas>
+          <p class="note" id="rep-note">Each dot is one survey. Until you draw a new sample, the same 200 surveys are used each time, so a change in the dots comes from the settings.</p>
         </section>
       </div>
     </main>
@@ -356,11 +361,11 @@ button.quiet { border-color: transparent; color: var(--graphite); padding: 4px 0
     <h2>Reading the picture</h2>
     <p>In the item count technique, a coin assigns each respondent to one of two lists that differ only by the sensitive item. Respondents report how many items apply, never which. Because assignment is random, the two groups agree on average about the shared items, so the difference between their average counts estimates the share for whom the sensitive item is true (Miller 1984; Glynn 2013). The sensitive item follows the list experiment of Streb et al. (2008).</p>
     <p>In the crosswise model, everyone answers the same question about two statements: the sensitive one, and one whose prevalence <span class="tex" data-tex="p">p</span> is known but which no researcher can observe for any individual, such as a mother's birth month. Respondents say only whether the two statements agree. If no one held the view, the share answering "both or neither" would be <span class="tex" data-tex="1 - p">1 - p</span>; the shortfall from that benchmark identifies the prevalence (Yu, Tian, and Tang 2008; Jann, Jerke, and Krumpal 2012).</p>
-    <p>Privacy is paid for in precision. Both estimators are noisier than an honest direct question, and the crosswise model's noise grows without bound as <span class="tex" data-tex="p">p</span> approaches one half, where an answer carries no information at all. Too little noise fails the other way: with a rare birth-month condition, "exactly one" nearly identifies a holder, and in the item count technique anyone who reports every item on version B reveals the sensitive answer.</p>
-    <p>The item count breaks in two places that the left panel opens. When every item applies, the count gives the respondent away, and some will report one fewer; the more upsetting the control items, the more respondents this reaches (Kuklinski, Cobb, and Gilens 1997; Glynn 2013). And the sensitive item can change how the others are counted, a design effect that the difference in means cannot tell apart from prevalence (Blair and Imai 2012).</p>
-    <p>The crosswise model breaks where the instructions do. A respondent who clicks at random says "both or neither" about half the time whatever the truth, which pulls every estimate toward one half: where no one holds the view, the false positives equal half the share who answer at random (H&ouml;glinger and Diekmann 2017). In two online surveys, Wolter and Diekmann (2021) found crosswise estimates of 5 to 15 percent for traits that almost no one has, while the item count technique mostly did not produce false positives. They trace the crosswise results to careless answering and to unrelated statements that were less or more common than assumed. With <span class="tex" data-tex="p">p</span> below one half, a statement B that is more common than assumed is read as prevalence of the view.</p>
-    <p>The safeguards come from the same two papers. Opposed control items lower the variance of the counts and keep every item from applying at once, so the ceiling empties (Glynn 2013). A placebo statement that no one can truthfully endorse measures false positives directly: whatever the crosswise model finds for it is error, and removing it repairs the estimate for the real statement. Asking a random subsample about statement B directly replaces the assumed share with a measured one, which Wolter and Diekmann found cut the false positives a good deal but not to zero. Asking respondents whether they had answered carefully did not help, since almost none said they had not. A screen removes some careless answers and some careful respondents with them. Each repair costs precision, so compare the intervals with and without.</p>
-    <p>The settings are assumptions, not estimates. How many holders really round down at the ceiling, or how far real birth months stray from the assumed shares, are questions for validation studies; the panel shows what each would cost. The direct question is not affected by any of them here. Glynn (2013) also describes the double list experiment, in which every respondent answers two lists and the two estimates are averaged; it is not simulated here.</p>
+    <p>Both estimators are noisier than an honest direct question, and the crosswise model's noise grows without bound as <span class="tex" data-tex="p">p</span> approaches one half, where an answer carries no information at all. Too little noise fails the other way: with a rare birth-month condition, "exactly one" points strongly to a holder, and in the item count technique anyone who reports every item on version B reveals the sensitive answer.</p>
+    <p>Beyond careless answering, the item count breaks in two places that "What can go wrong" opens. When every item applies, the count gives the respondent away, and some will report one fewer; the more upsetting the control items, the more respondents this reaches (Kuklinski, Cobb, and Gilens 1997; Glynn 2013). Glynn also names near-ceiling respondents who report one fewer, which the settings do not model, so they understate the problem. And the sensitive item can change how the others are counted, a design effect that the difference in means cannot tell apart from prevalence (Blair and Imai 2012).</p>
+    <p>The crosswise model breaks where the instructions do. A respondent who clicks at random says "both or neither" about half the time whatever the truth, which pulls every estimate toward one half: where no one holds the view, the false positives equal half the share who answer at random (H&ouml;glinger and Diekmann 2017). In two online surveys, Wolter and Diekmann (2021) found crosswise estimates of 5 to 15 percent for traits that almost no one has, while the item count technique mostly did not produce false positives. Here both techniques suffer equally from random answers; the item count's better record in their data is an empirical result this model does not generate. They trace the crosswise results to careless answering and to unrelated statements that were more or less common than assumed. With <span class="tex" data-tex="p">p</span> below one half, a statement B that is more common than assumed is read as prevalence of the view.</p>
+    <p>The safeguards are repairs these papers point toward. Glynn (2013) shows that opposed control items lower the variance of the counts and keep every item from applying at once; the pairs here are perfectly opposed, a best case, and his own example cut the standard deviation of the baseline counts from 0.76 to 0.65. Wolter and Diekmann recommend building in a check for false positives; the placebo statement is such a check, and the adjustment that subtracts its estimate follows Schnapp (2019), whose correction for random answers they tested with respondents' own reports and could not recommend. The placebo here is as common as assumed, so it catches careless answering and leaves a flawed statement B alone; mother's and father's birthday statements in their data were both more common than expected (Table 4), and a placebo that shares B's flaw would catch that too. Replacing the assumed share with one measured in a randomly assigned direct-question group cut their false positives a good deal but not to zero. A screen removes some careless answers and some careful respondents with them: dropping everyone who sped through the questions would have removed 58 to 67 percent of their Swiss sample, and asking respondents whether they had answered carefully did not help, since almost none admitted to clicking at random. Apart from the opposed list, each repair costs precision, so compare the intervals with and without.</p>
+    <p>The settings are assumptions, not estimates. How many holders really hold back at the ceiling, or how far real birth months stray from the assumed shares, are questions for validation studies; the panel shows what each would cost. The direct question is not affected by any of them here. Glynn (2013) also describes the double list experiment, in which every respondent answers two lists and the two estimates are averaged; it is not simulated here.</p>
   </section>
 
   <section class="refs">
@@ -371,6 +376,7 @@ button.quiet { border-color: transparent; color: var(--graphite); padding: 4px 0
     <p>Jann, Ben, Julia Jerke, and Ivar Krumpal. 2012. "Asking Sensitive Questions Using the Crosswise Model: An Experimental Survey Measuring Plagiarism." <i>Public Opinion Quarterly</i> 76 (1): 32-49.</p>
     <p>Kuklinski, James H., Michael D. Cobb, and Martin Gilens. 1997. "Racial Attitudes and the 'New South.'" <i>Journal of Politics</i> 59 (2): 323-49.</p>
     <p>Miller, Judith Droitcour. 1984. "A New Survey Technique for Studying Deviant Behavior." PhD diss., George Washington University.</p>
+    <p>Schnapp, Patrick. 2019. "Sensitive Question Techniques and Careless Responding: Adjusting the Crosswise Model for Random Answers." <i>Methods, Data, Analyses</i> 13 (2): 307-20.</p>
     <p>Streb, Matthew J., Barbara Burrell, Brian Frederick, and Michael A. Genovese. 2008. "Social Desirability Effects and Support for a Female American President." <i>Public Opinion Quarterly</i> 72 (1): 76-89.</p>
     <p>Wolter, Felix, and Andreas Diekmann. 2021. "False Positives and the 'More-Is-Better' Assumption in Sensitive Question Research: New Evidence on the Crosswise Model and the Item Count Technique." <i>Public Opinion Quarterly</i> 85 (3): 836-63.</p>
     <p>Yu, Jun-Wu, Guo-Liang Tian, and Man-Lai Tang. 2008. "Two New Models for Survey Sampling with Sensitive Characteristic: Design and Analysis." <i>Metrika</i> 67 (3): 251-63.</p>
@@ -383,7 +389,7 @@ button.quiet { border-color: transparent; color: var(--graphite); padding: 4px 0
 
 /* Constants */
 var INK = '#1D2A30', GRAPH = '#57656B', RULE = '#CBD2D1', PAPER = '#EEF1F0';
-var C_A = [79, 122, 30], C_B = [142, 47, 107], C_INK = [29, 42, 48], C_GR = [87, 101, 107];
+var C_A = [70, 120, 31], C_B = [142, 47, 107], C_INK = [29, 42, 48], C_GR = [87, 101, 107];
 var SERIF = '"Spectral", "Iowan Old Style", Georgia, serif';
 var SANS = '"Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif';
 var MINUS = '\u2212', PM = '\u00b1';
@@ -443,7 +449,7 @@ function tx(tex, fb) {
   if (window.katex) { try { return window.katex.renderToString(tex, { throwOnError: false }); } catch (e) {} }
   return fb;
 }
-function listKey(c) { return c.ceil ? 'upset' : (c.paired ? 'opposed' : 'mixed'); }
+function listKey(c) { return c.paired ? 'opposed' : (c.ceil ? 'upset' : 'mixed'); }
 
 /* The respondents: fixed random draws, so that the settings move the same people rather than new ones */
 function genDraws(seed, n) {
@@ -531,6 +537,7 @@ function cmStat(x, placebo) {
 function cmEst(a, cal, c) {
   if (a.n < 2) return null;
   var n = a.n, p = c.months / 12, lam = a.nSame / n, lam0 = a.nSame0 / n, pB = p, pB1 = p, vB = 0, vB1 = 0, j;
+  if (c.months === 6) return { lam: lam, lam0: lam0, pB: p, pB1: p, e1: NaN, e0: NaN, est: NaN, se: NaN };
   if (c.calib) {
     if (cal.n < 2) return { lam: lam, lam0: lam0, pB: NaN, pB1: NaN, e1: NaN, e0: NaN, est: NaN, se: NaN };
     pB = cal.b / cal.n; pB1 = cal.b1 / cal.n;
@@ -578,7 +585,7 @@ var el = {};
 ['stage', 'cards', 'out', 'fly', 'crowd', 'crowd-label', 'crowd-note', 'coin', 'coin-wrap', 'caption', 'calc-main', 'calc-sub', 'est', 'est-note',
  'reveal', 'rep', 'rep-go', 'rep-note', 'go', 'ceil', 'hide', 'hide-out', 'dsg', 'dsg-out', 'paired', 'placebo', 'calib', 'screen',
  'months', 'months-out', 'months-hint', 'pi', 'pi-out', 'deny', 'deny-out', 'rand', 'rand-out', 'dev', 'dev-out', 'dev-hint',
- 'cau', 'cau-out', 'resample', 'vcount', 'gcount', 'opt-cm'].forEach(function (id) { el[id.replace(/-/g, '_')] = document.getElementById(id); });
+ 'cau', 'cau-out', 'ceil-hint', 'resample', 'vcount', 'gcount', 'opt-cm'].forEach(function (id) { el[id.replace(/-/g, '_')] = document.getElementById(id); });
 
 /* Building the cards and the researcher's tallies */
 function cardICT(v) {
@@ -903,15 +910,16 @@ function updateCalc(force) {
     var k = cfg.months, p = k / 12, c = cmEst(L, R.cal, cfg);
     var model = 'If a share ' + tx('\\pi', '&pi;') + ' holds the view, the chance of answering "both or neither" is ' +
       tx('\\lambda = \\pi p + (1 - \\pi)(1 - p)', '&lambda; = &pi;p + (1 &minus; &pi;)(1 &minus; p)') + '.';
+    var dg = cfg.calib ? 3 : 2, nm = function (x) { var q = x.toFixed(dg); return Number(q) === 0 ? (0).toFixed(dg) : q; }, nn = function (x) { var q = nm(x); return q[0] === '-' ? '(' + q + ')' : q; };
     var ps = cfg.calib ? '\\hat{p}' : 'p', ps1 = cfg.calib ? "\\hat{p}'" : 'p', lamTx = tx('\\hat{\\lambda}', '&lambda;&#770;');
-    if (k === 6 && !cfg.calib) {
+    if (k === 6) {
       main = model + '<br>With ' + tx('p = 1/2', 'p = 1/2') + ', ' + tx('\\lambda = 1/2', '&lambda; = 1/2') + ' whatever ' + tx('\\pi', '&pi;') + ' is, so the answers carry no information.';
       sub = 'Choose a birth-month condition other than half the year.';
     } else if (c && isFinite(c.est)) {
-      main = model + '<br>' + tx('\\hat{\\pi} = \\frac{\\hat{\\lambda} + ' + ps + ' - 1}{2' + ps + ' - 1} = \\frac{' + t2(c.lam) + ' + ' + t2(c.pB) + ' - 1}{2 \\times ' + t2(c.pB) + ' - 1} = ' + t2(c.e1),
+      main = model + '<br>' + tx('\\hat{\\pi} = \\frac{\\hat{\\lambda} + ' + ps + ' - 1}{2' + ps + ' - 1} = \\frac{' + nm(c.lam) + ' + ' + nm(c.pB) + ' - 1}{2 \\times ' + nm(c.pB) + ' - 1} = ' + nm(c.e1),
         'estimate = (&lambda;&#770; + p &minus; 1)/(2p &minus; 1) = (' + f2(c.lam) + ' + ' + f2(c.pB) + ' &minus; 1)/(2 &times; ' + f2(c.pB) + ' &minus; 1) = ' + f2(c.e1));
       if (cfg.placebo) {
-        main += '<br>' + tx('\\hat{\\pi}_0 = \\frac{\\hat{\\lambda}_0 + ' + ps1 + ' - 1}{2' + ps1 + ' - 1} = ' + t2(c.e0) + '\\text{ for the placebo, so }\\tilde{\\pi} = \\frac{\\hat{\\pi} - \\hat{\\pi}_0}{1 - 2\\hat{\\pi}_0} = \\frac{' + t2(c.e1) + ' - ' + tn(c.e0) + '}{1 - 2 \\times ' + tn(c.e0) + '} = ' + t2(c.est),
+        main += '<br>' + tx('\\hat{\\pi}_0 = \\frac{\\hat{\\lambda}_0 + ' + ps1 + ' - 1}{2' + ps1 + ' - 1} = ' + nm(c.e0) + '\\text{ for the placebo, so }\\tilde{\\pi} = \\frac{\\hat{\\pi} - \\hat{\\pi}_0}{1 - 2\\hat{\\pi}_0} = \\frac{' + nm(c.e1) + ' - ' + nn(c.e0) + '}{1 - 2 \\times ' + nn(c.e0) + '} = ' + nm(c.est),
           'placebo estimate = ' + f2(c.e0) + '; adjusted estimate = (' + f2(c.e1) + ' &minus; ' + f2(c.e0) + ')/(1 &minus; 2 &times; ' + f2(c.e0) + ') = ' + f2(c.est));
       }
       sub = 'Here ' + lamTx + ' is the share answering "both or neither"' + (cfg.calib ? ', and ' + tx('\\hat{p}', 'p&#770;') + ' = ' + pct(c.pB) + ' is the share of the ' + R.cal.n + ' respondents asked directly for whom B is true (assumed: ' + pct(p) + ')'
@@ -958,7 +966,7 @@ function drawCrowd(g, A) {
     var cx = r.x + gap / 2 + (q % cols) * gap, cy = r.y + gap / 2 + Math.floor(q / cols) * gap;
     dot(g, cx, cy, 3.1, C_GR, 0.55);
   }
-  setText(el.crowd_label, state === 'idle' ? R.nUse + ' respondents' : (remaining > 0 ? remaining + ' still to answer' : R.nUse + ' answered'));
+  setText(el.crowd_label, state === 'idle' ? R.n + ' respondents' : (remaining > 0 ? remaining + ' still to answer' : R.nUse + ' in the analysis'));
   var note = '';
   if (R.nDrop) note += R.nDrop + ' screened out';
   if (R.cal.n) note += (note ? '<br>' : '') + R.cal.n + ' asked about B directly';
@@ -1036,7 +1044,7 @@ function drawFly(t) {
 
 /* Narration and the button */
 function narration(t) {
-  if (state === 'idle') return 'Press Run to send the questionnaire to ' + R.nUse + ' respondents.';
+  if (state === 'idle') return 'Press "Run the survey" to send the questionnaire to ' + R.n + ' respondents.';
   if (state === 'done') return cfg.method === 'ict' ? 'The estimate is the gap between the two average counts.'
     : 'The estimate compares the share answering "both or neither" with what it would be if no one held the view.';
   var st = activeStep(t);
@@ -1134,45 +1142,55 @@ function drawEst() {
     if (r.kind === 'hollow' || r.kind === 'plain') { g.fillStyle = PAPER; g.fill(); g.lineWidth = 1.8; g.strokeStyle = GRAPH; g.stroke(); }
     else { g.fillStyle = rgba(c, a); g.fill(); }
     offScale(g, X, r.v, y, rgba(c, a));
-    g.fillStyle = rgba(c, a); g.font = '500 14px ' + SANS; g.textAlign = 'right';
+    g.fillStyle = r.kind === 'faint' ? GRAPH : rgba(c, a); g.font = '500 14px ' + SANS; g.textAlign = 'right';
     g.fillText(pct(r.v) + ' ' + PM + Math.round(196 * r.se), W, y);
   });
   drawAxis(g, X, x0 + 18, x1, yEnd + 2);
+  el.est.setAttribute('aria-label', 'Estimates of the share, against a true share of ' + pct(cfg.pi) + '. ' + rows.map(function (r) {
+    return r.name + ': ' + (isFinite(r.v) ? pct(r.v) + ', 95% interval ' + pct(r.v - 1.96 * r.se) + ' to ' + pct(r.v + 1.96 * r.se) : 'undefined');
+  }).join('. ') + '.');
   if (ind && isFinite(ind.se) && S.hSe > 0) {
     el.est_note.textContent = 'Bars are 95% intervals. The ' + methodName().toLowerCase() + ' interval is ' + (ind.se / S.hSe).toFixed(1) +
       " times as wide as an honest direct question's." + (pl && isFinite(pl.se) && P.hSe > 0 && (ind.se / pl.se > 1.05 || ind.se / pl.se < 0.95)
         ? ' Without the safeguards it is ' + (pl.se / P.hSe).toFixed(1) + ' times.' : '');
   } else el.est_note.textContent = 'Bars are 95% intervals.';
+  if (cfg.method === 'cm' && cfg.calib && ind && (Math.abs(2 * ind.pB - 1) < 0.25 || R.cal.n < 50))
+    el.est_note.textContent += ' The measured share for B is close to one half or rests on few respondents, so the estimate is unstable and its interval is too narrow.';
 }
 function updateReveal() {
   if (state !== 'done') { el.reveal.innerHTML = '<p class="empty">Appears when the survey is done.</p>'; return; }
   if (cfg.method === 'ict') {
-    var nB = S.acc.nV[1], n5 = S.acc.hist[1][J + 1], exposed = 0, held = 0;
+    var nB = S.acc.nV[1], n5 = S.acc.hist[1][J + 1], exposed = 0, held = 0, careless5 = 0;
     for (var q = 0; q < R.idx.length; q++) {
       var i = R.idx[q];
-      if (R.ver[i] === 1 && R.s[i] && R.ctl[i] === J && R.why[i] !== 1) { exposed++; if (R.why[i] === 2) held++; }
+      if (R.ver[i] === 1 && R.s[i] && R.ctl[i] === J && R.why[i] !== 1) { exposed++; if (R.count[i] < R.tcount[i]) held++; }
+      if (R.ver[i] === 1 && R.why[i] === 1 && R.count[i] === J + 1) careless5++;
     }
     var tail;
     if (cfg.paired) tail = 'Opposed pairs rarely upset the same person, so almost no one has every item apply and the ceiling stays empty.';
     else if (cfg.ceil) tail = 'With control items that most people find upsetting, many holders on version B have every item apply.';
-    else tail = 'Control items that rarely all apply keep the ceiling rare; every other count hides the answer.';
-    if (exposed && cfg.hide > 0) tail += ' Of the ' + exposed + ' holders on version B for whom every item applied, ' + held + ' reported one fewer, which pulls the estimate down.';
+    else tail = 'Control items that rarely all apply keep the ceiling rare. A count of 0 on version B reveals a non-holder, which costs no one anything.';
+    if (exposed && (cfg.hide > 0 || cfg.dsg > 0)) tail += ' Of the ' + exposed + ' holders on version B for whom every item applied, ' + held + ' reported one fewer, which pulls the estimate down.';
     el.reveal.innerHTML = '<p class="reveal-big">' + n5 + ' of ' + nB + ' respondents on version B reported ' + (J + 1) +
-      ', the maximum. An honest respondent can give that answer only by holding the view, so it exposes them.</p><p class="note">' + tail + '</p>';
+      ', the maximum. An honest respondent can give that answer only by holding the view, so it exposes them.' +
+      (careless5 ? ' ' + careless5 + ' of these answered at random and are not exposed.' : '') + '</p><p class="note">' + tail + '</p>';
   } else {
-    var p = Math.abs(clamp(cfg.months / 12 + cfg.dev, 0.01, 0.99)), pi = cfg.pi;
-    var same = pi * p / (pi * p + (1 - pi) * (1 - p)), diff = pi * (1 - p) / (pi * (1 - p) + (1 - pi) * p);
+    var nAll = 0, hAll = 0, nS = 0, hS = 0, nD = 0, hD = 0, q2, j;
+    for (q2 = 0; q2 < R.idx.length; q2++) {
+      j = R.idx[q2]; nAll++; hAll += R.s[j];
+      if (R.same[j]) { nS++; hS += R.s[j]; } else { nD++; hD += R.s[j]; }
+    }
+    var pi = hAll / Math.max(1, nAll), same = hS / Math.max(1, nS), diff = hD / Math.max(1, nD);
     var row = function (label, v) { return '<div class="prow"><span>' + label + '</span><span class="pval">' + pct(v) + '</span><div class="pbar"><i style="width:' + (100 * v).toFixed(1) + '%"></i></div></div>'; };
-    el.reveal.innerHTML = '<p class="note" style="margin-top: 0">Chance that a respondent holds the view</p>' +
+    el.reveal.innerHTML = '<p class="note" style="margin-top: 0">Share of respondents in this survey who hold the view</p>' +
       row('Before the answer', pi) + row('After "both or neither"', same) + row('After "exactly one"', diff) +
-      '<p class="note">' + (cfg.months === 6 ? 'With half the year in statement B, an answer reveals nothing, and estimates nothing.'
-        : 'A birth-month condition closer to half the year hides more but estimates less precisely.') +
-      (cfg.cau > 0 ? ' Cautious holders avoid "exactly one," which is why the safe-looking answer is not safe for the estimate.' : '') + '</p>';
+      '<p class="note">' + (cfg.months === 6 ? 'With half the year in statement B, the answers cannot identify the share, so the estimate is undefined.'
+        : 'A birth-month condition closer to half the year hides more but estimates less precisely.') + '</p>';
   }
 }
 
 var rep = { res: null, key: '', running: false, method: 'ict', pi: 0.25, plain: false };
-function repKey() { return JSON.stringify(cfg); }
+function repKey() { return JSON.stringify(cfg) + seed; }
 function runReps() {
   if (rep.running) return;
   var c = JSON.parse(JSON.stringify(cfg)), total = 200, done = 0, s0 = (seed + 1000003) >>> 0, pl = needPlain(c), pc = plainOf(c);
@@ -1223,7 +1241,7 @@ function drawRep() {
     g.strokeStyle = RULE; g.lineWidth = 1; g.beginPath(); g.moveTo(x0, y + 0.5); g.lineTo(x1, y + 0.5); g.stroke();
     if (!rep.res) return;
     var arr = rep.res[r[1]];
-    g.fillStyle = rgba(r[2], 0.25);
+    g.fillStyle = rgba(r[2], 0.32);
     for (var q = 0; q < arr.length; q++) {
       if (!isFinite(arr[q])) continue;
       g.beginPath(); g.arc(X(arr[q]), y + ((q * 0.6180339887) % 1 - 0.5) * 16, 2.3, 0, 6.2832); g.fill();
@@ -1242,12 +1260,17 @@ function drawRep() {
 }
 function updateRepNote() {
   if (!rep.res || rep.running) return;
-  var bad = 0, tot = 0, a = rep.res.e, i;
-  for (i = 0; i < a.length; i++) { tot++; if (!isFinite(a[i])) bad++; }
+  var bad = 0, tot = 0, off = 0, a = rep.res.e.concat(rep.res.ep), i;
+  for (i = 0; i < a.length; i++) { tot++; if (!isFinite(a[i])) bad++; else if (a[i] < EST_D[0] || a[i] > EST_D[1]) off++; }
   var txt = 'Each dot is one survey of ' + cfg.n + ' respondents; whiskers show one standard deviation.' +
-    (bad ? ' ' + bad + ' of ' + tot + ' estimates were undefined and are left out.' : '') +
-    (rep.key !== repKey() ? ' These results are for earlier settings.' : '');
+    (bad ? ' ' + bad + ' of ' + tot + ' estimates were undefined and are left out of the averages.' : '') +
+    (off ? ' ' + off + ' fall off the axis and sit at its edge.' : '') +
+    (rep.key !== repKey() ? ' These results are for earlier settings or an earlier sample.' : '');
   if (txt !== noteText) { noteText = txt; el.rep_note.textContent = txt; }
+  el.rep.setAttribute('aria-label', 'Estimates across 200 surveys, against a true share of ' + pct(rep.pi) + '. ' + repRows().map(function (r) {
+    var m = msd(rep.res[r[1]]);
+    return r[0] + ': average ' + pct(m[0]) + ', standard deviation ' + (100 * m[1]).toFixed(1) + ' points';
+  }).join('. ') + '.');
 }
 
 /* Loop */
@@ -1273,22 +1296,29 @@ function syncOutputs() {
   el.hide_out.textContent = pct(cfg.hide);
   el.dsg_out.textContent = pct(cfg.dsg);
   el.cau_out.textContent = pct(cfg.cau);
+  var pn = cfg.months / 12, lo = -Math.min(0.1, Math.floor((pn - 0.02) * 100) / 100), hi = Math.min(0.1, Math.floor((0.98 - pn) * 100) / 100);
+  el.dev.min = lo; el.dev.max = hi;
+  if (cfg.dev < lo) cfg.dev = lo;
+  if (cfg.dev > hi) cfg.dev = hi;
+  el.dev.value = cfg.dev;
   el.dev_out.textContent = pts(cfg.dev);
   el.months_out.textContent = monthsShort(cfg.months);
-  el.months_hint.textContent = 'p = ' + cfg.months + '/12 of mothers' + (cfg.months === 6 ? '; at one half the method breaks down.' : '.');
+  el.months_hint.textContent = 'p = ' + cfg.months + '/12, the share of mothers in those months' + (cfg.months === 6 ? '; at one half the method breaks down.' : '.');
   el.dev_hint.textContent = 'Actual share for B: ' + pct(clamp(cfg.months / 12 + cfg.dev, 0.01, 0.99)) + '. The estimate assumes ' + pct(cfg.months / 12) + '.';
   Array.prototype.forEach.call(cardX.querySelectorAll('.months-text'), function (e) { e.textContent = monthsText(cfg.months); });
   var ict = cfg.method === 'ict', v = 0, g = 0;
   if (cfg.rand > 0) v++;
-  if (ict) { if (cfg.ceil) v++; if (cfg.hide > 0) v++; if (cfg.dsg > 0) v++; if (cfg.paired) g++; }
+  if (ict) { if (cfg.ceil && !cfg.paired) v++; if (cfg.hide > 0) v++; if (cfg.dsg > 0) v++; if (cfg.paired) g++; }
   else { if (cfg.dev !== 0) v++; if (cfg.cau > 0) v++; if (cfg.placebo) g++; if (cfg.calib) g++; }
   if (cfg.screen) g++;
+  el.ceil_hint.textContent = cfg.paired ? 'The opposed list is in use, so this has no effect.' : 'Control items that most people find upsetting, so many on version B have every item apply.';
+  ['pi', 'deny', 'rand', 'hide', 'dsg', 'dev', 'cau', 'months'].forEach(function (id) { el[id].setAttribute('aria-valuetext', el[id + '_out'].textContent); });
   el.vcount.hidden = !v; el.vcount.textContent = v + ' on';
   el.gcount.hidden = !g; el.gcount.textContent = g + ' on';
 }
 function settingsChanged() {
   syncOutputs(); showMethod();
-  if (state === 'idle') { recompute(); outVersion = -1; kick(); }
+  if (state === 'idle') { recompute(); outVersion = -1; kick(); updateCalc(true); }
   else finishNow();
   drawRep(); updateRepNote();
 }
@@ -1297,17 +1327,7 @@ function bindRange(id, key) {
 }
 bindRange('pi', 'pi'); bindRange('deny', 'deny'); bindRange('rand', 'rand'); bindRange('months', 'months');
 bindRange('hide', 'hide'); bindRange('dsg', 'dsg'); bindRange('dev', 'dev'); bindRange('cau', 'cau');
-el.ceil.addEventListener('change', function () {
-  cfg.ceil = el.ceil.checked;
-  if (cfg.ceil) { cfg.paired = false; el.paired.checked = false; }
-  settingsChanged();
-});
-el.paired.addEventListener('change', function () {
-  cfg.paired = el.paired.checked;
-  if (cfg.paired) { cfg.ceil = false; el.ceil.checked = false; }
-  settingsChanged();
-});
-['screen', 'placebo', 'calib'].forEach(function (id) {
+['ceil', 'paired', 'screen', 'placebo', 'calib'].forEach(function (id) {
   el[id].addEventListener('change', function () { cfg[id] = el[id].checked; settingsChanged(); });
 });
 Array.prototype.forEach.call(document.querySelectorAll('input[name=nsize]'), function (r) {
@@ -1352,9 +1372,17 @@ function renderStaticTex() {
 }
 window.onKatex = function () { renderStaticTex(); updateCalc(true); };
 
+function readControls() {
+  var m = document.querySelector('input[name=method]:checked'), z = document.querySelector('input[name=nsize]:checked');
+  if (m) cfg.method = m.value;
+  if (z) cfg.n = +z.value;
+  ['pi', 'deny', 'rand', 'months', 'hide', 'dsg', 'dev', 'cau'].forEach(function (k) { cfg[k] = +el[k].value; });
+  ['ceil', 'paired', 'screen', 'placebo', 'calib'].forEach(function (k) { cfg[k] = el[k].checked; });
+}
+readControls(); recompute();
 showMethod(); syncOutputs(); sizeAll(); clearReadouts(); updateCalc(true);
 if (window.katex) window.onKatex();
-if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { kick(); });
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { if (state === 'done') drawEst(); else drawEstEmpty(); drawRep(); kick(); });
 })();
 </script>
 </body>
