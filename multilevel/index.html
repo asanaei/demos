@@ -209,7 +209,8 @@ dl.items dd { margin: 2px 0 0; }
   </div>
 
   <section class="about">
-    <h2 class="sec">Survey items</h2>
+    <h2 class="sec">Data</h2>
+    <p>The data are simulated, based on the seventh wave of the World Values Survey (Haerpfer et al. 2024).</p>
     <dl class="items">
       <dt>Life satisfaction (Q49)</dt>
       <dd>"All things considered, how satisfied are you with your life as a whole these days?" 1 = completely dissatisfied, 10 = completely satisfied.</dd>
@@ -222,11 +223,6 @@ dl.items dd { margin: 2px 0 0; }
       <dt>Education (Q275)</dt>
       <dd>Highest level attained, on the ISCED 2011 scale from 0 (early childhood education or none) to 8 (doctoral degree).</dd>
     </dl>
-    <h2 class="sec">How the data were made</h2>
-    <p>The respondents are simulated. No real respondent appears in the data, and the countries carry letters or numbers instead of names.</p>
-    <p>For each country, the script under the R code draws age, gender, freedom of choice, and education from summaries of that country's sample in the seventh wave of the World Values Survey (Haerpfer et al. 2024). Life satisfaction comes from a latent score that is cut into answers 1 to 10.</p>
-    <p>In the four-country examples, the cuts reproduce each country's real shares of answers, and the slopes match the real ones. The one exception is age, which has the same slope in every country. The real data show no sign that the age slope differs across these four countries.</p>
-    <p>The 65-country example uses 65 of the 66 countries and territories in the wave. One was left out because its file repeats answers across items. The script draws 30 respondents per country. It spreads the slopes of freedom 1.5 times as far from their average as in the real data, and it pulls each country's level halfway toward the average level. With the real values, random intercepts and slopes did not have both the lowest AIC and the lowest BIC in any of 72 simulated samples with 8 to 60 respondents per country. The real slopes differ little compared with the real levels. By the time a sample is large enough for BIC to detect the slope differences, AIC already prefers fixed effects.</p>
     <h2 class="sec">References</h2>
     <p class="src">Bates, Douglas, Martin M&auml;chler, Ben Bolker, and Steve Walker. 2015. "Fitting Linear Mixed-Effects Models Using lme4." <i>Journal of Statistical Software</i> 67 (1): 1-48.</p>
     <p class="src">Greven, Sonja, and Thomas Kneib. 2010. "On the Behaviour of Marginal and Conditional AIC in Linear Mixed Models." <i>Biometrika</i> 97 (4): 773-89.</p>
