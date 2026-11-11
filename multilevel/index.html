@@ -156,11 +156,7 @@ pre.r .c { color: #9FB0B4; }
       <div>
         <h2>Options</h2>
         <div class="field row">
-          <label class="toggle"><input type="checkbox" id="split"><span class="track"></span><span>Split into within and between</span></label>
-          <button class="tip" type="button" aria-label="Explain: the split" data-tip="The predictor enters twice: each person's distance from their country's average, and the country's average itself. The first compares people in the same country; the second compares countries and rests on only four averages.">?</button>
-        </div>
-        <div class="field row">
-          <label class="toggle"><input type="checkbox" id="ctl"><span class="track"></span><span>Adjust for sex and education</span></label>
+          <label class="toggle"><input type="checkbox" id="ctl"><span class="track"></span><span>Adjust for gender and education</span></label>
           <button class="tip" type="button" aria-label="Explain: the controls" data-tip="Adds female (0 or 1) and education on the 0 to 8 ISCED scale, centered. The lines are drawn at each country's own average on both.">?</button>
         </div>
       </div>
@@ -193,7 +189,7 @@ pre.r .c { color: #9FB0B4; }
   </div>
 
   <section class="about">
-    <p>The respondents are simulated. The script under the R code draws age, sex, freedom of choice, and education from summaries of each country's sample in the seventh wave of the World Values Survey (Haerpfer et al. 2024). Life satisfaction comes from a latent score whose thresholds reproduce each country's real shares of answers 1 to 10, with slopes calibrated to the real ones, except that age has the same slope in every country, as the real data allow. No real respondent appears in the data.</p>
+    <p>The respondents are simulated. The script under the R code draws age, gender, freedom of choice, and education from summaries of each country's sample in the seventh wave of the World Values Survey (Haerpfer et al. 2024). Life satisfaction comes from a latent score whose thresholds reproduce each country's real shares of answers 1 to 10, with slopes calibrated to the real ones, except that age has the same slope in every country, as the real data allow. No real respondent appears in the data.</p>
     <p class="src">Bates, Douglas, Martin M&auml;chler, Ben Bolker, and Steve Walker. 2015. "Fitting Linear Mixed-Effects Models Using lme4." <i>Journal of Statistical Software</i> 67 (1): 1-48.</p>
     <p class="src">Greven, Sonja, and Thomas Kneib. 2010. "On the Behaviour of Marginal and Conditional AIC in Linear Mixed Models." <i>Biometrika</i> 97 (4): 773-89.</p>
     <p class="src">Haerpfer, C., R. Inglehart, A. Moreno, C. Welzel, K. Kizilova, J. Diez-Medrano, M. Lagos, P. Norris, E. Ponarin, and B. Puranen (eds.). 2024. <i>World Values Survey: Round Seven - Country-Pooled Datafile Version 6.0.0</i>. Madrid, Spain, and Vienna, Austria: JD Systems Institute and WVSA Secretariat. doi:10.14281/18241.24.</p>
@@ -216,7 +212,7 @@ var J = COUNTRIES.length;
 var MODELS = ['cp', 'fe', 'fex', 'ri', 'rs'];
 var MODEL_NAME = { cp: 'One regression for everyone', fe: 'Country fixed effects', fex: 'Fixed effects, country slopes', ri: 'Random intercepts', rs: 'Random intercepts and slopes' };
 var CSV_URL = 'https://asanaei.github.io/demos/multilevel/multilevel-simulated.csv';
-var SIM_CODE = "# Simulated respondents for four countries. The inputs are summaries of each\n# country's full sample in the seventh wave of the World Values Survey:\n#   age_bins  shares in five-year age groups (18-22, 23-27, ..., 88-90)\n#   female    share of women\n#   freedom   shares answering 1 to 10 on freedom of choice (drawn\n#             independently of age)\n#   educ      regression of education (ISCED 0-8) on age and sex:\n#             intercept, per decade from age 45, female, residual SD\n#   latent    coefficients of a latent satisfaction score on age in\n#             decades, freedom, female and education, plus a standard\n#             normal error\n#   cut       thresholds that turn the latent score into answers 1 to 10\n# The thresholds reproduce each country's real shares of answers 1 to 10,\n# and the coefficients were calibrated so that, on the 1-to-10 scale, the\n# slopes equal those of the real data: freedom, sex and education as in a\n# regression on all four predictors in each country, and age as the\n# common within-country slope (-0.11 per decade), since the real data show\n# no sign that the age slope differs across these countries.\nparams <- list(\n  \"Czechia\" = list(\n    age_bins = c(0.0527, 0.0677, 0.0786, 0.0936, 0.0828, 0.1028, 0.0953, 0.0886, 0.0844, 0.0895, 0.0669, 0.0493, 0.0318, 0.0142, 0.0017),\n    female = 0.538,\n    freedom = c(0.0109, 0.0125, 0.0334, 0.0460, 0.1120, 0.1321, 0.1898, 0.2249, 0.1355, 0.1028),\n    educ = c(3.166, -0.101, 0.041, 1.710),\n    latent = c(-0.0786, 0.3896, 0.0146, 0.0443),\n    cut = c(-0.8620, -0.3112, 0.3162, 0.9167, 1.5106, 1.9533, 2.5519, 3.4605, 4.5214)\n  ),\n  \"Kenya\" = list(\n    age_bins = c(0.1924, 0.2894, 0.1892, 0.1083, 0.0970, 0.0509, 0.0299, 0.0178, 0.0162, 0.0040, 0.0024, 0.0016, 0.0000, 0.0008, 0.0000),\n    female = 0.491,\n    freedom = c(0.0461, 0.0162, 0.0428, 0.0582, 0.1277, 0.1116, 0.1172, 0.1366, 0.0744, 0.2692),\n    educ = c(3.126, -0.269, -0.414, 1.657),\n    latent = c(-0.0424, 0.0777, -0.0437, 0.0004),\n    cut = c(-0.9829, -0.7512, -0.4858, -0.1589, 0.2764, 0.6379, 0.9604, 1.3124, 1.5316)\n  ),\n  \"Kyrgyzstan\" = list(\n    age_bins = c(0.1048, 0.1226, 0.1090, 0.1327, 0.1014, 0.0904, 0.0719, 0.0913, 0.0803, 0.0414, 0.0313, 0.0110, 0.0076, 0.0034, 0.0008),\n    female = 0.62,\n    freedom = c(0.0347, 0.0076, 0.0144, 0.0178, 0.1919, 0.0516, 0.1014, 0.0803, 0.0558, 0.4446),\n    educ = c(4.256, -0.001, 0.305, 1.711),\n    latent = c(-0.0614, 0.1114, -0.0124, -0.0343),\n    cut = c(-1.8505, -1.7448, -1.4914, -1.2353, -0.4894, -0.3401, -0.0843, 0.0963, 0.2209)\n  ),\n  \"Nigeria\" = list(\n    age_bins = c(0.1948, 0.2234, 0.1899, 0.1260, 0.0990, 0.0548, 0.0336, 0.0270, 0.0188, 0.0164, 0.0065, 0.0049, 0.0025, 0.0016, 0.0008),\n    female = 0.485,\n    freedom = c(0.0532, 0.0319, 0.0597, 0.0835, 0.1064, 0.0867, 0.1203, 0.1318, 0.0671, 0.2594),\n    educ = c(2.538, -0.305, -0.670, 1.832),\n    latent = c(-0.0417, 0.0603, -0.0134, 0.0012),\n    cut = c(-1.1390, -0.8304, -0.4276, -0.0800, 0.2527, 0.5512, 0.8782, 1.2703, 1.4568)\n  )\n)\n\nsimulate_country <- function(p, n) {\n  lower <- seq(18, 88, 5)\n  upper <- c(seq(22, 87, 5), 90)\n  bin <- sample(length(p$age_bins), n, replace = TRUE, prob = p$age_bins)\n  age <- lower[bin] + floor(runif(n) * (upper[bin] - lower[bin] + 1))\n  female <- rbinom(n, 1, p$female)\n  freedom <- sample(1:10, n, replace = TRUE, prob = p$freedom)\n  e <- p$educ\n  educ <- round(e[1] + e[2] * (age - 45) / 10 + e[3] * female + rnorm(n, 0, e[4]))\n  educ <- pmin(pmax(educ, 0), 8)\n  b <- p$latent\n  latent <- b[1] * age / 10 + b[2] * freedom + b[3] * female + b[4] * educ + rnorm(n)\n  lifesat <- findInterval(latent, p$cut) + 1\n  data.frame(lifesat, age, freedom, female, educ)\n}\n\nset.seed(110)\nsim <- do.call(rbind, lapply(names(params), function(k) {\n  cbind(country = k, simulate_country(params[[k]], 250))\n}))\nwrite.csv(sim, \"multilevel-simulated.csv\", row.names = FALSE)\n";
+var SIM_CODE = "# Simulated respondents for four countries. The inputs are summaries of each\n# country's full sample in the seventh wave of the World Values Survey:\n#   age_bins  shares in five-year age groups (18-22, 23-27, ..., 88-90)\n#   female    share of women\n#   freedom   shares answering 1 to 10 on freedom of choice (drawn\n#             independently of age)\n#   educ      regression of education (ISCED 0-8) on age and gender:\n#             intercept, per decade from age 45, female, residual SD\n#   latent    coefficients of a latent satisfaction score on age in\n#             decades, freedom, female and education, plus a standard\n#             normal error\n#   cut       thresholds that turn the latent score into answers 1 to 10\n# The thresholds reproduce each country's real shares of answers 1 to 10,\n# and the coefficients were calibrated so that, on the 1-to-10 scale, the\n# slopes equal those of the real data: freedom, gender and education as in a\n# regression on all four predictors in each country, and age as the\n# common within-country slope (-0.11 per decade), since the real data show\n# no sign that the age slope differs across these countries.\nparams <- list(\n  \"Czechia\" = list(\n    age_bins = c(0.0527, 0.0677, 0.0786, 0.0936, 0.0828, 0.1028, 0.0953, 0.0886, 0.0844, 0.0895, 0.0669, 0.0493, 0.0318, 0.0142, 0.0017),\n    female = 0.538,\n    freedom = c(0.0109, 0.0125, 0.0334, 0.0460, 0.1120, 0.1321, 0.1898, 0.2249, 0.1355, 0.1028),\n    educ = c(3.166, -0.101, 0.041, 1.710),\n    latent = c(-0.0786, 0.3896, 0.0146, 0.0443),\n    cut = c(-0.8620, -0.3112, 0.3162, 0.9167, 1.5106, 1.9533, 2.5519, 3.4605, 4.5214)\n  ),\n  \"Kenya\" = list(\n    age_bins = c(0.1924, 0.2894, 0.1892, 0.1083, 0.0970, 0.0509, 0.0299, 0.0178, 0.0162, 0.0040, 0.0024, 0.0016, 0.0000, 0.0008, 0.0000),\n    female = 0.491,\n    freedom = c(0.0461, 0.0162, 0.0428, 0.0582, 0.1277, 0.1116, 0.1172, 0.1366, 0.0744, 0.2692),\n    educ = c(3.126, -0.269, -0.414, 1.657),\n    latent = c(-0.0424, 0.0777, -0.0437, 0.0004),\n    cut = c(-0.9829, -0.7512, -0.4858, -0.1589, 0.2764, 0.6379, 0.9604, 1.3124, 1.5316)\n  ),\n  \"Kyrgyzstan\" = list(\n    age_bins = c(0.1048, 0.1226, 0.1090, 0.1327, 0.1014, 0.0904, 0.0719, 0.0913, 0.0803, 0.0414, 0.0313, 0.0110, 0.0076, 0.0034, 0.0008),\n    female = 0.62,\n    freedom = c(0.0347, 0.0076, 0.0144, 0.0178, 0.1919, 0.0516, 0.1014, 0.0803, 0.0558, 0.4446),\n    educ = c(4.256, -0.001, 0.305, 1.711),\n    latent = c(-0.0614, 0.1114, -0.0124, -0.0343),\n    cut = c(-1.8505, -1.7448, -1.4914, -1.2353, -0.4894, -0.3401, -0.0843, 0.0963, 0.2209)\n  ),\n  \"Nigeria\" = list(\n    age_bins = c(0.1948, 0.2234, 0.1899, 0.1260, 0.0990, 0.0548, 0.0336, 0.0270, 0.0188, 0.0164, 0.0065, 0.0049, 0.0025, 0.0016, 0.0008),\n    female = 0.485,\n    freedom = c(0.0532, 0.0319, 0.0597, 0.0835, 0.1064, 0.0867, 0.1203, 0.1318, 0.0671, 0.2594),\n    educ = c(2.538, -0.305, -0.670, 1.832),\n    latent = c(-0.0417, 0.0603, -0.0134, 0.0012),\n    cut = c(-1.1390, -0.8304, -0.4276, -0.0800, 0.2527, 0.5512, 0.8782, 1.2703, 1.4568)\n  )\n)\n\nsimulate_country <- function(p, n) {\n  lower <- seq(18, 88, 5)\n  upper <- c(seq(22, 87, 5), 90)\n  bin <- sample(length(p$age_bins), n, replace = TRUE, prob = p$age_bins)\n  age <- lower[bin] + floor(runif(n) * (upper[bin] - lower[bin] + 1))\n  female <- rbinom(n, 1, p$female)\n  freedom <- sample(1:10, n, replace = TRUE, prob = p$freedom)\n  e <- p$educ\n  educ <- round(e[1] + e[2] * (age - 45) / 10 + e[3] * female + rnorm(n, 0, e[4]))\n  educ <- pmin(pmax(educ, 0), 8)\n  b <- p$latent\n  latent <- b[1] * age / 10 + b[2] * freedom + b[3] * female + b[4] * educ + rnorm(n)\n  lifesat <- findInterval(latent, p$cut) + 1\n  data.frame(lifesat, age, freedom, female, educ)\n}\n\nset.seed(110)\nsim <- do.call(rbind, lapply(names(params), function(k) {\n  cbind(country = k, simulate_country(params[[k]], 250))\n}))\nwrite.csv(sim, \"multilevel-simulated.csv\", row.names = FALSE)\n";
 
 /* Engine: distributions */
 function lgamma(x) {
@@ -710,11 +706,11 @@ function rCode(cfg, csv) {
 
 
 /* Interface */
-var cfg = { x: 'age', model: 'ri', split: false, ctl: false, show: -1 }, R = null;
+var cfg = { x: 'age', model: 'ri', split: false, ctl: false, show: -1 }, R = null;   // split stays off: the engine supports it, the page does not offer it
 var MINUS = '−';
 var SHORT = { cp: 'One regression', fe: 'Fixed effects', fex: 'Fixed effects + slopes', ri: 'Random intercepts', rs: 'Random intercepts + slopes' };
 var el = {};
-['chips', 'legend', 'plot', 'result', 'truth', 'cmp', 'verdict', 'tests', 'est', 'rcode', 'simcode', 'copy', 'copy-status', 'dl', 'model-hint', 'split', 'ctl']
+['chips', 'legend', 'plot', 'result', 'truth', 'cmp', 'verdict', 'tests', 'est', 'rcode', 'simcode', 'copy', 'copy-status', 'dl', 'model-hint', 'ctl']
   .forEach(function (id) { el[id.replace(/-/g, '_')] = document.getElementById(id); });
 
 function num(x, d) {
@@ -735,19 +731,16 @@ function mulberry32(a) {
 var JIT = (function () { var r = mulberry32(110), out = [], i; for (i = 0; i < DATA.lifesat.length; i++) out.push([r() - 0.5, r() - 0.5]); return out; })();
 function per() { return cfg.x === 'age' ? 'per decade' : 'per point'; }
 function xName() { return cfg.x === 'age' ? 'Age' : 'Freedom of choice'; }
-function key() { return cfg.model + (cfg.split ? 1 : 0) + (cfg.ctl ? 1 : 0); }
-function absorbs() { return cfg.split && (cfg.model === 'fe' || cfg.model === 'fex'); }
+function key() { return cfg.model + '0' + (cfg.ctl ? 1 : 0); }
 
 function hintText() {
-  if (cfg.model === 'cp') return cfg.split ? 'No country levels: each country\'s line is placed by its average ' + (cfg.x === 'age' ? 'age' : 'freedom') + ' through the between-country slope.'
-    : 'One line for all 1,000 people, as if they lived in one country.';
-  var h = {
+  if (cfg.model === 'cp') return 'One line for all 1,000 people, as if they lived in one country.';
+  return {
     fe: 'Each country gets its own level, and all share one slope, estimated only from comparisons within countries.',
-    fex: 'Each country gets its own level and its own slope.' + (cfg.ctl ? ' The effects of sex and education are shared.' : ''),
+    fex: 'Each country gets its own level and its own slope.' + (cfg.ctl ? ' The effects of gender and education are shared.' : ''),
     ri: 'Each country gets its own level, pulled toward the overall average, and all share one slope.',
     rs: 'Each country gets its own level and its own slope, both pulled toward the average line.'
   }[cfg.model];
-  return h + (absorbs() ? ' The country terms absorb the between part, so the split changes only the name of the predictor.' : '');
 }
 
 function chipsHTML() {
@@ -778,7 +771,7 @@ function plotSVG(W) {
     return '<line x1="' + X(lo) + '" x2="' + X(hi) + '" y1="' + Y(L.at(lo)) + '" y2="' + Y(L.at(hi)) + '" stroke="#F7F9F8" stroke-width="6"/>' +
            '<line x1="' + X(lo) + '" x2="' + X(hi) + '" y1="' + Y(L.at(lo)) + '" y2="' + Y(L.at(hi)) + '" stroke="' + color + '" stroke-width="2.8"/>';
   }
-  var labels = [], one = cfg.model === 'cp' && !cfg.split, hiAll = age ? 92 : 10;
+  var labels = [], one = cfg.model === 'cp', hiAll = age ? 92 : 10;
   if (one) { s += seg(R.lines[0], age ? 18 : 1, hiAll, '#1D2A30'); labels.push({ y: Y(R.lines[0].at(hiAll)), text: 'Everyone', color: '#1D2A30', x: X(hiAll) }); }
   else for (j = 0; j < J; j++) if (show(j)) { s += seg(R.lines[j], R.means[j].lo, R.means[j].hi, COLORS[j]); labels.push({ y: Y(R.lines[j].at(R.means[j].hi)), text: COUNTRIES[j], color: COLORS[j], x: X(R.means[j].hi) }); }
   s += '</g>';
@@ -817,16 +810,12 @@ function resultHTML() {
       return '<span class="say"><i class="sw" style="background:' + COLORS[j] + '"></i>' + c + ' ' + signed(m.beta[k], 2) + ' (SE ' + num(m.se[k], 2) + ')</span>';
     }).join('');
   }
-  var sl = slopeOf(m, P), zero = sl.lo < 0 && sl.hi > 0, one = cfg.model === 'cp' && !cfg.split;
+  var sl = slopeOf(m, P), zero = sl.lo < 0 && sl.hi > 0, one = cfg.model === 'cp';
   var who = cfg.x === 'age' ? 'older people' : 'people who feel freer', dir = sl.b < 0 ? 'less' : 'more';
   var say = (one ? 'In one regression for everyone, ' + who + ' look ' + dir + ' satisfied' : 'Compared with others in their own country, ' + who + ' are ' + dir + ' satisfied') + (zero ? ', but the interval includes zero.' : '.');
   if (cfg.show >= 0 && !one) say += ' ' + COUNTRIES[cfg.show] + '\'s line: ' + signed(R.lines[cfg.show].slope, 2) + '.';
-  s = '<span class="say">' + xName() + (cfg.split ? ' within countries, ' : ', ') + per() + ':</span><span class="big">' + signed(sl.b, 2) + '</span><span class="say">95% interval ' + ci(sl.lo, sl.hi) +
+  s = '<span class="say">' + xName() + ', ' + per() + ':</span><span class="big">' + signed(sl.b, 2) + '</span><span class="say">95% interval ' + ci(sl.lo, sl.hi) +
       (m.kind === 'lmer' ? tip('A t interval with Satterthwaite\'s ' + num(sl.df, 1) + ' degrees of freedom, as lmerTest gives. With random slopes the average slope is learned from four country slopes, so its degrees of freedom are near 3 and the interval is wide.', 'the interval') : '') + '.</span><span class="say">' + say + '</span>';
-  if (R.wb) {
-    var b = R.wb.between;
-    s += '<span class="say">Between countries: ' + signed(b.b, 2) + ' per ' + (cfg.x === 'age' ? 'decade of a country\'s average age' : 'point of a country\'s average freedom') + ' (SE ' + num(b.se, 2) + ', ' + pfmt(b.p) + ').</span>';
-  }
   if (m.singular) s += '<span class="say warn">' + (m.kk === 2 && isFinite(m.corr) && Math.abs(m.corr) > 0.999 ? 'Singular fit: the intercept and slope deviations are perfectly correlated.' : 'Singular fit: a variance is estimated at zero.') +
     ' Four countries cannot estimate this covariance matrix reliably.</span>';
   return s;
@@ -840,10 +829,10 @@ function cmpHTML() {
     return '<tr' + (k === cfg.model ? ' class="cur"' : '') + '><td>' + SHORT[k] + (m.singular ? ' <span class="warn">(singular)</span>' : '') +
       '</td><td>' + (sl ? signed(sl.b, 3) + ' (' + num(sl.se, 3) + ')' : 'by country') + '</td><td>' + m.npar + '</td><td' + mark(aOn) + '>' + num(m.aic, 1) + arrow(aOn) + '</td><td' + mark(bOn) + '>' + num(m.bic, 1) + arrow(bOn) + '</td></tr>';
   }
-  rows += '<tr class="grp"><td colspan="5">' + (cfg.split ? 'No country terms' : 'Countries ignored') + '</td></tr>' + row('cp', B.feAIC === 'cp' && B.reAIC === 'cp', B.feBIC === 'cp' && B.reBIC === 'cp');
+  rows += '<tr class="grp"><td colspan="5">' + 'Countries ignored' + '</td></tr>' + row('cp', B.feAIC === 'cp' && B.reAIC === 'cp', B.feBIC === 'cp' && B.reBIC === 'cp');
   rows += '<tr class="grp"><td colspan="5">Countries as fixed effects</td></tr>' + row('fe', B.feAIC === 'fe', B.feBIC === 'fe') + row('fex', B.feAIC === 'fex', B.feBIC === 'fex');
   rows += '<tr class="grp"><td colspan="5">Countries as random effects</td></tr>' + row('ri', B.reAIC === 'ri', B.reBIC === 'ri') + row('rs', B.reAIC === 'rs', B.reBIC === 'rs');
-  return '<table class="cmp"><thead><tr><th>Model</th><th>Slope (SE)' + tip('The slope of ' + xName().toLowerCase() + (cfg.split ? ' within countries' : '') + ', ' + per() + ', with its standard error, from the maximum-likelihood fit. Under random slopes it is the average slope.', 'slope') +
+  return '<table class="cmp"><thead><tr><th>Model</th><th>Slope (SE)' + tip('The slope of ' + xName().toLowerCase() + ', ' + per() + ', with its standard error, from the maximum-likelihood fit. Under random slopes it is the average slope.', 'slope') +
     '</th><th>Parameters' + tip('The number of estimated parameters: the coefficients, the residual standard deviation, and each variance or correlation of the random effects. Random intercepts add one parameter, not four.', 'parameters') +
     '</th><th>AIC' + tip('Fit penalized by 2 per parameter. Lower is better.', 'AIC') + '</th><th>BIC' + tip('Fit penalized by log(n), about 6.9 here, per parameter, so it favors smaller models more than AIC does. Lower is better.', 'BIC') +
     '</th></tr></thead><tbody>' + rows + '</tbody></table><p class="narrow-only">Scroll the table sideways to see BIC.</p><p class="cap">&#9664; marks the lowest AIC or BIC within each route; the pooled model counts as the start of both.' +
@@ -861,13 +850,11 @@ function verdictHTML() {
   return s + ' ' + notes.join(' ') + tip('The F tests treat these four countries as fixed and are exact under the model. The likelihood ratio tests for variances rely on large-sample theory in the number of countries, which is four, and they reject less often than their nominal level here.', 'the verdict');
 }
 function testsHTML() {
-  var T = R.tests, s = '', beyond = cfg.split ? ' beyond what their average ' + (cfg.x === 'age' ? 'age' : 'freedom') + ' predicts' : '';
-  s += '<p><b>Levels' + beyond + ':</b> fixed effects F(' + T.fLevel.d1 + ', ' + T.fLevel.d2 + ') = ' + num(T.fLevel.F, 1) + ', ' + pfmt(T.fLevel.p) + '; random intercepts chi-square ' + num(T.lrRI, 1) + ', ' + pfmt(T.pRI) +
+  var T = R.tests, s = '';
+  s += '<p><b>Levels:</b> fixed effects F(' + T.fLevel.d1 + ', ' + T.fLevel.d2 + ') = ' + num(T.fLevel.F, 1) + ', ' + pfmt(T.fLevel.p) + '; random intercepts chi-square ' + num(T.lrRI, 1) + ', ' + pfmt(T.pRI) +
     tip('The likelihood ratio test compares random intercepts with one regression. A variance cannot be negative, so the usual chi-square p-value on 1 df is halved (Stram and Lee 1994).', 'the level test') + '.</p>';
   s += '<p><b>Slopes:</b> country slopes F(' + T.fSlope.d1 + ', ' + T.fSlope.d2 + ') = ' + num(T.fSlope.F, 2) + ', ' + pfmt(T.fSlope.p) + '; random slopes chi-square ' + num(T.lrRS, 2) + ', ' + pfmt(T.pRS) +
     tip('The likelihood ratio test compares random slopes with random intercepts. Its p-value averages chi-square distributions on 1 and 2 df; anova() reports the p-value from the chi-square on 2 df alone, here ' + (T.pRSnaive < 0.001 ? '< 0.001' : num(T.pRSnaive, 3)) + '.', 'the slope test') + '.</p>';
-  if (R.wb) s += '<p><b>Between minus within slope:</b> ' + signed(R.wb.diff, 2) + ' (SE ' + num(R.wb.se, 2) + ', ' + (R.sel.kind === 'lmer' ? 'df ' + num(R.wb.df, 1) + ', ' : '') + pfmt(R.wb.p) + ')' +
-    tip(cfg.model === 'cp' ? 'One regression treats the 1,000 respondents as independent, so this test ignores that the country average takes only four values.' : 'The country average takes only four values, so the Satterthwaite degrees of freedom are small and the test has little power.', 'the between-within test') + '.</p>';
   s += '<p><b>Share of variance between countries:</b> ' + num(100 * R.icc.icc, 1) + '%' + tip('The intraclass correlation from a random-intercept model with no predictors.', 'the intraclass correlation') + '.</p>';
   return s;
 }
@@ -880,7 +867,7 @@ function estHTML() {
     rows += '<tr><td>Residual</td><td>' + num(m.sigma, 3) + '</td><td colspan="4"></td></tr>';
   }
   return '<div class="tblwrap"><table class="est"><thead><tr><th></th><th>Estimate</th><th>Std. Error</th><th>df</th><th>t value</th><th>Pr(&gt;|t|)</th></tr></thead><tbody>' + rows + '</tbody></table></div><p class="estfoot">' + esc(rCall(cfg, cfg.model, 'm', true)) +
-    (mixed ? '. REML, as lmer does by default; degrees of freedom by Satterthwaite\'s method, as lmerTest computes them.' : '.') + (absorbs() ? ' The country average is left out because the country terms absorb it.' : '') + '</p>';
+    (mixed ? '. REML, as lmer does by default; degrees of freedom by Satterthwaite\'s method, as lmerTest computes them.' : '.') + '</p>';
 }
 function highlightR(code) {
   return code.split('\n').map(function (line) {
@@ -919,7 +906,7 @@ function refit() { R = fitFor(cfg); }
 function draw() {
   hideTip();
   el.chips.innerHTML = chipsHTML();
-  el.legend.textContent = 'Large dots: country averages. Lines: ' + (cfg.model === 'cp' && !cfg.split ? 'the one regression line for everyone.' : 'each country\'s line in the chosen model.');
+  el.legend.textContent = 'Large dots: country averages. Lines: ' + (cfg.model === 'cp' ? 'the one regression line for everyone.' : 'each country\'s line in the chosen model.');
   el.plot.innerHTML = plotSVG(el.plot.clientWidth || 860);
   el.plot.setAttribute('aria-label', 'Simulated life satisfaction against ' + xName().toLowerCase() + ', colored by country' + (cfg.show >= 0 ? ', showing ' + COUNTRIES[cfg.show] : '') + '. ' +
     COUNTRIES.map(function (c, j) { return c + ': fitted slope ' + num(R.lines[j].slope, 2) + ' ' + per(); }).join('; ') + '.');
@@ -933,12 +920,11 @@ function draw() {
   el.model_hint.textContent = hintText();
 }
 function render() { refit(); draw(); }
-function fileName() { return 'multilevel-' + cfg.x + '-' + cfg.model + (cfg.split ? '-split' : '') + (cfg.ctl ? '-controls' : '') + '.R'; }
+function fileName() { return 'multilevel-' + cfg.x + '-' + cfg.model + (cfg.ctl ? '-controls' : '') + '.R'; }
 function say(t, keep) { el.copy_status.textContent = t; clearTimeout(say.t); if (!keep) say.t = setTimeout(function () { el.copy_status.textContent = ''; }, 4000); }
 function bind() {
   Array.prototype.forEach.call(document.querySelectorAll('input[name=model]'), function (r) { r.addEventListener('change', function () { cfg.model = r.value; render(); }); });
   Array.prototype.forEach.call(document.querySelectorAll('input[name=x]'), function (r) { r.addEventListener('change', function () { cfg.x = r.value; render(); }); });
-  el.split.addEventListener('change', function () { cfg.split = el.split.checked; render(); });
   el.ctl.addEventListener('change', function () { cfg.ctl = el.ctl.checked; render(); });
   el.chips.addEventListener('click', function (e) { var b = e.target.closest('button'); if (!b) return; cfg.show = +b.getAttribute('data-k'); draw(); var nb = el.chips.querySelector('button[data-k="' + cfg.show + '"]'); if (nb) nb.focus(); });
   el.copy.addEventListener('click', function () {
@@ -958,7 +944,7 @@ function readControls() {
   var m = document.querySelector('input[name=model]:checked'), x = document.querySelector('input[name=x]:checked');
   if (m) cfg.model = m.value;
   if (x) cfg.x = x.value;
-  cfg.split = el.split.checked; cfg.ctl = el.ctl.checked;
+  cfg.ctl = el.ctl.checked;
 }
 el.simcode.innerHTML = highlightR(SIM_CODE);
 readControls(); bind(); render();
