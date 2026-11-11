@@ -1,521 +1,1951 @@
 "country","lifesat","age","freedom","female","educ"
-"Andorra",7,61,3,0,1
-"Andorra",10,50,8,1,5
-"Andorra",6,66,8,1,6
-"Andorra",5,23,7,0,1
-"Andorra",5,25,3,1,5
-"Andorra",7,51,6,1,1
-"Andorra",8,67,9,1,5
-"Andorra",8,78,8,0,1
-"Argentina",8,36,8,1,4
-"Argentina",10,39,10,1,3
-"Argentina",10,26,10,0,3
-"Argentina",7,19,8,0,4
-"Argentina",6,24,9,0,2
-"Argentina",9,66,7,1,2
-"Argentina",2,49,8,1,2
-"Argentina",7,61,10,1,2
-"Armenia",5,30,10,1,3
-"Armenia",9,39,8,1,5
-"Armenia",8,63,10,1,4
-"Armenia",8,44,10,1,4
-"Armenia",5,33,8,1,8
-"Armenia",7,36,6,1,6
-"Armenia",9,39,9,1,6
-"Armenia",7,65,9,1,6
-"Australia",8,69,10,1,4
-"Australia",8,53,8,1,4
-"Australia",8,34,7,0,5
-"Australia",8,58,8,0,5
-"Australia",9,67,7,1,4
-"Australia",9,82,8,0,3
-"Australia",7,44,7,1,6
-"Australia",9,65,7,1,5
-"Bangladesh",7,29,10,1,5
-"Bangladesh",8,30,9,1,3
-"Bangladesh",4,32,6,1,0
-"Bangladesh",6,49,5,1,0
-"Bangladesh",8,42,7,1,3
-"Bangladesh",6,31,8,1,0
-"Bangladesh",9,53,7,0,0
-"Bangladesh",8,34,9,0,4
-"Bolivia",8,19,10,0,2
-"Bolivia",8,19,7,1,3
-"Bolivia",6,25,6,1,4
-"Bolivia",6,44,10,1,3
-"Bolivia",3,44,7,0,0
-"Bolivia",7,29,7,0,5
-"Bolivia",7,20,6,1,5
-"Bolivia",6,59,6,1,1
-"Brazil",8,48,5,0,1
-"Brazil",10,61,6,1,1
-"Brazil",6,56,9,1,1
-"Brazil",10,30,8,0,3
-"Brazil",5,48,8,1,4
-"Brazil",1,37,2,1,3
-"Brazil",7,55,7,1,4
-"Brazil",7,42,10,1,4
-"Canada",8,37,9,1,5
-"Canada",7,52,10,0,4
-"Canada",9,53,7,0,8
-"Canada",4,28,4,1,4
-"Canada",7,43,8,0,4
-"Canada",7,60,5,0,5
-"Canada",7,28,4,0,3
-"Canada",7,74,9,0,2
-"Chile",7,57,4,1,4
-"Chile",7,68,9,1,3
-"Chile",10,66,10,1,2
-"Chile",4,47,8,1,5
-"Chile",1,61,4,1,0
-"Chile",10,45,10,1,4
-"Chile",10,72,10,1,1
-"Chile",9,37,10,0,5
-"China",6,41,5,0,2
-"China",5,21,4,0,4
-"China",7,48,7,0,2
-"China",5,58,6,0,1
-"China",10,28,10,1,3
-"China",8,31,8,1,6
-"China",6,59,3,1,0
-"China",5,37,8,1,4
-"Colombia",10,18,10,0,3
-"Colombia",5,21,1,1,7
-"Colombia",8,50,10,1,1
-"Colombia",10,20,4,1,2
-"Colombia",10,37,10,0,5
-"Colombia",9,18,10,1,2
-"Colombia",8,30,8,1,2
-"Colombia",8,43,10,0,6
-"Cyprus",1,49,5,0,5
-"Cyprus",5,26,9,1,6
-"Cyprus",7,25,10,1,6
-"Cyprus",5,36,5,1,5
-"Cyprus",8,53,10,0,3
-"Cyprus",7,52,7,0,4
-"Cyprus",7,67,4,0,2
-"Cyprus",6,62,6,0,4
-"Czechia",9,41,8,1,2
-"Czechia",5,75,8,0,3
-"Czechia",8,35,8,0,0
-"Czechia",8,19,5,0,3
-"Czechia",9,60,8,1,3
-"Czechia",10,18,10,0,3
-"Czechia",5,59,8,0,2
-"Czechia",6,47,6,0,4
-"Ecuador",10,22,10,1,6
-"Ecuador",8,38,7,0,0
-"Ecuador",10,52,10,0,3
-"Ecuador",7,24,7,1,4
-"Ecuador",8,51,10,0,5
-"Ecuador",7,46,10,0,5
-"Ecuador",9,20,10,1,3
-"Ecuador",8,58,10,0,5
-"Egypt",2,62,5,0,1
-"Egypt",6,20,7,1,2
-"Egypt",8,53,5,0,3
-"Egypt",7,54,3,1,0
-"Egypt",8,23,8,1,3
-"Egypt",5,51,5,0,0
-"Egypt",3,48,8,0,2
-"Egypt",1,20,7,1,0
-"Ethiopia",5,29,10,1,4
-"Ethiopia",5,27,4,1,2
-"Ethiopia",5,32,10,1,4
-"Ethiopia",1,25,1,0,0
-"Ethiopia",3,37,4,1,2
-"Ethiopia",4,18,10,1,6
-"Ethiopia",10,32,10,1,0
-"Ethiopia",7,32,10,0,6
-"Germany",9,52,8,1,5
-"Germany",5,23,5,0,5
-"Germany",9,77,5,1,4
-"Germany",7,27,10,1,3
-"Germany",9,29,7,1,6
-"Germany",10,28,7,0,6
-"Germany",8,52,7,0,8
-"Germany",8,35,10,0,5
-"Great Britain",8,77,8,1,0
-"Great Britain",8,28,7,0,2
-"Great Britain",8,75,7,1,4
-"Great Britain",2,52,5,0,4
-"Great Britain",6,69,8,1,5
-"Great Britain",5,55,5,0,4
-"Great Britain",7,22,7,0,4
-"Great Britain",5,29,6,1,3
-"Greece",10,34,10,0,7
-"Greece",8,32,8,0,3
-"Greece",7,46,5,0,4
-"Greece",7,46,3,1,4
-"Greece",6,50,7,1,2
-"Greece",7,57,7,0,1
-"Greece",6,61,7,0,4
-"Greece",6,48,8,0,4
-"Guatemala",5,22,7,1,4
-"Guatemala",9,20,10,0,3
-"Guatemala",10,50,8,0,5
-"Guatemala",7,28,7,0,6
-"Guatemala",10,18,10,1,4
-"Guatemala",8,28,10,0,3
-"Guatemala",8,49,7,1,3
-"Guatemala",10,29,10,1,5
-"Hong Kong",6,23,5,1,5
-"Hong Kong",6,38,4,1,4
-"Hong Kong",8,69,6,0,6
-"Hong Kong",10,63,9,1,5
-"Hong Kong",5,66,5,1,3
-"Hong Kong",4,34,5,1,7
-"Hong Kong",8,49,7,1,5
-"Hong Kong",9,71,6,1,4
-"India",9,37,10,1,3
-"India",7,43,10,0,1
-"India",6,54,4,0,3
-"India",3,45,8,1,3
-"India",4,60,9,0,4
-"India",10,25,10,1,2
-"India",7,43,4,1,3
-"India",6,37,8,1,2
-"Indonesia",6,32,8,0,3
-"Indonesia",5,41,1,1,3
-"Indonesia",10,45,10,1,1
-"Indonesia",9,47,10,0,0
-"Indonesia",10,37,10,1,3
-"Indonesia",6,36,7,0,2
-"Indonesia",2,26,7,1,1
-"Indonesia",10,46,6,0,2
-"Iran",6,42,7,0,1
-"Iran",5,18,10,0,5
-"Iran",5,27,6,0,2
-"Iran",1,37,7,0,4
-"Iran",5,48,5,1,3
-"Iran",5,42,6,1,3
-"Iran",4,33,1,0,4
-"Iran",9,57,8,0,3
-"Japan",8,78,8,1,5
-"Japan",7,20,5,0,4
-"Japan",8,52,7,0,5
-"Japan",8,55,10,1,0
-"Japan",8,26,8,1,4
-"Japan",4,52,6,0,6
-"Japan",8,82,5,0,5
-"Japan",5,47,3,0,6
-"Jordan",10,34,9,1,1
-"Jordan",9,67,8,0,3
-"Jordan",6,47,7,1,0
-"Jordan",10,48,10,0,0
-"Jordan",7,44,6,1,3
-"Jordan",9,66,10,0,2
-"Jordan",7,60,7,1,3
-"Jordan",3,40,7,0,3
-"Kazakhstan",10,39,10,1,5
-"Kazakhstan",9,52,10,0,7
-"Kazakhstan",9,45,5,1,5
-"Kazakhstan",7,39,8,0,5
-"Kazakhstan",8,68,10,0,5
-"Kazakhstan",8,44,5,1,4
-"Kazakhstan",1,51,1,1,3
-"Kazakhstan",8,25,8,1,5
-"Kenya",1,23,8,1,4
-"Kenya",6,20,9,0,5
-"Kenya",1,32,8,0,6
-"Kenya",10,45,7,0,5
-"Kenya",3,42,10,1,2
-"Kenya",10,26,6,1,1
-"Kenya",7,25,6,1,3
-"Kenya",6,25,6,0,6
-"Kyrgyzstan",7,34,9,1,5
-"Kyrgyzstan",10,44,10,1,4
-"Kyrgyzstan",10,19,5,1,4
-"Kyrgyzstan",1,44,1,1,4
-"Kyrgyzstan",10,55,8,1,5
-"Kyrgyzstan",9,24,5,0,6
-"Kyrgyzstan",9,46,7,1,7
-"Kyrgyzstan",5,61,10,0,2
-"Lebanon",7,33,7,1,2
-"Lebanon",7,31,7,1,4
-"Lebanon",6,42,3,0,3
-"Lebanon",6,42,6,1,5
-"Lebanon",6,22,7,0,3
-"Lebanon",6,53,8,1,4
-"Lebanon",6,29,8,1,4
-"Lebanon",2,49,2,1,5
-"Libya",9,48,8,1,2
-"Libya",8,23,7,0,4
-"Libya",8,40,8,1,8
-"Libya",10,34,10,1,4
-"Libya",10,43,10,1,4
-"Libya",10,66,10,1,6
-"Libya",10,50,7,0,6
-"Libya",7,43,8,1,6
-"Macau",6,24,8,0,4
-"Macau",9,62,10,1,2
-"Macau",6,18,7,0,6
-"Macau",2,62,4,1,3
-"Macau",7,49,6,0,2
-"Macau",7,79,6,1,0
-"Macau",8,50,10,0,2
-"Macau",8,56,7,0,4
-"Malaysia",7,25,7,0,8
-"Malaysia",6,48,6,0,1
-"Malaysia",8,26,8,0,4
-"Malaysia",7,34,6,1,3
-"Malaysia",8,60,8,1,2
-"Malaysia",8,42,8,1,2
-"Malaysia",5,25,7,1,6
-"Malaysia",6,39,6,0,2
-"Maldives",10,28,10,0,4
-"Maldives",10,28,9,1,0
-"Maldives",6,22,10,1,5
-"Maldives",5,29,9,1,4
-"Maldives",8,47,8,0,0
-"Maldives",8,31,7,0,2
-"Maldives",8,27,10,0,1
-"Maldives",7,37,10,1,4
-"Mexico",10,58,10,1,3
-"Mexico",10,68,8,0,4
-"Mexico",9,27,10,1,4
-"Mexico",3,19,7,0,5
-"Mexico",3,38,8,1,2
-"Mexico",8,54,10,0,6
-"Mexico",8,26,5,0,4
-"Mexico",8,31,7,0,5
-"Mongolia",5,55,10,0,7
-"Mongolia",3,46,7,1,6
-"Mongolia",4,56,6,0,7
-"Mongolia",6,26,5,0,6
-"Mongolia",8,45,6,0,3
-"Mongolia",7,40,8,0,4
-"Mongolia",3,29,5,1,6
-"Mongolia",6,32,6,0,6
-"Morocco",6,29,10,1,6
-"Morocco",6,27,4,1,2
-"Morocco",6,30,8,0,5
-"Morocco",2,41,2,1,0
-"Morocco",10,18,8,0,4
-"Morocco",10,57,10,0,5
-"Morocco",10,21,10,0,0
-"Morocco",5,21,5,0,4
-"Myanmar",9,32,5,1,2
-"Myanmar",8,48,10,1,0
-"Myanmar",10,36,4,1,2
-"Myanmar",9,44,8,0,4
-"Myanmar",7,39,2,0,1
-"Myanmar",9,26,5,0,6
-"Myanmar",5,64,7,0,0
-"Myanmar",10,21,5,1,4
-"Netherlands",7,29,8,1,6
-"Netherlands",8,22,9,0,5
-"Netherlands",9,72,9,1,4
-"Netherlands",5,69,4,1,4
-"Netherlands",8,64,8,0,7
-"Netherlands",6,43,7,0,2
-"Netherlands",4,48,7,1,5
-"Netherlands",7,58,7,0,7
-"New Zealand",7,58,7,0,7
-"New Zealand",10,21,10,0,5
-"New Zealand",3,48,1,1,5
-"New Zealand",7,61,8,0,5
-"New Zealand",8,84,8,0,5
-"New Zealand",6,53,6,1,4
-"New Zealand",10,77,8,1,3
-"New Zealand",8,60,7,0,5
-"Nicaragua",10,33,8,1,3
-"Nicaragua",7,24,10,0,6
-"Nicaragua",8,28,9,1,4
-"Nicaragua",10,34,8,0,1
-"Nicaragua",10,30,10,0,3
-"Nicaragua",10,34,8,0,4
-"Nicaragua",10,37,7,1,6
-"Nicaragua",10,42,10,1,1
-"Nigeria",10,18,10,0,3
-"Nigeria",3,19,6,1,1
-"Nigeria",4,38,10,0,2
-"Nigeria",5,31,8,1,0
-"Nigeria",9,32,10,1,4
-"Nigeria",10,26,3,0,0
-"Nigeria",8,19,5,0,5
-"Nigeria",3,19,6,0,4
-"Northern Ireland",8,57,5,0,5
-"Northern Ireland",8,25,5,0,2
-"Northern Ireland",10,47,8,1,4
-"Northern Ireland",5,59,10,0,3
-"Northern Ireland",10,74,10,1,5
-"Northern Ireland",10,65,10,1,3
-"Northern Ireland",8,28,10,1,5
-"Northern Ireland",7,46,8,0,5
-"Pakistan",9,36,9,0,0
-"Pakistan",8,23,10,0,0
-"Pakistan",7,31,10,0,3
-"Pakistan",1,24,5,0,7
-"Pakistan",3,53,10,0,0
-"Pakistan",9,30,10,1,3
-"Pakistan",8,29,10,1,1
-"Pakistan",5,32,10,1,1
-"Peru",6,22,10,0,3
-"Peru",5,25,10,0,2
-"Peru",7,19,8,0,6
-"Peru",7,19,5,0,4
-"Peru",8,79,5,1,1
-"Peru",10,36,10,1,6
-"Peru",7,38,9,0,5
-"Peru",8,47,7,0,1
-"Philippines",7,43,9,1,5
-"Philippines",7,40,6,1,2
-"Philippines",8,34,10,1,1
-"Philippines",2,36,5,1,2
-"Philippines",2,31,10,0,2
-"Philippines",8,61,6,1,4
-"Philippines",8,48,10,1,0
-"Philippines",10,47,8,1,4
-"Puerto Rico",10,55,7,1,4
-"Puerto Rico",10,81,10,1,4
-"Puerto Rico",10,81,3,0,5
-"Puerto Rico",10,24,10,0,8
-"Puerto Rico",7,40,10,1,5
-"Puerto Rico",7,63,8,1,3
-"Puerto Rico",10,51,8,1,2
-"Puerto Rico",10,30,10,1,4
-"Romania",1,60,1,0,7
-"Romania",5,74,10,1,4
-"Romania",9,55,10,1,3
-"Romania",8,34,4,0,3
-"Romania",1,62,5,1,2
-"Romania",6,73,3,1,4
-"Romania",8,32,8,1,5
-"Romania",8,34,9,0,3
-"Russia",4,68,6,1,2
-"Russia",8,58,6,0,7
-"Russia",1,19,8,1,5
-"Russia",8,67,9,0,8
-"Russia",6,39,10,0,6
-"Russia",10,30,6,1,4
-"Russia",10,32,8,1,5
-"Russia",10,43,8,0,6
-"Serbia",5,33,10,0,8
-"Serbia",10,38,9,1,7
-"Serbia",4,48,6,0,7
-"Serbia",8,51,7,0,3
-"Serbia",6,70,8,0,3
-"Serbia",7,82,4,1,5
-"Serbia",5,62,5,1,6
-"Serbia",9,64,9,1,7
-"Singapore",8,46,8,0,4
-"Singapore",10,67,7,0,5
-"Singapore",8,56,10,0,2
-"Singapore",7,39,7,0,3
-"Singapore",7,28,7,0,5
-"Singapore",1,26,1,1,3
-"Singapore",4,27,4,0,6
-"Singapore",6,18,5,1,7
-"Slovakia",8,89,10,0,3
-"Slovakia",8,41,5,0,3
-"Slovakia",7,79,6,1,4
-"Slovakia",7,66,9,1,4
-"Slovakia",1,45,1,1,3
-"Slovakia",3,25,5,0,6
-"Slovakia",9,59,9,1,7
-"Slovakia",10,40,9,1,4
-"South Korea",7,59,7,0,3
-"South Korea",6,30,5,1,5
-"South Korea",7,24,8,1,5
-"South Korea",5,58,6,1,2
-"South Korea",7,51,7,0,6
-"South Korea",7,58,7,0,5
-"South Korea",7,60,7,0,4
-"South Korea",7,18,7,1,6
-"Taiwan",5,27,10,1,6
-"Taiwan",8,41,6,0,6
-"Taiwan",8,79,10,1,3
-"Taiwan",5,60,10,0,4
-"Taiwan",6,59,5,1,5
-"Taiwan",6,49,8,1,2
-"Taiwan",4,42,9,0,6
-"Taiwan",6,51,8,0,6
-"Tajikistan",5,43,7,1,4
-"Tajikistan",9,47,7,0,2
-"Tajikistan",6,31,4,0,5
-"Tajikistan",9,46,7,0,6
-"Tajikistan",8,24,6,0,2
-"Tajikistan",10,55,8,0,5
-"Tajikistan",5,49,10,1,3
-"Tajikistan",8,55,7,1,5
-"Thailand",5,57,4,1,1
-"Thailand",9,34,10,0,1
-"Thailand",7,54,6,0,2
-"Thailand",8,37,10,0,3
-"Thailand",3,23,3,1,3
-"Thailand",5,49,7,1,5
-"Thailand",5,30,5,1,3
-"Thailand",7,38,3,1,0
-"Tunisia",8,52,8,0,0
-"Tunisia",7,64,5,1,3
-"Tunisia",7,40,5,1,2
-"Tunisia",1,30,1,0,6
-"Tunisia",1,58,3,1,2
-"Tunisia",1,46,2,1,0
-"Tunisia",6,21,8,1,2
-"Tunisia",10,24,10,1,2
-"Turkey",6,36,9,0,0
-"Turkey",8,26,5,0,4
-"Turkey",6,40,6,0,6
-"Turkey",8,36,7,1,3
-"Turkey",10,57,9,0,3
-"Turkey",5,41,7,0,5
-"Turkey",7,35,5,0,4
-"Turkey",7,35,8,1,4
-"Ukraine",10,25,5,0,4
-"Ukraine",6,60,7,0,4
-"Ukraine",7,47,10,1,8
-"Ukraine",9,68,9,0,5
-"Ukraine",4,47,7,1,5
-"Ukraine",5,47,8,0,7
-"Ukraine",6,36,5,0,7
-"Ukraine",6,39,7,0,4
-"United States",10,39,9,0,5
-"United States",9,47,8,0,2
-"United States",7,55,9,1,4
-"United States",8,30,8,0,7
-"United States",10,23,8,0,6
-"United States",6,32,10,0,5
-"United States",7,37,7,1,5
-"United States",8,54,10,1,3
-"Uruguay",8,62,8,1,5
-"Uruguay",9,33,8,1,0
-"Uruguay",10,32,7,1,3
-"Uruguay",10,55,8,1,3
-"Uruguay",8,77,10,0,1
-"Uruguay",5,64,5,1,3
-"Uruguay",9,20,10,0,2
-"Uruguay",7,62,6,1,4
-"Uzbekistan",10,29,10,1,4
-"Uzbekistan",9,48,8,1,3
-"Uzbekistan",9,33,8,1,5
-"Uzbekistan",6,51,5,0,4
-"Uzbekistan",9,24,10,1,4
-"Uzbekistan",6,21,9,1,4
-"Uzbekistan",7,61,10,1,4
-"Uzbekistan",4,45,2,0,3
-"Venezuela",7,39,7,0,4
-"Venezuela",5,51,10,1,4
-"Venezuela",4,32,10,0,2
-"Venezuela",4,64,9,0,2
-"Venezuela",3,55,4,1,0
-"Venezuela",9,54,10,0,2
-"Venezuela",3,36,10,0,4
-"Venezuela",9,24,10,0,6
-"Vietnam",8,43,8,1,3
-"Vietnam",8,56,8,1,4
-"Vietnam",8,25,10,0,3
-"Vietnam",9,55,5,0,2
-"Vietnam",10,22,10,1,7
-"Vietnam",10,19,10,1,4
-"Vietnam",8,39,5,0,3
-"Vietnam",8,48,8,1,4
-"Zimbabwe",10,26,10,1,3
-"Zimbabwe",5,36,3,0,3
-"Zimbabwe",10,22,10,0,3
-"Zimbabwe",5,32,10,0,3
-"Zimbabwe",1,37,6,0,3
-"Zimbabwe",3,34,9,0,3
-"Zimbabwe",5,19,10,1,4
-"Zimbabwe",1,21,1,1,2
+"Andorra",8,60,9,1,1
+"Andorra",8,48,8,1,6
+"Andorra",5,63,7,1,0
+"Andorra",8,24,9,1,3
+"Andorra",8,26,8,0,5
+"Andorra",8,50,10,1,1
+"Andorra",5,67,5,0,2
+"Andorra",8,81,8,0,2
+"Andorra",5,28,9,0,4
+"Andorra",8,62,8,0,1
+"Andorra",7,31,10,1,3
+"Andorra",7,51,8,1,3
+"Andorra",9,53,7,1,3
+"Andorra",5,27,4,0,5
+"Andorra",6,66,8,1,4
+"Andorra",10,51,10,0,1
+"Andorra",8,39,9,0,2
+"Andorra",6,60,8,1,3
+"Andorra",8,61,10,0,4
+"Andorra",8,34,9,1,6
+"Andorra",9,67,10,0,2
+"Andorra",7,61,5,0,4
+"Andorra",8,18,10,1,4
+"Andorra",7,51,8,1,3
+"Andorra",6,78,5,1,6
+"Andorra",6,44,4,0,5
+"Andorra",7,44,7,0,5
+"Andorra",7,31,8,0,6
+"Andorra",9,79,10,0,1
+"Andorra",8,63,9,0,4
+"Argentina",6,23,7,1,0
+"Argentina",8,44,10,1,4
+"Argentina",9,39,10,0,4
+"Argentina",8,38,10,0,2
+"Argentina",8,59,7,1,2
+"Argentina",8,25,8,0,3
+"Argentina",8,30,10,1,2
+"Argentina",9,58,5,1,1
+"Argentina",5,57,6,1,0
+"Argentina",9,26,7,1,2
+"Argentina",6,46,10,1,2
+"Argentina",5,20,8,0,3
+"Argentina",7,36,7,1,3
+"Argentina",7,57,9,0,3
+"Argentina",6,54,8,1,3
+"Argentina",8,18,7,0,3
+"Argentina",7,19,5,0,0
+"Argentina",6,20,8,0,4
+"Argentina",9,22,7,1,1
+"Argentina",4,62,7,0,3
+"Argentina",5,51,9,1,3
+"Argentina",5,22,5,1,2
+"Argentina",8,68,8,1,2
+"Argentina",6,51,5,0,0
+"Argentina",7,33,10,0,3
+"Argentina",8,40,10,1,5
+"Argentina",8,61,7,1,3
+"Argentina",8,23,9,0,4
+"Argentina",4,78,7,1,1
+"Argentina",10,31,8,1,2
+"Armenia",8,38,9,0,5
+"Armenia",7,30,8,1,3
+"Armenia",5,35,1,1,4
+"Armenia",4,37,5,1,7
+"Armenia",5,86,10,1,4
+"Armenia",6,58,5,1,4
+"Armenia",7,51,10,1,4
+"Armenia",10,58,9,0,3
+"Armenia",6,37,10,1,4
+"Armenia",5,54,7,1,7
+"Armenia",10,47,10,0,3
+"Armenia",5,68,10,1,5
+"Armenia",5,66,7,1,4
+"Armenia",10,32,8,0,4
+"Armenia",10,66,7,1,4
+"Armenia",5,70,7,0,2
+"Armenia",5,32,10,1,6
+"Armenia",10,37,10,1,4
+"Armenia",10,64,10,0,5
+"Armenia",7,38,7,1,2
+"Armenia",7,19,10,0,1
+"Armenia",3,64,4,0,5
+"Armenia",6,28,1,1,4
+"Armenia",3,45,8,1,4
+"Armenia",8,39,4,0,2
+"Armenia",9,41,7,0,4
+"Armenia",5,57,10,1,6
+"Armenia",8,62,10,1,4
+"Armenia",5,18,10,1,6
+"Armenia",10,65,10,1,3
+"Australia",7,31,7,1,7
+"Australia",9,54,10,1,6
+"Australia",10,48,10,1,6
+"Australia",5,70,6,0,5
+"Australia",8,43,9,1,3
+"Australia",8,76,10,0,5
+"Australia",7,88,6,1,4
+"Australia",7,84,7,0,2
+"Australia",9,64,8,1,3
+"Australia",8,76,8,0,3
+"Australia",6,45,7,0,4
+"Australia",8,57,8,1,2
+"Australia",6,30,6,1,8
+"Australia",8,48,8,1,2
+"Australia",8,26,9,1,5
+"Australia",8,41,10,0,6
+"Australia",6,30,5,1,7
+"Australia",8,57,10,0,6
+"Australia",8,50,8,1,4
+"Australia",8,62,10,0,7
+"Australia",9,43,10,1,5
+"Australia",5,22,8,1,5
+"Australia",7,50,8,0,7
+"Australia",8,72,7,0,4
+"Australia",10,60,9,1,4
+"Australia",10,63,10,0,3
+"Australia",9,36,9,1,5
+"Australia",9,65,9,1,4
+"Australia",6,70,8,1,6
+"Australia",7,84,9,1,5
+"Bangladesh",8,34,6,0,3
+"Bangladesh",2,19,6,0,5
+"Bangladesh",5,42,7,0,2
+"Bangladesh",7,18,9,0,2
+"Bangladesh",7,41,7,1,3
+"Bangladesh",6,28,6,0,3
+"Bangladesh",8,37,10,0,2
+"Bangladesh",8,39,9,0,4
+"Bangladesh",7,18,10,0,8
+"Bangladesh",7,63,8,0,1
+"Bangladesh",7,56,7,1,0
+"Bangladesh",8,33,7,0,5
+"Bangladesh",7,62,7,0,0
+"Bangladesh",8,32,5,1,1
+"Bangladesh",8,48,5,0,2
+"Bangladesh",8,62,6,0,3
+"Bangladesh",5,42,5,1,0
+"Bangladesh",9,41,8,1,1
+"Bangladesh",8,54,4,0,0
+"Bangladesh",9,29,10,0,2
+"Bangladesh",5,45,6,1,0
+"Bangladesh",2,52,7,0,0
+"Bangladesh",10,34,10,1,2
+"Bangladesh",8,22,10,1,2
+"Bangladesh",8,24,8,1,3
+"Bangladesh",9,55,8,0,2
+"Bangladesh",5,19,5,0,2
+"Bangladesh",7,62,10,0,0
+"Bangladesh",9,53,8,1,1
+"Bangladesh",9,18,8,0,3
+"Bolivia",8,64,8,0,3
+"Bolivia",8,54,10,1,6
+"Bolivia",8,33,5,1,4
+"Bolivia",5,82,8,0,4
+"Bolivia",8,47,8,0,4
+"Bolivia",6,37,6,0,5
+"Bolivia",9,49,10,1,5
+"Bolivia",8,30,10,0,7
+"Bolivia",8,23,9,1,2
+"Bolivia",4,28,8,1,2
+"Bolivia",4,40,8,0,5
+"Bolivia",9,33,8,0,7
+"Bolivia",9,30,10,1,3
+"Bolivia",7,40,10,0,5
+"Bolivia",7,23,5,0,7
+"Bolivia",8,43,9,0,4
+"Bolivia",6,21,7,1,7
+"Bolivia",9,19,9,1,3
+"Bolivia",8,60,5,1,3
+"Bolivia",7,39,5,0,1
+"Bolivia",10,24,10,1,6
+"Bolivia",8,35,7,0,4
+"Bolivia",8,61,8,1,0
+"Bolivia",7,37,5,1,6
+"Bolivia",5,61,8,1,1
+"Bolivia",4,39,5,1,5
+"Bolivia",5,35,4,0,4
+"Bolivia",5,22,6,1,6
+"Bolivia",5,19,9,0,5
+"Bolivia",8,21,7,0,2
+"Brazil",10,57,10,1,3
+"Brazil",9,32,1,0,2
+"Brazil",10,48,10,0,3
+"Brazil",7,38,7,0,3
+"Brazil",9,46,6,1,4
+"Brazil",9,39,10,1,2
+"Brazil",5,37,10,1,3
+"Brazil",7,18,1,1,0
+"Brazil",3,49,8,1,2
+"Brazil",1,57,5,0,4
+"Brazil",5,47,1,1,4
+"Brazil",6,23,7,0,5
+"Brazil",9,32,10,1,2
+"Brazil",8,47,10,1,4
+"Brazil",10,18,10,1,4
+"Brazil",8,37,5,1,2
+"Brazil",7,43,9,1,3
+"Brazil",10,42,5,1,0
+"Brazil",8,24,8,1,4
+"Brazil",6,43,1,0,3
+"Brazil",7,38,3,1,3
+"Brazil",1,34,1,1,2
+"Brazil",9,56,10,1,2
+"Brazil",5,37,1,0,5
+"Brazil",10,38,7,1,2
+"Brazil",10,83,10,1,3
+"Brazil",8,46,10,1,2
+"Brazil",8,18,8,1,4
+"Brazil",5,36,8,1,4
+"Brazil",8,31,6,1,3
+"Canada",7,50,8,1,4
+"Canada",7,80,8,1,4
+"Canada",4,27,7,0,5
+"Canada",9,21,8,0,6
+"Canada",7,20,5,1,3
+"Canada",6,42,7,0,5
+"Canada",8,52,8,0,5
+"Canada",5,34,5,0,5
+"Canada",5,45,7,1,7
+"Canada",8,23,8,1,5
+"Canada",7,39,8,1,6
+"Canada",9,65,8,0,6
+"Canada",4,26,5,0,5
+"Canada",7,31,9,1,4
+"Canada",7,68,8,0,4
+"Canada",8,27,9,1,4
+"Canada",4,25,5,0,6
+"Canada",10,21,10,1,6
+"Canada",8,68,10,1,7
+"Canada",8,29,8,1,3
+"Canada",8,60,9,1,4
+"Canada",9,82,8,0,6
+"Canada",8,52,8,1,6
+"Canada",9,33,10,1,1
+"Canada",7,53,7,1,5
+"Canada",8,64,10,1,5
+"Canada",7,33,9,1,5
+"Canada",6,30,8,0,3
+"Canada",8,32,10,0,5
+"Canada",7,45,10,1,4
+"Chile",9,40,10,0,5
+"Chile",8,64,9,0,4
+"Chile",7,48,6,1,3
+"Chile",8,30,8,0,6
+"Chile",4,44,5,1,2
+"Chile",8,76,10,0,1
+"Chile",7,42,10,1,6
+"Chile",4,47,2,0,2
+"Chile",9,40,8,0,4
+"Chile",5,44,4,0,5
+"Chile",5,54,6,0,4
+"Chile",10,37,9,0,4
+"Chile",10,42,7,1,2
+"Chile",10,20,9,0,4
+"Chile",10,32,10,1,5
+"Chile",8,41,10,0,5
+"Chile",9,62,10,1,3
+"Chile",5,48,2,1,2
+"Chile",7,70,10,1,2
+"Chile",5,62,7,0,3
+"Chile",7,65,7,0,7
+"Chile",8,65,10,1,2
+"Chile",9,34,10,0,4
+"Chile",4,79,7,1,3
+"Chile",6,31,5,0,3
+"Chile",10,57,10,1,2
+"Chile",7,51,10,0,6
+"Chile",6,38,7,0,3
+"Chile",8,41,10,1,5
+"Chile",7,47,5,0,4
+"China",8,61,6,1,0
+"China",5,56,6,1,1
+"China",9,70,10,0,3
+"China",10,63,6,1,3
+"China",2,51,7,1,0
+"China",4,59,1,1,0
+"China",7,52,10,0,1
+"China",8,53,7,0,3
+"China",5,63,4,1,3
+"China",6,43,6,1,2
+"China",10,59,5,1,0
+"China",10,60,9,0,2
+"China",10,64,10,1,0
+"China",6,51,6,0,0
+"China",6,45,5,1,2
+"China",8,58,10,0,1
+"China",7,62,8,0,1
+"China",10,26,7,1,4
+"China",9,31,8,1,2
+"China",8,45,6,0,4
+"China",6,42,7,0,5
+"China",7,34,8,0,3
+"China",9,31,3,0,4
+"China",10,49,7,1,0
+"China",6,46,5,0,3
+"China",4,45,8,0,3
+"China",4,24,3,1,3
+"China",9,31,6,1,4
+"China",10,47,6,1,5
+"China",7,47,5,0,2
+"Colombia",9,27,10,1,4
+"Colombia",7,48,10,0,8
+"Colombia",8,22,10,0,0
+"Colombia",10,37,10,0,1
+"Colombia",7,31,10,0,6
+"Colombia",10,51,10,0,2
+"Colombia",8,53,10,1,3
+"Colombia",10,40,3,0,4
+"Colombia",9,19,8,1,5
+"Colombia",6,18,10,1,3
+"Colombia",8,74,6,0,2
+"Colombia",10,57,10,0,3
+"Colombia",10,22,10,0,3
+"Colombia",7,29,10,1,5
+"Colombia",10,54,10,1,3
+"Colombia",4,18,5,1,3
+"Colombia",8,43,10,0,2
+"Colombia",9,18,5,1,3
+"Colombia",10,28,10,0,6
+"Colombia",10,36,10,1,4
+"Colombia",10,59,6,1,2
+"Colombia",10,18,10,1,4
+"Colombia",6,47,7,0,3
+"Colombia",10,56,7,1,2
+"Colombia",8,44,8,0,1
+"Colombia",7,46,7,0,0
+"Colombia",1,54,8,1,3
+"Colombia",5,42,10,1,6
+"Colombia",10,26,10,1,2
+"Colombia",7,22,9,0,2
+"Cyprus",10,41,7,1,5
+"Cyprus",7,71,6,0,3
+"Cyprus",10,62,10,1,0
+"Cyprus",6,67,5,0,2
+"Cyprus",6,54,6,0,2
+"Cyprus",3,36,4,0,5
+"Cyprus",6,34,6,1,4
+"Cyprus",3,26,4,0,7
+"Cyprus",9,24,9,1,7
+"Cyprus",8,66,10,1,1
+"Cyprus",3,26,9,1,4
+"Cyprus",7,29,8,0,4
+"Cyprus",10,37,5,0,2
+"Cyprus",8,19,10,0,3
+"Cyprus",6,41,6,1,5
+"Cyprus",5,64,7,1,7
+"Cyprus",10,28,9,1,4
+"Cyprus",8,49,8,1,5
+"Cyprus",6,34,7,1,4
+"Cyprus",10,32,5,1,4
+"Cyprus",8,32,8,0,6
+"Cyprus",3,25,5,0,5
+"Cyprus",3,26,7,1,4
+"Cyprus",5,49,10,1,0
+"Cyprus",6,47,8,0,0
+"Cyprus",8,47,10,1,4
+"Cyprus",7,27,4,1,5
+"Cyprus",10,30,5,0,3
+"Cyprus",5,47,8,0,2
+"Cyprus",8,54,5,0,0
+"Czechia",5,38,3,0,1
+"Czechia",8,35,7,1,2
+"Czechia",3,47,7,0,4
+"Czechia",9,45,9,1,5
+"Czechia",7,35,6,1,2
+"Czechia",8,69,9,0,4
+"Czechia",10,29,9,0,3
+"Czechia",8,40,7,0,4
+"Czechia",8,50,9,0,3
+"Czechia",7,54,9,1,3
+"Czechia",3,64,5,0,5
+"Czechia",6,23,6,0,6
+"Czechia",5,27,4,0,5
+"Czechia",9,30,8,0,2
+"Czechia",7,43,9,0,3
+"Czechia",8,73,9,1,3
+"Czechia",8,82,7,1,7
+"Czechia",8,29,9,1,2
+"Czechia",8,39,8,0,4
+"Czechia",7,31,6,1,3
+"Czechia",8,49,7,1,8
+"Czechia",5,71,4,1,5
+"Czechia",3,29,5,0,4
+"Czechia",9,27,7,0,2
+"Czechia",4,68,4,1,2
+"Czechia",10,41,8,1,4
+"Czechia",6,43,4,1,5
+"Czechia",8,66,10,0,3
+"Czechia",8,50,9,0,0
+"Czechia",6,60,4,1,0
+"Ecuador",10,22,5,0,3
+"Ecuador",10,49,8,0,0
+"Ecuador",7,46,10,0,4
+"Ecuador",10,43,7,1,4
+"Ecuador",10,21,4,1,4
+"Ecuador",9,36,10,0,6
+"Ecuador",8,36,1,0,3
+"Ecuador",10,55,6,1,3
+"Ecuador",8,18,5,1,4
+"Ecuador",5,20,1,0,2
+"Ecuador",1,65,7,0,2
+"Ecuador",1,26,10,0,4
+"Ecuador",9,56,7,1,8
+"Ecuador",10,65,8,0,6
+"Ecuador",3,74,10,0,3
+"Ecuador",8,62,10,0,2
+"Ecuador",7,48,9,1,3
+"Ecuador",5,42,10,0,2
+"Ecuador",7,32,10,0,3
+"Ecuador",4,28,2,1,3
+"Ecuador",8,66,4,1,4
+"Ecuador",8,77,8,0,0
+"Ecuador",9,37,8,1,3
+"Ecuador",8,29,7,1,1
+"Ecuador",8,18,4,1,4
+"Ecuador",8,19,6,1,4
+"Ecuador",6,19,10,1,8
+"Ecuador",8,59,7,0,4
+"Ecuador",6,37,10,0,4
+"Ecuador",6,63,10,0,2
+"Egypt",5,20,7,1,3
+"Egypt",1,67,1,0,5
+"Egypt",8,21,7,1,3
+"Egypt",6,18,10,0,2
+"Egypt",9,22,7,1,3
+"Egypt",1,55,6,1,0
+"Egypt",5,40,6,1,3
+"Egypt",4,30,6,0,4
+"Egypt",7,43,8,1,0
+"Egypt",8,60,6,1,2
+"Egypt",7,57,7,1,1
+"Egypt",10,31,6,0,5
+"Egypt",8,54,10,1,0
+"Egypt",4,35,8,1,4
+"Egypt",6,54,7,0,2
+"Egypt",5,24,3,1,4
+"Egypt",7,27,6,1,3
+"Egypt",8,61,10,1,4
+"Egypt",4,28,5,1,0
+"Egypt",4,41,6,0,3
+"Egypt",5,20,5,0,1
+"Egypt",8,32,6,0,0
+"Egypt",5,39,5,1,4
+"Egypt",6,19,10,1,6
+"Egypt",7,52,3,0,5
+"Egypt",8,20,9,0,2
+"Egypt",10,20,10,0,0
+"Egypt",5,31,4,0,3
+"Egypt",4,30,8,0,2
+"Egypt",9,65,8,1,5
+"Ethiopia",4,63,4,1,1
+"Ethiopia",5,27,6,1,4
+"Ethiopia",4,21,6,0,5
+"Ethiopia",5,33,1,1,2
+"Ethiopia",1,22,6,0,4
+"Ethiopia",10,21,7,0,2
+"Ethiopia",7,27,10,0,3
+"Ethiopia",10,30,9,1,3
+"Ethiopia",6,23,9,0,2
+"Ethiopia",10,18,5,0,4
+"Ethiopia",8,18,10,0,0
+"Ethiopia",10,52,10,1,0
+"Ethiopia",5,43,8,1,0
+"Ethiopia",7,60,10,0,0
+"Ethiopia",5,19,2,1,5
+"Ethiopia",1,31,10,0,3
+"Ethiopia",7,22,10,1,2
+"Ethiopia",10,33,6,0,5
+"Ethiopia",8,39,8,0,4
+"Ethiopia",2,18,1,0,2
+"Ethiopia",5,27,5,0,7
+"Ethiopia",4,25,8,0,3
+"Ethiopia",10,53,9,1,1
+"Ethiopia",10,22,7,0,5
+"Ethiopia",6,34,10,1,0
+"Ethiopia",7,30,6,0,1
+"Ethiopia",10,21,10,1,2
+"Ethiopia",4,36,10,1,1
+"Ethiopia",7,20,10,1,2
+"Ethiopia",7,31,10,0,4
+"Germany",6,48,10,1,4
+"Germany",3,57,5,0,3
+"Germany",6,62,8,1,3
+"Germany",8,68,6,0,4
+"Germany",4,68,8,1,4
+"Germany",7,51,3,0,4
+"Germany",8,19,7,1,6
+"Germany",8,48,10,0,4
+"Germany",8,69,8,1,3
+"Germany",8,51,8,0,6
+"Germany",5,19,10,0,4
+"Germany",8,36,8,0,6
+"Germany",10,89,7,1,5
+"Germany",7,46,7,1,7
+"Germany",8,34,7,1,2
+"Germany",8,20,5,0,4
+"Germany",7,66,7,1,5
+"Germany",8,73,7,0,2
+"Germany",7,65,7,0,7
+"Germany",6,46,7,0,1
+"Germany",5,81,8,0,5
+"Germany",10,29,7,0,5
+"Germany",8,42,10,0,3
+"Germany",9,75,5,1,4
+"Germany",7,77,10,0,1
+"Germany",8,67,10,0,4
+"Germany",10,39,10,0,5
+"Germany",8,65,8,1,7
+"Germany",7,43,5,1,4
+"Germany",8,82,5,0,2
+"Great Britain",4,34,1,0,3
+"Great Britain",1,61,5,0,2
+"Great Britain",7,38,8,1,4
+"Great Britain",7,30,5,1,0
+"Great Britain",5,31,5,0,5
+"Great Britain",7,61,9,1,3
+"Great Britain",8,80,7,0,4
+"Great Britain",7,52,8,1,5
+"Great Britain",6,50,7,0,6
+"Great Britain",7,60,10,0,6
+"Great Britain",7,20,8,1,8
+"Great Britain",10,62,10,0,4
+"Great Britain",8,23,8,1,5
+"Great Britain",9,48,10,1,5
+"Great Britain",8,47,7,1,2
+"Great Britain",8,42,7,1,6
+"Great Britain",10,64,9,1,2
+"Great Britain",7,45,7,1,5
+"Great Britain",4,56,5,1,3
+"Great Britain",9,38,7,0,7
+"Great Britain",3,70,2,0,1
+"Great Britain",9,45,5,1,4
+"Great Britain",4,55,8,1,4
+"Great Britain",4,28,8,1,5
+"Great Britain",7,35,5,0,6
+"Great Britain",4,36,6,1,5
+"Great Britain",4,25,6,0,6
+"Great Britain",7,25,9,1,3
+"Great Britain",7,20,8,1,1
+"Great Britain",4,65,7,0,6
+"Greece",6,78,4,0,0
+"Greece",9,21,6,0,5
+"Greece",9,28,7,0,5
+"Greece",8,35,3,0,4
+"Greece",6,75,5,0,1
+"Greece",8,87,8,1,2
+"Greece",7,45,8,0,5
+"Greece",3,34,5,0,2
+"Greece",6,67,5,0,3
+"Greece",6,69,8,1,4
+"Greece",4,70,3,1,3
+"Greece",8,34,7,1,0
+"Greece",4,61,5,1,4
+"Greece",10,42,10,1,2
+"Greece",6,45,7,0,4
+"Greece",4,85,8,1,1
+"Greece",9,20,8,1,3
+"Greece",9,51,3,1,3
+"Greece",6,75,9,1,4
+"Greece",10,20,7,0,5
+"Greece",8,38,6,0,6
+"Greece",6,55,5,1,0
+"Greece",7,78,5,0,5
+"Greece",5,18,2,1,4
+"Greece",1,41,2,1,3
+"Greece",7,46,7,0,2
+"Greece",9,39,9,1,2
+"Greece",6,22,4,0,4
+"Greece",6,76,5,0,3
+"Greece",5,70,5,0,3
+"Guatemala",5,26,10,0,3
+"Guatemala",9,23,10,0,8
+"Guatemala",9,47,5,1,0
+"Guatemala",8,21,3,0,8
+"Guatemala",10,31,7,1,4
+"Guatemala",7,56,5,1,3
+"Guatemala",7,20,7,1,5
+"Guatemala",5,38,5,1,5
+"Guatemala",6,53,6,1,4
+"Guatemala",9,36,8,0,0
+"Guatemala",8,40,7,1,5
+"Guatemala",5,31,5,1,5
+"Guatemala",10,18,8,1,8
+"Guatemala",10,21,8,1,3
+"Guatemala",7,21,9,0,1
+"Guatemala",10,33,8,0,4
+"Guatemala",1,29,1,1,8
+"Guatemala",9,52,9,0,6
+"Guatemala",8,50,7,0,6
+"Guatemala",10,35,10,0,1
+"Guatemala",7,50,8,1,6
+"Guatemala",8,28,8,0,6
+"Guatemala",7,23,9,0,4
+"Guatemala",5,26,3,0,2
+"Guatemala",10,61,10,0,3
+"Guatemala",9,26,10,1,6
+"Guatemala",6,29,3,0,8
+"Guatemala",9,25,6,1,3
+"Guatemala",3,44,8,1,0
+"Guatemala",6,39,8,0,5
+"Hong Kong",7,35,7,0,5
+"Hong Kong",5,46,6,0,7
+"Hong Kong",5,50,8,1,3
+"Hong Kong",6,46,5,0,7
+"Hong Kong",4,40,3,0,7
+"Hong Kong",8,33,8,1,4
+"Hong Kong",9,32,10,1,0
+"Hong Kong",8,45,7,1,5
+"Hong Kong",4,47,6,1,2
+"Hong Kong",6,46,7,0,4
+"Hong Kong",8,61,9,0,2
+"Hong Kong",8,62,7,0,4
+"Hong Kong",6,24,5,0,6
+"Hong Kong",6,28,5,1,7
+"Hong Kong",8,53,7,1,7
+"Hong Kong",9,25,7,1,6
+"Hong Kong",9,52,10,1,5
+"Hong Kong",8,60,7,0,2
+"Hong Kong",5,37,5,1,6
+"Hong Kong",6,25,4,1,7
+"Hong Kong",8,69,7,0,5
+"Hong Kong",7,77,8,1,3
+"Hong Kong",3,46,3,0,4
+"Hong Kong",6,46,6,0,5
+"Hong Kong",5,39,7,0,6
+"Hong Kong",8,44,7,0,6
+"Hong Kong",6,26,8,0,7
+"Hong Kong",7,55,5,1,5
+"Hong Kong",8,67,8,1,0
+"Hong Kong",9,86,8,0,2
+"India",8,32,10,0,5
+"India",5,59,9,0,1
+"India",5,18,2,1,4
+"India",6,29,9,1,1
+"India",9,50,9,1,1
+"India",10,53,8,1,3
+"India",6,49,2,1,3
+"India",8,42,8,1,4
+"India",10,30,10,1,1
+"India",10,26,7,0,5
+"India",1,39,10,0,1
+"India",8,49,10,0,0
+"India",7,32,6,0,4
+"India",8,28,10,0,5
+"India",10,57,7,1,0
+"India",5,57,7,0,4
+"India",1,58,2,0,0
+"India",6,21,1,1,3
+"India",8,36,9,0,0
+"India",5,34,6,0,3
+"India",5,49,3,0,1
+"India",7,33,9,1,3
+"India",10,18,5,0,4
+"India",10,30,9,0,4
+"India",7,21,10,1,6
+"India",9,46,8,1,0
+"India",10,32,8,0,2
+"India",5,50,2,1,2
+"India",3,22,6,0,5
+"India",10,38,10,0,6
+"Indonesia",8,39,10,1,1
+"Indonesia",9,44,8,1,2
+"Indonesia",7,49,7,1,3
+"Indonesia",8,27,7,0,2
+"Indonesia",5,71,1,1,2
+"Indonesia",8,68,7,1,2
+"Indonesia",8,45,10,0,3
+"Indonesia",7,61,9,0,4
+"Indonesia",8,36,5,1,4
+"Indonesia",10,34,10,0,4
+"Indonesia",10,44,3,0,0
+"Indonesia",6,57,10,1,2
+"Indonesia",9,25,10,0,2
+"Indonesia",8,30,7,1,5
+"Indonesia",10,40,6,1,1
+"Indonesia",3,60,10,1,3
+"Indonesia",9,29,4,0,1
+"Indonesia",10,50,10,1,2
+"Indonesia",5,55,9,0,1
+"Indonesia",9,75,10,0,0
+"Indonesia",7,66,10,1,3
+"Indonesia",9,19,10,1,4
+"Indonesia",4,39,6,1,1
+"Indonesia",4,30,5,0,0
+"Indonesia",10,20,7,1,3
+"Indonesia",10,38,3,1,0
+"Indonesia",10,19,10,1,2
+"Indonesia",7,52,7,0,2
+"Indonesia",5,26,6,0,6
+"Indonesia",4,24,10,0,3
+"Iran",10,48,6,0,7
+"Iran",3,29,5,0,1
+"Iran",1,23,1,1,7
+"Iran",7,55,5,0,4
+"Iran",8,19,10,0,3
+"Iran",8,30,10,1,4
+"Iran",5,38,5,1,5
+"Iran",8,40,8,1,6
+"Iran",4,28,5,1,6
+"Iran",1,65,5,1,5
+"Iran",10,42,5,1,6
+"Iran",7,41,10,1,4
+"Iran",9,30,7,1,5
+"Iran",1,50,8,1,7
+"Iran",8,20,10,0,6
+"Iran",7,54,10,1,2
+"Iran",4,36,10,0,3
+"Iran",4,21,5,0,6
+"Iran",8,33,8,1,5
+"Iran",5,43,7,1,5
+"Iran",9,20,8,0,4
+"Iran",10,19,6,0,8
+"Iran",7,51,5,0,2
+"Iran",10,38,10,1,7
+"Iran",5,63,5,1,5
+"Iran",10,37,10,1,3
+"Iran",6,18,10,0,4
+"Iran",10,46,5,1,6
+"Iran",8,32,5,0,2
+"Iran",6,32,8,1,5
+"Japan",5,38,5,0,8
+"Japan",7,47,7,1,3
+"Japan",8,46,7,0,5
+"Japan",4,55,4,0,4
+"Japan",9,46,7,1,2
+"Japan",10,72,7,0,6
+"Japan",9,39,8,1,5
+"Japan",2,67,5,1,4
+"Japan",5,23,3,0,6
+"Japan",2,33,8,0,4
+"Japan",9,78,8,1,3
+"Japan",8,42,8,0,6
+"Japan",8,33,7,0,5
+"Japan",5,35,7,1,5
+"Japan",7,52,3,0,4
+"Japan",7,80,4,1,4
+"Japan",3,71,1,0,6
+"Japan",1,44,4,0,5
+"Japan",7,25,7,1,5
+"Japan",5,65,1,1,3
+"Japan",8,52,9,1,4
+"Japan",9,46,7,0,4
+"Japan",9,81,7,1,6
+"Japan",4,63,2,1,6
+"Japan",8,63,7,1,1
+"Japan",8,73,6,1,2
+"Japan",3,79,4,0,2
+"Japan",7,52,4,1,6
+"Japan",6,71,6,0,2
+"Japan",7,52,5,0,4
+"Jordan",9,22,7,0,6
+"Jordan",1,32,6,0,2
+"Jordan",10,27,6,0,4
+"Jordan",8,43,8,0,5
+"Jordan",8,53,3,0,2
+"Jordan",6,51,8,0,4
+"Jordan",4,24,4,0,2
+"Jordan",8,58,8,1,6
+"Jordan",8,44,10,1,6
+"Jordan",5,68,7,1,1
+"Jordan",5,49,4,0,6
+"Jordan",6,28,8,0,5
+"Jordan",9,34,10,1,4
+"Jordan",10,49,8,0,1
+"Jordan",4,28,6,1,5
+"Jordan",5,44,7,0,2
+"Jordan",10,59,10,0,7
+"Jordan",9,26,7,0,3
+"Jordan",7,57,10,0,4
+"Jordan",7,42,1,0,2
+"Jordan",7,30,7,1,4
+"Jordan",5,42,3,1,4
+"Jordan",5,40,5,0,5
+"Jordan",8,50,8,1,2
+"Jordan",6,53,8,1,6
+"Jordan",8,21,5,1,3
+"Jordan",7,71,10,1,0
+"Jordan",5,25,6,1,8
+"Jordan",7,49,7,1,5
+"Jordan",10,40,8,1,3
+"Kazakhstan",9,18,7,0,4
+"Kazakhstan",7,33,6,1,3
+"Kazakhstan",6,52,4,1,4
+"Kazakhstan",5,42,7,0,4
+"Kazakhstan",7,57,5,1,7
+"Kazakhstan",4,35,7,0,5
+"Kazakhstan",5,64,10,1,3
+"Kazakhstan",6,51,6,1,5
+"Kazakhstan",9,35,3,0,7
+"Kazakhstan",6,39,6,0,5
+"Kazakhstan",10,32,9,0,6
+"Kazakhstan",10,62,10,0,5
+"Kazakhstan",4,20,6,0,6
+"Kazakhstan",10,36,10,0,6
+"Kazakhstan",8,22,7,1,6
+"Kazakhstan",7,61,7,0,3
+"Kazakhstan",7,44,7,0,3
+"Kazakhstan",8,22,7,1,3
+"Kazakhstan",6,76,7,0,0
+"Kazakhstan",5,43,4,1,6
+"Kazakhstan",7,82,9,1,6
+"Kazakhstan",7,39,5,1,7
+"Kazakhstan",5,26,6,1,3
+"Kazakhstan",8,48,8,1,4
+"Kazakhstan",5,51,5,1,6
+"Kazakhstan",8,47,7,1,8
+"Kazakhstan",5,25,4,1,5
+"Kazakhstan",8,25,6,0,7
+"Kazakhstan",10,32,10,0,7
+"Kazakhstan",4,57,5,1,4
+"Kenya",8,20,5,0,2
+"Kenya",7,21,6,0,4
+"Kenya",8,23,7,0,2
+"Kenya",9,59,9,1,2
+"Kenya",1,19,8,0,7
+"Kenya",6,24,10,1,5
+"Kenya",8,26,7,0,3
+"Kenya",8,50,7,1,6
+"Kenya",10,28,10,0,4
+"Kenya",5,39,10,0,4
+"Kenya",1,60,8,0,3
+"Kenya",5,31,1,0,2
+"Kenya",10,40,5,0,5
+"Kenya",8,30,4,0,3
+"Kenya",7,45,8,0,4
+"Kenya",6,47,8,0,4
+"Kenya",8,61,1,1,4
+"Kenya",10,54,8,1,2
+"Kenya",7,21,6,1,3
+"Kenya",8,24,10,0,5
+"Kenya",9,23,3,0,5
+"Kenya",6,31,6,1,4
+"Kenya",10,28,8,0,4
+"Kenya",1,18,10,1,2
+"Kenya",4,37,4,1,1
+"Kenya",3,40,6,1,2
+"Kenya",6,24,1,0,6
+"Kenya",4,32,3,0,0
+"Kenya",10,32,8,1,3
+"Kenya",4,51,6,0,2
+"Kyrgyzstan",10,24,10,1,6
+"Kyrgyzstan",3,38,1,1,5
+"Kyrgyzstan",8,32,10,1,3
+"Kyrgyzstan",10,56,10,1,4
+"Kyrgyzstan",10,45,10,1,2
+"Kyrgyzstan",10,35,10,1,5
+"Kyrgyzstan",10,60,5,0,2
+"Kyrgyzstan",10,37,10,0,3
+"Kyrgyzstan",8,35,8,1,3
+"Kyrgyzstan",10,25,9,1,5
+"Kyrgyzstan",10,21,10,1,5
+"Kyrgyzstan",10,61,1,0,1
+"Kyrgyzstan",1,19,3,1,3
+"Kyrgyzstan",1,29,5,0,1
+"Kyrgyzstan",5,37,10,1,5
+"Kyrgyzstan",8,60,5,1,5
+"Kyrgyzstan",10,18,5,0,3
+"Kyrgyzstan",5,44,5,1,5
+"Kyrgyzstan",5,23,7,0,7
+"Kyrgyzstan",8,31,10,0,7
+"Kyrgyzstan",9,19,7,1,2
+"Kyrgyzstan",4,35,5,1,3
+"Kyrgyzstan",10,57,5,0,4
+"Kyrgyzstan",10,24,10,0,0
+"Kyrgyzstan",5,41,7,1,3
+"Kyrgyzstan",8,56,10,0,2
+"Kyrgyzstan",10,26,10,1,5
+"Kyrgyzstan",5,36,4,1,1
+"Kyrgyzstan",10,28,10,1,3
+"Kyrgyzstan",3,67,7,0,7
+"Lebanon",6,57,3,1,5
+"Lebanon",8,32,3,0,6
+"Lebanon",4,23,1,1,4
+"Lebanon",7,49,10,0,3
+"Lebanon",8,29,7,1,6
+"Lebanon",7,28,2,1,6
+"Lebanon",7,66,6,0,5
+"Lebanon",7,29,5,0,4
+"Lebanon",8,25,4,1,3
+"Lebanon",7,44,7,0,4
+"Lebanon",8,27,8,0,6
+"Lebanon",10,38,6,0,1
+"Lebanon",7,29,4,1,2
+"Lebanon",8,53,8,1,1
+"Lebanon",6,50,1,1,4
+"Lebanon",7,43,6,0,2
+"Lebanon",8,23,4,0,1
+"Lebanon",7,55,8,1,6
+"Lebanon",6,23,3,1,4
+"Lebanon",8,46,8,1,2
+"Lebanon",9,19,3,0,3
+"Lebanon",7,60,4,0,3
+"Lebanon",7,49,8,0,2
+"Lebanon",9,28,8,0,4
+"Lebanon",8,21,8,0,7
+"Lebanon",8,81,6,1,2
+"Lebanon",7,43,8,1,4
+"Lebanon",10,43,7,0,6
+"Lebanon",6,35,4,0,5
+"Lebanon",7,47,7,0,4
+"Libya",5,26,10,0,3
+"Libya",7,39,8,0,4
+"Libya",7,45,7,1,3
+"Libya",6,56,6,1,6
+"Libya",5,27,8,1,4
+"Libya",10,46,10,0,5
+"Libya",10,32,10,0,3
+"Libya",10,30,7,0,6
+"Libya",7,42,10,0,5
+"Libya",5,51,5,1,3
+"Libya",10,49,7,1,5
+"Libya",8,62,7,0,4
+"Libya",7,18,7,1,2
+"Libya",10,19,10,0,5
+"Libya",8,36,8,1,0
+"Libya",6,22,10,1,5
+"Libya",4,37,6,0,1
+"Libya",9,23,10,1,6
+"Libya",9,39,9,0,6
+"Libya",10,53,10,0,7
+"Libya",8,43,5,1,5
+"Libya",10,24,8,1,7
+"Libya",6,35,10,1,4
+"Libya",10,53,10,1,5
+"Libya",9,61,7,0,4
+"Libya",10,44,10,1,4
+"Libya",8,53,10,0,4
+"Libya",10,35,7,1,4
+"Libya",10,41,8,0,4
+"Libya",2,45,3,0,6
+"Macau",8,36,5,1,5
+"Macau",5,24,2,0,7
+"Macau",6,52,7,1,3
+"Macau",10,18,10,0,5
+"Macau",7,22,4,1,5
+"Macau",5,60,8,1,0
+"Macau",8,39,4,1,5
+"Macau",7,51,7,1,2
+"Macau",7,67,7,1,4
+"Macau",3,24,6,1,3
+"Macau",6,61,5,0,2
+"Macau",7,25,7,0,4
+"Macau",10,20,10,0,6
+"Macau",5,24,5,0,5
+"Macau",4,50,5,1,4
+"Macau",8,33,8,1,6
+"Macau",7,62,4,0,4
+"Macau",10,27,10,0,2
+"Macau",8,67,8,1,2
+"Macau",6,25,6,1,2
+"Macau",8,19,10,0,6
+"Macau",6,21,7,1,6
+"Macau",6,62,7,0,3
+"Macau",10,45,9,1,5
+"Macau",8,51,9,1,4
+"Macau",9,32,7,1,6
+"Macau",5,73,4,0,2
+"Macau",8,65,8,0,3
+"Macau",6,22,7,0,3
+"Macau",6,28,9,1,5
+"Malaysia",7,30,8,1,1
+"Malaysia",3,25,2,1,4
+"Malaysia",8,34,8,0,7
+"Malaysia",6,59,5,1,5
+"Malaysia",8,54,10,1,4
+"Malaysia",5,27,7,0,3
+"Malaysia",7,38,7,1,4
+"Malaysia",8,24,8,1,3
+"Malaysia",7,28,6,0,5
+"Malaysia",8,72,8,0,0
+"Malaysia",7,28,7,0,4
+"Malaysia",7,45,5,1,3
+"Malaysia",7,25,6,0,0
+"Malaysia",8,36,8,0,3
+"Malaysia",3,38,4,1,3
+"Malaysia",9,40,9,0,2
+"Malaysia",6,52,5,1,0
+"Malaysia",7,56,9,1,5
+"Malaysia",4,23,4,0,5
+"Malaysia",5,24,7,1,3
+"Malaysia",7,52,10,0,4
+"Malaysia",7,27,6,1,4
+"Malaysia",8,22,9,1,3
+"Malaysia",8,64,8,0,2
+"Malaysia",9,23,10,0,2
+"Malaysia",8,25,8,1,1
+"Malaysia",8,41,8,0,3
+"Malaysia",8,50,7,1,3
+"Malaysia",4,41,4,0,2
+"Malaysia",9,34,8,0,5
+"Maldives",10,42,9,0,0
+"Maldives",6,36,5,1,3
+"Maldives",7,31,10,1,2
+"Maldives",10,27,10,1,3
+"Maldives",8,54,10,0,1
+"Maldives",7,30,10,0,4
+"Maldives",6,48,7,1,2
+"Maldives",8,19,10,1,5
+"Maldives",5,36,7,1,2
+"Maldives",10,37,8,1,4
+"Maldives",8,47,9,1,2
+"Maldives",10,66,10,0,3
+"Maldives",6,28,9,0,7
+"Maldives",7,58,10,1,2
+"Maldives",1,49,2,0,4
+"Maldives",7,18,10,1,5
+"Maldives",6,26,8,0,4
+"Maldives",7,33,9,1,3
+"Maldives",9,29,10,0,3
+"Maldives",9,32,8,0,0
+"Maldives",6,29,8,0,4
+"Maldives",3,42,7,1,0
+"Maldives",8,29,6,0,5
+"Maldives",6,20,9,1,3
+"Maldives",10,33,9,0,1
+"Maldives",6,42,9,1,1
+"Maldives",9,21,10,1,6
+"Maldives",6,36,7,0,1
+"Maldives",8,36,10,1,3
+"Maldives",9,25,10,0,2
+"Mexico",6,45,5,1,4
+"Mexico",10,20,10,1,1
+"Mexico",10,45,9,0,4
+"Mexico",8,57,10,0,1
+"Mexico",8,28,9,0,4
+"Mexico",10,46,10,0,4
+"Mexico",9,28,10,0,3
+"Mexico",5,29,7,0,2
+"Mexico",10,33,10,0,4
+"Mexico",9,55,8,0,2
+"Mexico",10,31,10,1,1
+"Mexico",9,35,8,0,4
+"Mexico",7,65,8,0,3
+"Mexico",5,55,6,1,4
+"Mexico",8,29,8,0,4
+"Mexico",8,38,9,0,4
+"Mexico",4,67,9,1,2
+"Mexico",10,25,10,0,3
+"Mexico",7,34,6,1,3
+"Mexico",10,32,7,1,3
+"Mexico",10,20,3,0,7
+"Mexico",9,29,8,0,2
+"Mexico",5,57,9,1,1
+"Mexico",9,68,8,1,2
+"Mexico",8,25,10,0,4
+"Mexico",8,41,7,0,5
+"Mexico",10,29,10,0,2
+"Mexico",8,26,10,1,3
+"Mexico",10,44,9,0,6
+"Mexico",10,45,5,0,5
+"Mongolia",8,29,4,0,2
+"Mongolia",6,42,8,0,5
+"Mongolia",9,54,5,1,3
+"Mongolia",7,35,5,1,5
+"Mongolia",8,35,9,1,4
+"Mongolia",7,36,6,0,6
+"Mongolia",5,22,6,0,6
+"Mongolia",6,53,5,1,3
+"Mongolia",6,27,8,0,6
+"Mongolia",8,26,6,1,6
+"Mongolia",3,76,6,0,6
+"Mongolia",8,55,6,1,3
+"Mongolia",1,26,1,1,8
+"Mongolia",6,41,6,0,4
+"Mongolia",8,66,9,1,3
+"Mongolia",8,19,9,0,5
+"Mongolia",10,45,10,1,4
+"Mongolia",1,35,4,0,5
+"Mongolia",6,43,5,1,7
+"Mongolia",9,20,8,0,7
+"Mongolia",8,19,9,0,4
+"Mongolia",2,54,3,1,6
+"Mongolia",9,43,9,1,5
+"Mongolia",10,56,8,0,7
+"Mongolia",3,42,2,1,3
+"Mongolia",10,31,10,1,0
+"Mongolia",5,20,6,1,4
+"Mongolia",6,42,6,1,3
+"Mongolia",9,30,8,0,6
+"Mongolia",8,53,4,1,5
+"Morocco",9,39,6,1,2
+"Morocco",7,40,8,1,0
+"Morocco",8,29,10,0,1
+"Morocco",7,38,8,0,2
+"Morocco",6,46,6,1,0
+"Morocco",9,42,10,0,6
+"Morocco",4,75,5,0,0
+"Morocco",10,21,10,0,7
+"Morocco",6,24,5,0,4
+"Morocco",9,35,8,0,2
+"Morocco",9,31,8,0,3
+"Morocco",8,35,7,0,2
+"Morocco",8,48,6,1,4
+"Morocco",8,57,7,1,4
+"Morocco",9,29,8,1,4
+"Morocco",9,32,10,0,5
+"Morocco",9,40,10,1,2
+"Morocco",6,49,7,1,7
+"Morocco",6,39,6,0,1
+"Morocco",3,41,3,0,6
+"Morocco",8,42,5,1,2
+"Morocco",6,54,3,1,2
+"Morocco",7,22,6,1,4
+"Morocco",7,40,7,1,1
+"Morocco",10,22,10,0,4
+"Morocco",6,28,7,1,1
+"Morocco",9,29,8,1,0
+"Morocco",10,21,9,0,4
+"Morocco",6,28,4,1,6
+"Morocco",7,44,7,1,3
+"Myanmar",6,65,6,0,1
+"Myanmar",10,54,5,1,3
+"Myanmar",10,29,5,0,4
+"Myanmar",3,52,8,0,1
+"Myanmar",5,22,5,1,4
+"Myanmar",6,59,9,0,0
+"Myanmar",8,22,6,1,5
+"Myanmar",8,49,7,1,3
+"Myanmar",5,31,7,0,3
+"Myanmar",1,40,4,1,4
+"Myanmar",6,50,8,0,5
+"Myanmar",5,34,2,1,2
+"Myanmar",9,20,5,0,5
+"Myanmar",10,40,10,1,2
+"Myanmar",5,31,5,1,5
+"Myanmar",6,26,5,0,6
+"Myanmar",7,69,8,0,1
+"Myanmar",5,55,7,0,3
+"Myanmar",6,49,8,1,3
+"Myanmar",8,21,9,0,6
+"Myanmar",7,45,10,1,0
+"Myanmar",10,39,5,1,2
+"Myanmar",6,47,10,1,0
+"Myanmar",7,25,4,1,0
+"Myanmar",5,27,4,0,5
+"Myanmar",3,48,3,1,3
+"Myanmar",6,27,8,1,2
+"Myanmar",8,48,10,0,5
+"Myanmar",8,39,5,1,0
+"Myanmar",10,39,10,0,2
+"Netherlands",8,50,7,0,5
+"Netherlands",8,66,8,1,0
+"Netherlands",8,56,7,1,3
+"Netherlands",8,23,9,0,8
+"Netherlands",6,49,3,0,5
+"Netherlands",8,67,7,1,8
+"Netherlands",8,66,7,0,5
+"Netherlands",8,35,8,1,8
+"Netherlands",7,61,8,1,4
+"Netherlands",7,46,7,0,6
+"Netherlands",7,38,7,0,5
+"Netherlands",7,35,5,1,3
+"Netherlands",8,37,9,0,3
+"Netherlands",7,67,8,1,4
+"Netherlands",8,81,7,0,5
+"Netherlands",9,64,6,1,5
+"Netherlands",7,53,4,0,8
+"Netherlands",8,46,8,0,3
+"Netherlands",7,77,7,1,4
+"Netherlands",6,72,7,1,2
+"Netherlands",7,26,6,1,5
+"Netherlands",7,62,8,1,6
+"Netherlands",6,36,8,0,7
+"Netherlands",8,46,7,0,7
+"Netherlands",9,72,8,0,6
+"Netherlands",6,28,6,1,5
+"Netherlands",10,63,9,1,6
+"Netherlands",7,44,8,0,1
+"Netherlands",8,40,7,1,4
+"Netherlands",4,71,4,1,0
+"New Zealand",8,61,9,0,4
+"New Zealand",7,73,5,0,4
+"New Zealand",7,58,7,1,4
+"New Zealand",8,60,8,1,2
+"New Zealand",8,61,6,1,4
+"New Zealand",9,81,7,1,0
+"New Zealand",8,29,7,0,8
+"New Zealand",8,52,9,0,3
+"New Zealand",7,87,10,0,4
+"New Zealand",9,31,8,1,7
+"New Zealand",9,61,8,1,6
+"New Zealand",10,69,10,1,4
+"New Zealand",6,64,10,1,6
+"New Zealand",4,62,6,1,3
+"New Zealand",10,27,8,1,4
+"New Zealand",8,82,9,0,4
+"New Zealand",8,75,8,0,3
+"New Zealand",8,43,6,0,4
+"New Zealand",7,68,5,1,7
+"New Zealand",6,49,7,1,4
+"New Zealand",7,67,5,1,4
+"New Zealand",9,62,7,1,6
+"New Zealand",10,76,9,0,3
+"New Zealand",7,57,6,0,5
+"New Zealand",9,43,8,1,4
+"New Zealand",9,76,8,1,3
+"New Zealand",7,32,5,1,5
+"New Zealand",8,47,8,1,4
+"New Zealand",2,31,7,0,2
+"New Zealand",9,58,10,1,5
+"Nicaragua",6,38,6,0,4
+"Nicaragua",5,25,6,1,1
+"Nicaragua",10,41,6,1,0
+"Nicaragua",10,56,9,0,1
+"Nicaragua",10,42,10,0,6
+"Nicaragua",10,21,10,1,6
+"Nicaragua",10,48,10,1,3
+"Nicaragua",8,38,7,0,2
+"Nicaragua",9,18,10,1,3
+"Nicaragua",5,27,8,1,1
+"Nicaragua",10,60,8,0,4
+"Nicaragua",8,34,5,0,4
+"Nicaragua",9,42,10,0,2
+"Nicaragua",1,37,1,1,5
+"Nicaragua",6,33,10,1,3
+"Nicaragua",9,40,10,0,0
+"Nicaragua",10,23,8,0,5
+"Nicaragua",1,59,6,0,2
+"Nicaragua",8,37,10,0,3
+"Nicaragua",10,18,10,1,4
+"Nicaragua",9,22,7,0,4
+"Nicaragua",9,33,10,0,4
+"Nicaragua",10,26,10,1,7
+"Nicaragua",1,44,5,0,2
+"Nicaragua",5,42,5,0,3
+"Nicaragua",10,18,2,0,3
+"Nicaragua",10,42,9,0,3
+"Nicaragua",10,37,9,0,2
+"Nicaragua",8,29,9,0,2
+"Nicaragua",4,24,5,1,4
+"Nigeria",2,69,8,1,1
+"Nigeria",3,21,10,1,3
+"Nigeria",5,21,2,0,2
+"Nigeria",7,53,4,1,2
+"Nigeria",6,21,9,1,0
+"Nigeria",6,21,4,1,4
+"Nigeria",3,26,9,0,1
+"Nigeria",2,33,4,0,4
+"Nigeria",10,40,8,1,2
+"Nigeria",10,26,8,1,2
+"Nigeria",4,39,10,0,1
+"Nigeria",7,31,4,0,6
+"Nigeria",3,24,6,0,3
+"Nigeria",3,22,8,1,4
+"Nigeria",6,23,7,0,3
+"Nigeria",7,31,1,0,0
+"Nigeria",8,22,6,0,5
+"Nigeria",7,20,9,1,3
+"Nigeria",5,31,4,0,3
+"Nigeria",9,35,10,0,4
+"Nigeria",6,39,10,0,4
+"Nigeria",10,36,5,0,0
+"Nigeria",10,32,10,0,4
+"Nigeria",4,23,5,0,3
+"Nigeria",7,26,4,0,1
+"Nigeria",2,23,4,0,4
+"Nigeria",3,34,6,0,5
+"Nigeria",4,28,7,0,2
+"Nigeria",5,37,8,0,0
+"Nigeria",10,24,9,1,2
+"Northern Ireland",7,54,5,1,5
+"Northern Ireland",10,34,10,0,2
+"Northern Ireland",7,39,10,0,2
+"Northern Ireland",3,89,8,0,1
+"Northern Ireland",9,50,10,0,5
+"Northern Ireland",8,22,10,0,5
+"Northern Ireland",9,65,7,1,5
+"Northern Ireland",6,64,5,0,2
+"Northern Ireland",6,44,7,1,1
+"Northern Ireland",10,30,8,1,8
+"Northern Ireland",8,56,10,0,5
+"Northern Ireland",8,50,7,0,3
+"Northern Ireland",6,19,8,1,6
+"Northern Ireland",2,26,4,0,2
+"Northern Ireland",10,38,8,1,4
+"Northern Ireland",7,76,6,1,4
+"Northern Ireland",9,48,8,1,2
+"Northern Ireland",9,83,9,1,5
+"Northern Ireland",9,36,10,1,7
+"Northern Ireland",9,79,8,1,0
+"Northern Ireland",5,24,7,1,6
+"Northern Ireland",5,60,5,1,4
+"Northern Ireland",10,65,8,1,6
+"Northern Ireland",7,40,7,1,7
+"Northern Ireland",3,52,5,0,1
+"Northern Ireland",5,65,7,1,1
+"Northern Ireland",7,24,5,1,4
+"Northern Ireland",8,20,7,1,7
+"Northern Ireland",5,75,8,0,3
+"Northern Ireland",9,71,5,0,5
+"Pakistan",10,43,10,1,3
+"Pakistan",9,27,8,1,4
+"Pakistan",10,29,9,0,1
+"Pakistan",10,22,10,0,0
+"Pakistan",10,65,8,0,1
+"Pakistan",9,33,10,0,1
+"Pakistan",5,66,5,0,5
+"Pakistan",6,30,7,0,4
+"Pakistan",9,27,10,0,0
+"Pakistan",7,19,10,1,0
+"Pakistan",7,28,9,1,2
+"Pakistan",8,23,6,1,0
+"Pakistan",5,43,10,1,2
+"Pakistan",8,31,6,1,3
+"Pakistan",10,18,9,1,3
+"Pakistan",6,49,7,0,5
+"Pakistan",10,24,7,1,2
+"Pakistan",1,20,3,1,3
+"Pakistan",3,54,2,0,0
+"Pakistan",7,27,9,1,4
+"Pakistan",8,28,8,1,5
+"Pakistan",6,60,10,0,0
+"Pakistan",10,23,10,1,5
+"Pakistan",10,46,8,1,3
+"Pakistan",9,42,9,0,0
+"Pakistan",3,50,10,1,2
+"Pakistan",9,26,10,0,3
+"Pakistan",10,40,5,0,2
+"Pakistan",4,20,5,1,2
+"Pakistan",6,36,10,0,6
+"Peru",6,23,6,1,4
+"Peru",6,53,9,1,1
+"Peru",8,53,9,0,2
+"Peru",8,23,9,1,1
+"Peru",9,42,10,0,6
+"Peru",10,51,6,0,5
+"Peru",6,64,10,1,1
+"Peru",7,19,5,0,5
+"Peru",8,71,10,0,0
+"Peru",5,56,5,1,2
+"Peru",7,75,10,0,1
+"Peru",8,31,5,1,3
+"Peru",8,45,7,0,4
+"Peru",6,36,8,1,3
+"Peru",8,18,8,0,3
+"Peru",9,76,9,1,5
+"Peru",8,57,10,1,5
+"Peru",8,22,9,1,4
+"Peru",6,25,5,1,3
+"Peru",9,49,10,1,4
+"Peru",10,38,8,0,4
+"Peru",8,24,9,0,4
+"Peru",6,58,10,1,6
+"Peru",6,29,9,0,0
+"Peru",7,64,7,0,2
+"Peru",10,19,8,1,5
+"Peru",10,23,10,0,4
+"Peru",10,45,10,0,5
+"Peru",9,20,10,1,5
+"Peru",8,45,6,1,1
+"Philippines",2,42,3,1,1
+"Philippines",10,41,5,0,3
+"Philippines",1,32,7,1,1
+"Philippines",10,44,6,1,4
+"Philippines",7,34,8,1,2
+"Philippines",4,51,3,0,2
+"Philippines",7,46,7,0,0
+"Philippines",5,35,1,0,3
+"Philippines",10,35,6,1,5
+"Philippines",5,52,6,0,3
+"Philippines",7,53,5,0,0
+"Philippines",5,23,10,0,2
+"Philippines",2,40,6,1,2
+"Philippines",3,54,9,1,0
+"Philippines",5,61,5,1,3
+"Philippines",10,54,10,1,0
+"Philippines",3,61,8,1,3
+"Philippines",9,34,9,1,2
+"Philippines",8,26,8,1,1
+"Philippines",9,25,8,1,1
+"Philippines",8,38,8,0,3
+"Philippines",7,46,5,0,4
+"Philippines",10,30,1,0,4
+"Philippines",10,87,9,0,3
+"Philippines",6,22,10,0,4
+"Philippines",1,56,7,0,1
+"Philippines",4,42,7,0,5
+"Philippines",10,21,3,0,2
+"Philippines",8,39,3,0,6
+"Philippines",4,76,5,1,4
+"Puerto Rico",7,37,10,1,8
+"Puerto Rico",10,41,10,0,3
+"Puerto Rico",10,45,10,1,5
+"Puerto Rico",8,49,10,0,5
+"Puerto Rico",7,24,9,1,6
+"Puerto Rico",7,28,10,1,2
+"Puerto Rico",9,25,8,1,4
+"Puerto Rico",10,42,10,1,1
+"Puerto Rico",10,19,7,0,2
+"Puerto Rico",8,54,10,1,6
+"Puerto Rico",1,55,2,1,6
+"Puerto Rico",10,21,10,1,3
+"Puerto Rico",10,62,8,0,6
+"Puerto Rico",4,42,8,0,1
+"Puerto Rico",8,21,10,1,6
+"Puerto Rico",8,46,10,0,7
+"Puerto Rico",6,66,10,0,6
+"Puerto Rico",9,51,10,1,2
+"Puerto Rico",7,40,8,1,5
+"Puerto Rico",6,42,1,1,5
+"Puerto Rico",8,47,10,1,6
+"Puerto Rico",10,64,10,1,3
+"Puerto Rico",8,45,10,1,5
+"Puerto Rico",8,81,10,1,0
+"Puerto Rico",10,73,7,1,4
+"Puerto Rico",10,56,6,1,3
+"Puerto Rico",1,21,8,1,4
+"Puerto Rico",8,64,7,1,4
+"Puerto Rico",5,71,8,1,4
+"Puerto Rico",6,49,8,0,5
+"Romania",7,28,7,0,3
+"Romania",2,49,7,0,2
+"Romania",9,68,7,1,4
+"Romania",10,26,10,1,5
+"Romania",5,63,10,1,1
+"Romania",5,40,3,1,4
+"Romania",6,41,6,0,5
+"Romania",7,55,8,1,4
+"Romania",9,46,10,0,6
+"Romania",7,35,10,0,4
+"Romania",5,42,5,1,4
+"Romania",7,23,8,0,5
+"Romania",8,31,8,0,1
+"Romania",4,64,5,1,4
+"Romania",7,49,8,0,5
+"Romania",7,42,7,1,1
+"Romania",5,66,5,0,3
+"Romania",8,64,9,1,1
+"Romania",7,30,7,0,6
+"Romania",8,57,10,1,2
+"Romania",10,43,10,1,2
+"Romania",8,18,10,1,4
+"Romania",10,59,10,0,3
+"Romania",7,36,6,1,6
+"Romania",10,19,10,1,3
+"Romania",6,56,5,0,3
+"Romania",5,43,8,0,2
+"Romania",10,23,10,0,3
+"Romania",10,48,10,0,3
+"Romania",9,80,7,1,3
+"Russia",9,61,7,1,7
+"Russia",9,37,7,0,6
+"Russia",7,32,6,0,1
+"Russia",5,49,7,1,3
+"Russia",7,22,10,1,7
+"Russia",9,27,8,0,3
+"Russia",7,42,5,1,6
+"Russia",1,54,5,1,5
+"Russia",8,34,6,0,0
+"Russia",6,33,5,1,5
+"Russia",5,35,5,1,2
+"Russia",8,37,10,1,6
+"Russia",10,27,8,1,6
+"Russia",5,52,10,1,6
+"Russia",8,70,8,1,6
+"Russia",7,27,4,1,6
+"Russia",6,36,6,0,5
+"Russia",9,46,8,1,3
+"Russia",10,69,10,0,5
+"Russia",7,39,6,1,5
+"Russia",5,28,6,0,5
+"Russia",8,27,7,1,3
+"Russia",5,60,7,1,5
+"Russia",10,32,4,1,2
+"Russia",8,31,10,0,2
+"Russia",6,25,7,0,5
+"Russia",8,32,10,0,6
+"Russia",8,43,9,1,7
+"Russia",5,24,6,1,4
+"Russia",8,25,10,1,6
+"Serbia",8,25,8,0,7
+"Serbia",10,39,10,1,7
+"Serbia",6,27,6,0,8
+"Serbia",4,60,4,1,4
+"Serbia",9,31,4,1,7
+"Serbia",3,21,1,1,7
+"Serbia",8,64,7,1,8
+"Serbia",8,22,7,0,6
+"Serbia",6,20,6,1,8
+"Serbia",7,35,10,1,4
+"Serbia",6,60,7,0,1
+"Serbia",8,79,8,0,5
+"Serbia",5,26,3,0,8
+"Serbia",8,49,6,0,3
+"Serbia",10,54,10,1,6
+"Serbia",8,21,7,1,6
+"Serbia",9,76,8,0,4
+"Serbia",8,27,8,1,8
+"Serbia",5,30,7,1,6
+"Serbia",8,64,6,1,5
+"Serbia",5,39,4,1,8
+"Serbia",8,62,7,1,6
+"Serbia",3,47,3,1,3
+"Serbia",8,57,9,1,6
+"Serbia",9,72,9,1,8
+"Serbia",8,22,10,0,4
+"Serbia",9,32,10,1,6
+"Serbia",7,24,3,0,8
+"Serbia",4,61,3,0,8
+"Serbia",4,35,6,1,3
+"Singapore",7,30,7,1,6
+"Singapore",10,60,10,0,3
+"Singapore",9,58,10,0,3
+"Singapore",10,51,8,1,2
+"Singapore",6,43,5,1,5
+"Singapore",7,72,6,0,4
+"Singapore",5,39,5,1,7
+"Singapore",8,80,8,0,3
+"Singapore",4,40,5,0,5
+"Singapore",4,41,5,1,7
+"Singapore",5,40,5,0,6
+"Singapore",7,68,8,1,3
+"Singapore",2,35,2,1,4
+"Singapore",6,29,8,1,4
+"Singapore",8,28,10,0,3
+"Singapore",6,42,7,0,5
+"Singapore",7,24,5,0,5
+"Singapore",5,19,8,1,6
+"Singapore",8,77,8,1,0
+"Singapore",6,63,7,0,3
+"Singapore",8,20,10,0,8
+"Singapore",4,41,5,1,3
+"Singapore",8,43,7,1,4
+"Singapore",1,26,3,1,5
+"Singapore",7,19,5,1,6
+"Singapore",7,50,10,1,4
+"Singapore",8,28,7,1,3
+"Singapore",3,58,5,0,3
+"Singapore",7,33,7,1,5
+"Singapore",5,62,7,1,1
+"Slovakia",6,36,8,1,3
+"Slovakia",7,43,8,1,3
+"Slovakia",7,75,7,1,4
+"Slovakia",8,72,8,1,4
+"Slovakia",3,71,7,1,1
+"Slovakia",7,22,9,1,4
+"Slovakia",7,53,8,0,3
+"Slovakia",10,74,10,1,5
+"Slovakia",8,66,8,1,3
+"Slovakia",5,61,8,0,4
+"Slovakia",7,75,7,1,2
+"Slovakia",3,53,6,0,1
+"Slovakia",9,37,8,1,3
+"Slovakia",6,64,7,0,2
+"Slovakia",5,55,5,0,3
+"Slovakia",5,85,3,1,4
+"Slovakia",9,69,10,1,5
+"Slovakia",7,69,7,0,1
+"Slovakia",3,44,3,1,0
+"Slovakia",3,54,3,1,5
+"Slovakia",7,56,7,0,4
+"Slovakia",7,82,10,1,1
+"Slovakia",9,59,10,1,4
+"Slovakia",9,39,8,0,4
+"Slovakia",2,72,3,1,3
+"Slovakia",5,59,6,1,0
+"Slovakia",7,64,5,0,0
+"Slovakia",8,39,10,1,2
+"Slovakia",5,72,5,1,4
+"Slovakia",6,58,9,0,3
+"South Korea",7,48,6,1,5
+"South Korea",8,28,8,0,7
+"South Korea",7,24,7,1,2
+"South Korea",7,52,7,0,7
+"South Korea",7,73,6,1,2
+"South Korea",7,62,7,1,4
+"South Korea",5,24,6,1,5
+"South Korea",7,28,9,1,4
+"South Korea",7,22,8,1,6
+"South Korea",8,49,7,0,5
+"South Korea",6,46,7,0,2
+"South Korea",7,51,8,1,0
+"South Korea",9,53,7,0,2
+"South Korea",7,48,5,0,3
+"South Korea",7,54,5,1,4
+"South Korea",9,44,9,1,3
+"South Korea",8,46,8,0,4
+"South Korea",7,64,6,1,5
+"South Korea",6,50,9,0,5
+"South Korea",7,25,3,0,5
+"South Korea",7,25,7,0,2
+"South Korea",8,33,9,1,6
+"South Korea",7,41,6,0,4
+"South Korea",7,43,8,1,3
+"South Korea",4,43,6,1,5
+"South Korea",7,34,7,1,5
+"South Korea",7,34,5,0,6
+"South Korea",7,59,8,0,6
+"South Korea",7,58,7,1,1
+"South Korea",7,44,7,1,3
+"Taiwan",7,29,10,1,5
+"Taiwan",6,55,9,1,4
+"Taiwan",5,58,5,1,2
+"Taiwan",8,79,8,1,0
+"Taiwan",6,62,8,0,2
+"Taiwan",7,43,5,1,5
+"Taiwan",9,47,10,1,2
+"Taiwan",6,44,8,0,0
+"Taiwan",5,25,9,1,4
+"Taiwan",8,47,5,1,5
+"Taiwan",7,30,5,1,2
+"Taiwan",8,42,10,0,5
+"Taiwan",7,53,6,0,2
+"Taiwan",9,43,10,0,5
+"Taiwan",5,25,5,1,6
+"Taiwan",9,65,10,1,4
+"Taiwan",7,19,7,1,3
+"Taiwan",5,36,7,1,3
+"Taiwan",8,44,9,0,6
+"Taiwan",5,29,8,0,5
+"Taiwan",8,73,6,0,4
+"Taiwan",2,51,3,1,4
+"Taiwan",6,29,4,0,4
+"Taiwan",8,75,6,1,4
+"Taiwan",7,32,5,1,5
+"Taiwan",5,71,7,0,4
+"Taiwan",9,23,10,0,7
+"Taiwan",6,41,5,0,6
+"Taiwan",10,59,9,1,1
+"Taiwan",6,42,8,1,3
+"Tajikistan",6,24,6,1,4
+"Tajikistan",10,32,5,1,0
+"Tajikistan",8,67,8,1,3
+"Tajikistan",10,38,9,1,7
+"Tajikistan",10,35,10,0,3
+"Tajikistan",7,56,5,0,5
+"Tajikistan",8,25,6,1,6
+"Tajikistan",10,50,9,1,2
+"Tajikistan",7,82,5,0,5
+"Tajikistan",7,26,5,1,3
+"Tajikistan",6,35,10,0,3
+"Tajikistan",9,66,8,0,4
+"Tajikistan",10,46,10,0,3
+"Tajikistan",8,51,10,0,7
+"Tajikistan",8,70,8,0,4
+"Tajikistan",10,26,7,1,1
+"Tajikistan",5,46,7,0,6
+"Tajikistan",9,26,6,0,4
+"Tajikistan",8,30,9,0,6
+"Tajikistan",6,33,6,0,3
+"Tajikistan",8,77,5,1,8
+"Tajikistan",5,59,7,0,5
+"Tajikistan",5,38,5,1,4
+"Tajikistan",8,39,6,0,3
+"Tajikistan",6,20,5,1,2
+"Tajikistan",7,32,7,0,2
+"Tajikistan",9,56,6,0,4
+"Tajikistan",10,18,6,1,6
+"Tajikistan",6,24,10,0,6
+"Tajikistan",1,57,7,1,5
+"Thailand",6,18,4,1,3
+"Thailand",9,32,10,1,2
+"Thailand",7,66,10,1,0
+"Thailand",3,35,5,0,0
+"Thailand",9,68,6,0,1
+"Thailand",9,40,8,0,4
+"Thailand",8,34,10,1,0
+"Thailand",9,21,8,0,6
+"Thailand",9,52,6,0,1
+"Thailand",7,53,5,1,2
+"Thailand",9,54,9,0,0
+"Thailand",5,38,5,1,3
+"Thailand",10,52,7,1,4
+"Thailand",8,24,6,0,2
+"Thailand",10,52,6,0,5
+"Thailand",5,59,5,0,0
+"Thailand",8,33,8,0,2
+"Thailand",7,48,8,0,2
+"Thailand",7,47,7,1,3
+"Thailand",4,63,5,1,0
+"Thailand",8,50,8,1,1
+"Thailand",5,46,5,0,4
+"Thailand",5,56,9,1,0
+"Thailand",9,64,3,1,2
+"Thailand",4,53,3,1,0
+"Thailand",5,25,5,1,4
+"Thailand",10,66,10,1,2
+"Thailand",7,39,9,0,5
+"Thailand",9,25,8,1,3
+"Thailand",10,45,9,0,2
+"Tunisia",5,64,4,1,0
+"Tunisia",10,72,10,1,1
+"Tunisia",3,77,6,1,0
+"Tunisia",5,51,4,1,0
+"Tunisia",3,39,2,0,2
+"Tunisia",5,52,7,1,3
+"Tunisia",9,36,6,1,2
+"Tunisia",10,38,9,0,6
+"Tunisia",6,52,5,1,0
+"Tunisia",7,30,8,0,4
+"Tunisia",9,54,9,0,2
+"Tunisia",7,44,7,1,3
+"Tunisia",5,22,6,1,2
+"Tunisia",9,50,6,0,2
+"Tunisia",7,52,5,0,5
+"Tunisia",5,24,6,1,2
+"Tunisia",1,62,1,1,0
+"Tunisia",7,45,10,0,4
+"Tunisia",5,36,5,1,4
+"Tunisia",1,41,3,1,0
+"Tunisia",4,21,4,0,4
+"Tunisia",3,57,5,1,4
+"Tunisia",10,23,10,1,1
+"Tunisia",5,25,7,1,4
+"Tunisia",7,20,6,1,3
+"Tunisia",10,32,5,1,4
+"Tunisia",9,29,8,0,1
+"Tunisia",2,30,5,1,1
+"Tunisia",4,28,6,1,3
+"Tunisia",3,21,2,1,3
+"Turkey",5,55,10,0,2
+"Turkey",2,53,4,1,3
+"Turkey",9,31,9,1,1
+"Turkey",2,36,10,1,4
+"Turkey",10,34,6,1,1
+"Turkey",6,47,7,1,1
+"Turkey",6,46,9,0,5
+"Turkey",5,25,6,0,2
+"Turkey",6,45,8,0,0
+"Turkey",8,58,4,0,5
+"Turkey",5,18,7,1,3
+"Turkey",4,30,5,0,1
+"Turkey",7,53,9,0,2
+"Turkey",7,37,9,0,0
+"Turkey",6,33,5,0,3
+"Turkey",7,47,8,0,3
+"Turkey",9,35,5,1,6
+"Turkey",7,34,5,0,3
+"Turkey",7,33,4,1,6
+"Turkey",6,25,4,1,5
+"Turkey",6,24,8,1,3
+"Turkey",8,18,10,0,0
+"Turkey",10,27,8,0,4
+"Turkey",8,35,8,0,0
+"Turkey",10,51,9,0,5
+"Turkey",4,34,7,0,3
+"Turkey",7,34,6,1,2
+"Turkey",8,36,7,0,0
+"Turkey",7,60,8,0,3
+"Turkey",5,31,7,1,1
+"Ukraine",6,54,10,0,5
+"Ukraine",6,24,7,1,5
+"Ukraine",7,60,6,1,8
+"Ukraine",5,32,7,0,5
+"Ukraine",5,66,3,1,5
+"Ukraine",5,67,4,0,6
+"Ukraine",8,32,6,1,5
+"Ukraine",8,63,1,1,5
+"Ukraine",8,19,7,1,6
+"Ukraine",5,20,5,0,6
+"Ukraine",6,44,5,1,3
+"Ukraine",7,41,9,0,5
+"Ukraine",1,44,10,1,5
+"Ukraine",3,53,7,1,5
+"Ukraine",7,62,7,1,1
+"Ukraine",3,70,6,1,6
+"Ukraine",8,53,10,1,3
+"Ukraine",8,36,6,0,5
+"Ukraine",4,37,7,1,6
+"Ukraine",7,40,8,1,6
+"Ukraine",7,42,6,0,5
+"Ukraine",10,20,10,1,8
+"Ukraine",4,69,7,1,7
+"Ukraine",10,41,10,0,6
+"Ukraine",6,56,10,0,6
+"Ukraine",3,57,6,1,3
+"Ukraine",8,42,4,0,4
+"Ukraine",7,59,3,0,6
+"Ukraine",5,32,5,1,4
+"Ukraine",10,57,7,1,7
+"United States",8,30,8,1,5
+"United States",10,37,10,1,4
+"United States",7,27,6,1,7
+"United States",8,29,7,1,5
+"United States",9,33,7,1,6
+"United States",7,41,6,0,3
+"United States",8,23,8,0,3
+"United States",8,52,6,1,5
+"United States",6,27,6,1,6
+"United States",7,23,10,0,6
+"United States",4,27,5,0,5
+"United States",9,39,10,1,5
+"United States",7,51,8,0,4
+"United States",9,32,9,1,6
+"United States",8,33,7,1,5
+"United States",8,60,9,1,5
+"United States",9,27,7,0,5
+"United States",7,64,8,0,5
+"United States",7,23,8,0,7
+"United States",9,41,8,1,6
+"United States",8,61,10,0,5
+"United States",7,57,9,0,5
+"United States",2,38,1,0,4
+"United States",7,26,9,1,6
+"United States",4,47,5,0,5
+"United States",4,28,7,0,6
+"United States",8,36,7,0,2
+"United States",5,62,5,1,3
+"United States",7,34,3,0,3
+"United States",8,44,8,1,5
+"Uruguay",10,20,8,1,4
+"Uruguay",7,40,10,1,3
+"Uruguay",8,41,9,1,6
+"Uruguay",7,24,9,0,3
+"Uruguay",9,54,10,1,3
+"Uruguay",8,67,10,1,4
+"Uruguay",6,20,10,1,2
+"Uruguay",7,68,8,1,6
+"Uruguay",9,81,10,1,0
+"Uruguay",5,20,7,0,4
+"Uruguay",5,32,5,1,3
+"Uruguay",10,76,9,0,4
+"Uruguay",8,33,8,0,6
+"Uruguay",10,59,8,1,0
+"Uruguay",8,63,8,0,4
+"Uruguay",8,36,8,1,1
+"Uruguay",8,88,7,0,4
+"Uruguay",10,28,10,0,3
+"Uruguay",9,22,9,1,0
+"Uruguay",9,70,10,0,8
+"Uruguay",7,62,9,1,5
+"Uruguay",10,47,8,1,3
+"Uruguay",9,67,10,1,0
+"Uruguay",10,33,10,0,4
+"Uruguay",5,29,8,1,2
+"Uruguay",6,66,5,1,3
+"Uruguay",4,86,5,0,5
+"Uruguay",8,34,9,0,6
+"Uruguay",7,26,10,0,5
+"Uruguay",8,34,10,0,3
+"Uzbekistan",7,52,10,0,5
+"Uzbekistan",5,69,10,0,5
+"Uzbekistan",7,23,10,0,5
+"Uzbekistan",5,36,8,1,6
+"Uzbekistan",8,33,8,1,4
+"Uzbekistan",1,62,2,0,4
+"Uzbekistan",7,21,6,0,4
+"Uzbekistan",7,41,8,0,6
+"Uzbekistan",10,53,10,1,2
+"Uzbekistan",6,35,10,1,6
+"Uzbekistan",2,20,3,0,7
+"Uzbekistan",5,32,9,0,4
+"Uzbekistan",6,36,5,1,7
+"Uzbekistan",5,43,1,1,6
+"Uzbekistan",10,41,9,1,6
+"Uzbekistan",7,41,5,1,7
+"Uzbekistan",7,58,10,1,3
+"Uzbekistan",8,20,8,1,6
+"Uzbekistan",1,23,1,0,5
+"Uzbekistan",6,31,5,0,5
+"Uzbekistan",8,30,7,1,4
+"Uzbekistan",4,25,2,0,4
+"Uzbekistan",5,25,6,1,4
+"Uzbekistan",4,19,8,0,5
+"Uzbekistan",10,32,5,1,6
+"Uzbekistan",6,32,5,0,5
+"Uzbekistan",10,21,10,0,4
+"Uzbekistan",7,31,9,1,5
+"Uzbekistan",6,23,5,1,3
+"Uzbekistan",8,25,9,0,6
+"Venezuela",5,29,4,0,6
+"Venezuela",7,19,10,0,2
+"Venezuela",5,26,6,1,3
+"Venezuela",10,55,10,1,3
+"Venezuela",6,40,5,0,4
+"Venezuela",6,31,1,0,4
+"Venezuela",7,21,10,0,3
+"Venezuela",10,25,10,0,4
+"Venezuela",6,22,10,1,3
+"Venezuela",6,18,7,1,6
+"Venezuela",8,32,10,0,2
+"Venezuela",10,45,10,0,4
+"Venezuela",7,62,6,0,2
+"Venezuela",8,50,7,0,5
+"Venezuela",8,40,10,0,3
+"Venezuela",6,33,5,1,4
+"Venezuela",9,23,5,0,4
+"Venezuela",7,31,4,0,4
+"Venezuela",6,23,5,0,5
+"Venezuela",10,62,9,0,6
+"Venezuela",5,21,4,1,5
+"Venezuela",6,48,9,1,2
+"Venezuela",10,54,7,0,3
+"Venezuela",7,75,10,1,2
+"Venezuela",4,51,3,0,5
+"Venezuela",6,24,4,0,5
+"Venezuela",8,37,10,0,4
+"Venezuela",10,77,5,1,5
+"Venezuela",10,41,9,1,2
+"Venezuela",8,57,10,0,4
+"Vietnam",7,66,8,1,2
+"Vietnam",9,43,10,1,4
+"Vietnam",7,44,9,1,3
+"Vietnam",7,43,5,0,3
+"Vietnam",8,35,10,1,3
+"Vietnam",8,24,9,1,7
+"Vietnam",7,42,9,0,3
+"Vietnam",6,36,9,1,2
+"Vietnam",7,44,8,1,0
+"Vietnam",7,61,6,1,3
+"Vietnam",9,26,10,1,5
+"Vietnam",9,19,9,0,5
+"Vietnam",10,27,10,1,5
+"Vietnam",9,26,10,0,6
+"Vietnam",6,49,6,0,4
+"Vietnam",7,33,9,1,1
+"Vietnam",8,49,8,1,2
+"Vietnam",6,33,3,0,4
+"Vietnam",10,19,9,1,3
+"Vietnam",8,40,8,0,3
+"Vietnam",10,51,10,0,1
+"Vietnam",7,51,8,1,3
+"Vietnam",7,38,10,1,2
+"Vietnam",7,44,7,1,4
+"Vietnam",8,26,7,1,4
+"Vietnam",7,39,8,0,4
+"Vietnam",5,30,9,1,3
+"Vietnam",8,42,8,0,3
+"Vietnam",9,31,10,0,3
+"Vietnam",7,41,8,1,1
+"Zimbabwe",5,81,10,1,0
+"Zimbabwe",10,48,10,1,3
+"Zimbabwe",10,33,8,1,2
+"Zimbabwe",4,24,10,1,1
+"Zimbabwe",4,45,7,0,2
+"Zimbabwe",10,33,1,1,3
+"Zimbabwe",10,28,9,0,3
+"Zimbabwe",1,53,8,0,1
+"Zimbabwe",6,30,10,1,0
+"Zimbabwe",1,47,5,1,2
+"Zimbabwe",10,53,10,0,2
+"Zimbabwe",5,75,1,0,1
+"Zimbabwe",5,25,8,1,1
+"Zimbabwe",5,23,5,0,4
+"Zimbabwe",10,38,10,0,4
+"Zimbabwe",8,37,7,0,4
+"Zimbabwe",10,63,8,0,3
+"Zimbabwe",10,56,10,1,4
+"Zimbabwe",7,37,7,0,1
+"Zimbabwe",1,33,3,1,2
+"Zimbabwe",4,21,1,1,3
+"Zimbabwe",10,40,1,0,3
+"Zimbabwe",4,72,10,0,2
+"Zimbabwe",7,19,6,0,4
+"Zimbabwe",4,54,10,0,2
+"Zimbabwe",10,25,7,0,4
+"Zimbabwe",1,25,10,0,2
+"Zimbabwe",10,55,10,1,5
+"Zimbabwe",8,36,7,0,2
+"Zimbabwe",5,26,10,0,4
