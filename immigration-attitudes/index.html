@@ -165,6 +165,9 @@ dl.items dd { margin: 2px 0 0; }
 .about .src { font-size: 14px; color: var(--graphite); padding-left: 2em; text-indent: -2em; margin-bottom: 5px; }
 .about a { color: var(--ink); text-underline-offset: 3px; word-break: break-all; }
 .figwrap { position: relative; }
+h3.sub3 { font-family: var(--serif); font-weight: 500; font-size: 17px; margin: 22px 0 6px; }
+p.lead3 { font-size: 14.5px; margin: 0 0 10px; max-width: 80ch; }
+p.introlead { font-size: 14px; color: var(--graphite); margin: 8px 0 0; }
 .figwrap .tip.hdr { position: absolute; margin: 0; }
 
 @media (max-width: 960px) {
@@ -190,22 +193,32 @@ dl.items dd { margin: 2px 0 0; }
 <div class="wrap">
   <header>
     <h1>Ten questions, one attitude?</h1>
-    <p class="sub">In 2017 the World Values Survey, an international academic survey, asked adults in the United States ten questions about the effects of immigration. Combine the answers of the 2,455 who answered all ten into one index, then see what alpha and factor analysis say about whether one number can stand for them.</p>
+    <p class="sub">The World Values Survey, an international academic survey, asks the same ten questions about the effects of immigration in dozens of countries. Pick the United States, surveyed in 2017, or Great Britain, surveyed in 2022, combine the answers into one index, and see what alpha and factor analysis say about whether one number can stand for them.</p>
     <details class="intro"><summary>What to try</summary>
+      <p class="introlead">The numbers below are for the United States, the country shown first.</p>
       <ul>
         <li><b>Turn off the reversal.</b> Five questions run the other way: agreeing that immigrants increase crime is the less favorable answer. Left as they are, these questions pull against the rest, and alpha falls from 0.82 to 0.35. The first principal component and the one-factor scores do not change, because they work out the direction of each question from the data.</li>
         <li><b>Compare one factor with two.</b> An alpha of 0.82 is high enough for most readers to call the ten questions one scale. Yet a model with one common factor fits poorly: its RMSEA, a measure of misfit, is 0.144, where values above 0.10 are usually called poor. Two factors fit well (0.038), and parallel analysis also keeps two. One factor gathers the four statements of harm, the other the four statements of benefit.</li>
         <li><b>Drop the asylum question.</b> It goes least with the rest (item-rest correlation 0.20), and alpha rises slightly without it, from 0.82 to 0.83. Whether it belongs in an index of views on immigration is still a question about content, not about alpha.</li>
-        <li><b>Rotate.</b> Try varimax, promax, oblimin, and geomin. The fit and the share of each question that the factors explain stay the same; only the loadings change. In the loading plot the questions stay put and the axes move. Varimax keeps the axes at right angles; oblimin lets them lean toward each other until they meet at 62 degrees, and the cosine of that angle, 0.47, is the correlation between the two factors. All four rotations find the same two factors.</li>
+        <li><b>Rotate.</b> Try varimax, promax, oblimin, and geomin. The fit and the share of each question that the factors explain stay the same; only the loadings change. In the loading plot the questions keep their places relative to one another; only the lines of the factors move. Varimax keeps the axes at right angles; oblimin lets them lean toward each other until they meet at 62 degrees, and the cosine of that angle, 0.47, is the correlation between the two factors. All four rotations find the same two factors.</li>
         <li><b>Ask for three factors.</b> The third factor is a single question, the statement that immigration gives asylum to political refugees (<code>Q125</code>). The model explains 99.5% of the variation in its answers, the ceiling of the fitting procedure. Survey answers always contain some error, so a factor that explains one question completely is a sign of one factor too many.</li>
-        <li><b>See who holds which view.</b> With the reversal on, a high score on either factor means a favorable view: seeing little harm, or seeing many benefits. Each additional level of education goes with a score 0.22 standard deviations higher on the benefit factor and 0.11 higher on the harm factor; a bachelor's degree is three levels above a high-school diploma. The average of all ten answers lands in between, at 0.19, and hides the difference. Age works the other way round: each decade goes with seeing more harm (0.09 standard deviations) and slightly fewer benefits (0.03). The page offers two readings of the education gap below the regressions.</li>
-        <li><b>Open Advanced.</b> With omega instead of alpha, the reliability of the index depends on the factor model: 0.82 with one factor, 0.85 with two. With polychoric correlations the loadings rise, for <code>Q122</code> from 0.72 to 0.81, but the regressions on the two factors barely move.</li>
+        <li><b>See who holds which view.</b> With the reversal on, a high score on either factor means a favorable view: seeing little harm, or seeing many benefits. Each additional level of education goes with a score 0.22 standard deviations higher on the benefit factor and 0.11 higher on the harm factor; a bachelor's degree is three levels above a high-school diploma. The average of all ten answers lands in between, at 0.19, and hides the difference. Age works the other way round: each decade goes with seeing more harm (0.09 standard deviations) and slightly fewer benefits (0.03). Below the regressions, a model that allows for a habit of agreeing tells a different story.</li>
+        <li><b>Open Advanced.</b> With omega instead of alpha, the reliability of the index depends on the factor model: 0.82 with one factor, 0.85 with two. With polychoric correlations the loadings rise, for <code>Q122</code> from 0.72 to 0.81; the benefit factor now comes first, but the regressions on the two factors barely move.</li>
+        <li><b>Switch to Great Britain.</b> The ten questions split the same way, but parallel analysis and BIC both favor three factors there. The third is not a single question: it gathers the statements that immigration gives asylum to political refugees and helps poor people establish new lives, a humanitarian side of the benefits. In the model with a habit of agreeing, the habit shows no clear link with education in Britain, while in the United States it rises with it.</li>
       </ul>
     </details>
   </header>
 
   <div class="main">
     <aside class="controls">
+      <div>
+        <h2>The survey</h2>
+        <div class="field">
+          <label class="name" for="country" style="display:block;font-size:14.5px;margin-bottom:4px">Country</label>
+          <select id="country"></select>
+          <p class="hint" id="country-hint"></p>
+        </div>
+      </div>
       <div>
         <h2>The questions</h2>
         <div class="field" id="itembox"></div>
@@ -265,7 +278,7 @@ dl.items dd { margin: 2px 0 0; }
             <p class="hint">In parallel analysis, instead of factors.</p>
           </div>
           <div class="field">
-            <div class="advrow"><label class="toggle"><input type="checkbox" id="structure"><span class="track"></span><span>Structure loadings</span></label><button class="tip" type="button" aria-label="Explain: structure loadings" data-tip="When the factors correlate, as with promax, oblimin, and geomin, a loading can mean two things. Pattern loadings, shown by default, say how much a factor contributes to a question with the other factor held fixed. Structure loadings are the plain correlations between the question and each factor. They are larger, because correlated factors share credit for the same answers.">?</button></div>
+            <div class="advrow"><label class="toggle"><input type="checkbox" id="structure"><span class="track"></span><span>Structure loadings</span></label><button class="tip" type="button" aria-label="Explain: structure loadings" data-tip="When the factors correlate, as with promax, oblimin, and geomin, a loading can mean two things. Pattern loadings, shown by default, say how much a factor contributes to a question with the other factor held fixed. Structure loadings are the plain correlations between the question and each factor. They are usually larger, because correlated factors share credit for the same answers; a question that loads negatively on the other factor can have a smaller one.">?</button></div>
             <p class="hint">Correlations of questions with factors.</p>
           </div>
         </details>
@@ -315,6 +328,7 @@ dl.items dd { margin: 2px 0 0; }
         <div class="tblwrap" id="regtbl" style="margin-top:12px"></div>
         <p class="cap" id="regcap"></p>
         <div class="lines" id="reginterp"></div>
+        <div id="habitbox"></div>
       </section>
 
       <section class="block">
@@ -330,7 +344,7 @@ dl.items dd { margin: 2px 0 0; }
 
   <section class="about">
     <h2 class="sec">Data</h2>
-    <p>The data come from the seventh wave of the World Values Survey, which interviewed people in 64 countries and territories between 2017 and 2022 (Haerpfer et al. 2022). The survey in the United States, in 2017, had 2,596 respondents. The page uses the 2,455 who answered all ten questions below, counting "don't know" and refusals as missing. The survey's weights are not applied, so the numbers describe these respondents rather than all American adults.</p>
+    <p>The data come from the seventh wave of the World Values Survey, which interviewed people in 64 countries and territories between 2017 and 2022 (Haerpfer et al. 2022). The page uses two of its national surveys: the United States in 2017, with 2,596 respondents, and Great Britain in 2022, with 2,609; Northern Ireland was surveyed separately. In each, the page uses the respondents who answered all ten questions below, 2,455 in the United States and 2,407 in Britain, counting "don't know", refusals, and other missing codes as missing. The survey weights are not applied, so the numbers describe these respondents rather than all adults in either country.</p>
     <dl class="items">
       <dt><code>Q121</code> Impact on the country</dt>
       <dd>"Now we would like to know your opinion about the people from other countries who come to live in this country - the immigrants. How would you evaluate the impact of these people on the development of this country?" Five answers, coded from 1, the most negative, through 3, neither good nor bad, to 5, very good.</dd>
@@ -339,37 +353,38 @@ dl.items dd { margin: 2px 0 0; }
       <dt><code>Q130</code> Who may come to work</dt>
       <dd>"How about people from other countries coming here to work. Which one of the following do you think the government should do?" 1 = let anyone come who wants to, 2 = let people come as long as there are jobs available, 3 = place strict limits on the number of foreigners who can come here, 4 = prohibit people coming here from other countries.</dd>
       <dt>Background</dt>
-      <dd>Education is the highest level completed, on the international ISCED scale from 0, none or early childhood education only, to 8, a doctorate; 3 is upper secondary school, in the United States a high-school diploma, and 6 a bachelor's degree (<code>Q275</code>). Age is in years and enters per decade (<code>Q262</code>). Female is 1 for women (<code>Q260</code>). Born abroad is 1 for respondents who say they are immigrants to the country (<code>Q263</code>). Of the 2,455, 2,402 answered all four and enter the regressions; 251 of them were born abroad.</dd>
+      <dd>Education is the highest level completed, on the international ISCED scale from 0, none or early childhood education only, to 8, a doctorate; 3 is upper secondary school and 6 a bachelor's degree (<code>Q275</code>). Age is in years and enters per decade (<code>Q262</code>). Female is 1 for women (<code>Q260</code>). Born abroad is 1 for respondents who say they are immigrants to the country (<code>Q263</code>). The regressions use those who also answered these four questions: 2,402 in the United States, 251 of them born abroad, and 2,130 in Britain, 282 of them born abroad.</dd>
     </dl>
-    <p>The survey's conditions of use do not allow its data files to be passed on, so the page holds no individual answers. It holds summary numbers computed from the file: how many people gave each answer, the means and standard deviations, the correlations among the ten questions, and their covariances with the four background questions. The R script that computed them is under the R code.</p>
+    <p>The survey's conditions of use do not allow its data files to be passed on, so the page holds no individual answers. It holds summary numbers computed from the file for each country: how many people gave each answer, the means and standard deviations, the correlations among the ten questions, their covariances with the four background questions, and the estimates of the model with a habit of agreeing. The R script that computed them is under the R code.</p>
 
     <h2 class="sec">How the page computes</h2>
-    <p>Everything on the page is computed in the browser from those summary numbers, with the formulas of the R packages psych and GPArotation. The R code below runs the same analysis on the survey file and gives the same numbers to three decimals, with two exceptions. Parallel analysis compares the data with random data, so its yardstick varies a little from run to run, and in close cases R and the page can keep different numbers of factors. With three or four factors, when one question ends up almost fully explained, R and the page can settle on different solutions that fit about equally well.</p>
+    <p>Everything on the page except the model with a habit of agreeing is computed in the browser from those summary numbers, with the formulas of the R packages psych and GPArotation; that model is estimated in R with the package lavaan. The R code below runs the same analysis on the survey file and gives the same numbers to three decimals, with two exceptions. Parallel analysis compares the data with random data, so its yardstick varies a little from run to run, and in close cases R and the page can keep different numbers of factors. With three or four factors, when one question ends up almost fully explained, R and the page can settle on different solutions that fit about equally well.</p>
 
     <h2 class="sec">Notes on method</h2>
-    <p>Alpha measures how consistently the questions in an index go together, from 0 to 1. It rises with the number of questions, and it can be high even when the questions measure two different things, as here. When the errors in the answers are unrelated, alpha is a lower bound on the reliability of the index, equal to it only if every question measures the same thing equally well. When the errors are related, as a shared habit of answering makes them, alpha can overstate the reliability. Omega, under Advanced, uses the loadings of a factor model and gives the share of the index's variation that the factors account for; it is only as good as that model.</p>
-    <p>A factor model looks for a few unobserved variables, the factors, that would explain the correlations among the questions. A loading is the correlation between a question and a factor: near 0, the question has little to do with the factor; near 1, it follows the factor closely. The page fits the model as psych does by default, by making the correlations the model predicts as close as possible to the observed ones ("minres"). RMSEA, TLI, and BIC compare how well models with different numbers of factors fit. Parallel analysis keeps each factor whose eigenvalue, a measure of how much of the shared variation the factor takes, is larger than in 95% of random data sets of the same size. Fitted to random data, a one-factor model often lets a single question take nearly the whole factor, so the yardstick for the first factor is close to 1; psych does the same. Chapter 6 of Revelle's online book is a readable guide to all of this, with R code (Revelle, in preparation).</p>
-    <p>Rotation changes the axes, not the model: every rotation of the same solution fits the data equally well. Varimax keeps the axes at right angles and makes the loadings on each factor as unequal as possible, a few large and the rest near zero. Promax, oblimin, and geomin let the axes lean toward each other, so that the factors can correlate. Promax raises the varimax loadings to the fourth power to make a target and then finds the leaning axes that come closest to it. Oblimin, the default in psych, and geomin, the default of the <code>efa()</code> function in the R package lavaan, each reward loadings near zero in their own way. Factor scores give each respondent a value on each factor; for two or more factors the page uses psych's default, which keeps the scores correlated as the factors are.</p>
+    <p>Alpha measures how consistently the questions in an index go together, from 0 to 1. It rises with the number of questions, and it can be high even when the questions measure two different things, as here. When the errors in the answers are unrelated, alpha is a lower bound on the reliability of the index, equal to it only if every question measures the same thing equally well. When the errors are related, alpha can be off in either direction: a habit of agreeing inflates it when all statements run one way, and deflates it when, as here, they run both ways and some are reversed. Omega, under Advanced, uses the loadings of a factor model and gives the share of the index's variation that the factors account for; it is only as good as that model.</p>
+    <p>A factor model looks for a few unobserved variables, the factors, that would explain the correlations among the questions. A loading says how strongly a question goes with a factor. With one factor, or with axes kept at right angles, it is the correlation between the two: near 0, the question has little to do with the factor; near 1, it follows the factor closely. With axes that lean it is the weight of the factor in the question, which is not a correlation. The page fits the model as psych does by default, by making the correlations the model predicts as close as possible to the observed ones ("minres"). RMSEA, TLI, and BIC compare how well models with different numbers of factors fit. Parallel analysis keeps each factor whose eigenvalue, a measure of how much of the shared variation the factor takes, is larger than in 95% of random data sets of the same size. Fitted to random data, a one-factor model often lets a single question take nearly the whole factor, so the yardstick for the first factor is close to 1; psych does the same. Chapter 6 of Revelle's online book is a readable guide to all of this, with R code (Revelle, in preparation).</p>
+    <p>Rotation changes the axes, not the model: every rotation of the same solution fits the data equally well. Varimax keeps the axes at right angles and makes the loadings on each factor as unequal as possible, a few large and the rest near zero. Promax, oblimin, and geomin let the axes lean toward each other, so that the factors can correlate. Promax raises the varimax loadings to the fourth power to make a target and then finds the leaning axes that come closest to it. Oblimin, the default in psych, and geomin, the default of the <code>efa()</code> function in the R package lavaan, each reward loadings near zero in their own way. Factor scores give each respondent a value on each factor. For two or more factors the page uses ten Berge scores, the default of psych's <code>factor.scores()</code> function, which keep the scores correlated as the factors are; with one factor it uses regression scores, which are proportional to them.</p>
     <p>A correlation between questions with three answers understates how strongly the opinions behind them go together. Polychoric correlations, under Advanced, estimate the latter by treating each answer as a cut through an opinion that varies smoothly. The loadings rise, but which question goes with which hardly changes.</p>
-    <p>The two factors follow the direction of the statements: the statements of harm go together, and so do the statements of benefit. Part of this split can come from a habit of agreeing with whatever statement is put to the respondent, which pushes answers to benefit and harm statements in opposite directions once the harm statements are reversed. Fitted to the eight statements alone, a two-factor model puts the correlation between the benefit and the harm factor at 0.44. Adding the habit as one more factor, acting equally on all eight statements, improves the fit and raises that correlation to 0.84 (Billiet and McClendon 2000). The code for that model is at the end of the R code. Because the benefit and the harm statements are worded in opposite directions, any difference between groups in that habit shows up as a difference between the two factors, so these questions cannot fully separate the two. Holding both views is also possible: a respondent can believe that immigrants fill useful jobs and that they raise unemployment. The regressions describe who holds which view; they do not say why.</p>
+    <p>The two factors follow the direction of the statements: the statements of harm go together, and so do the statements of benefit. Part of this split can come from a habit of agreeing with whatever statement is put to the respondent. A common way to model such a habit, when a set of agree-disagree statements runs both ways, is to add a factor that raises agreement with every statement by the same amount and is unrelated to the views themselves; the page reports that model under the regressions, and its code is at the end of the R code. Its results depend on those assumptions, and here they are fragile: fitted to the answers as ordered categories, the same model gives impossible estimates in both countries. Holding both views is also possible: a respondent can believe that immigrants fill useful jobs and that they raise unemployment. The regressions describe who holds which view; they do not say why.</p>
 
     <h2 class="sec">References</h2>
-    <p class="src">Billiet, Jaak B., and McKee J. McClendon. 2000. "Modeling Acquiescence in Measurement Models for Two Balanced Sets of Items." <i>Structural Equation Modeling</i> 7 (4): 608-28.</p>
     <p class="src">Haerpfer, Christian, Ronald Inglehart, Alejandro Moreno, Christian Welzel, Kseniya Kizilova, Jaime Diez-Medrano, Marta Lagos, Pippa Norris, Eduard Ponarin, and Bi Puranen, eds. 2022. <i>World Values Survey: Round Seven - Country-Pooled Datafile Version 5.0</i>. Madrid, Spain, and Vienna, Austria: JD Systems Institute and WVSA Secretariat. doi:10.14281/18241.20.</p>
     <p class="src">Revelle, William. In preparation. "Constructs, Components, and Factor Models." Chapter 6 in <i>An Introduction to Psychometric Theory with Applications in R</i>. Evanston, IL: Personality Project. <a href="https://www.personality-project.org/r/book/Chapter6.pdf">https://www.personality-project.org/r/book/Chapter6.pdf</a>.</p>
   </section>
 </div>
 
-<script id="data" type="application/json">{"source":"World Values Survey wave 7, country-pooled file, version 5.0","items":["Q121","Q122","Q123","Q124","Q125","Q126","Q127","Q128","Q129","Q130"],"background":["education","age10","female","immigrant"],"countries":[{"iso":"USA","name":"United States","year":2017,"n_sample":2596,"n":2455,"mean":[3.3824847,1.5327902,1.5413442,1.1164969,1.3132383,1.1808554,1.4158859,1.0940937,1.301833,2.3405295],"sd":[0.96470873,0.63422825,0.66571455,0.68891617,0.63966925,0.75523174,0.67266468,0.72930965,0.67537359,0.77483792],"counts":[[84,292,988,783,308],[188,771,1496],[239,648,1568],[456,1257,742],[238,1210,1007],[518,975,962],[257,920,1278],[548,1128,779],[301,1112,1042],[375,955,1039,86]],"r":[1,0.485331,0.497889,-0.414112,0.190755,-0.405398,0.37959,-0.406793,-0.262948,-0.484509,1,0.520137,-0.261491,0.235325,-0.259102,0.426982,-0.231764,-0.068304,-0.362711,1,-0.295724,0.227469,-0.295314,0.424319,-0.269463,-0.136981,-0.402555,1,-0.025509,0.622868,-0.191648,0.549964,0.38858,0.399719,1,-0.031275,0.284288,-0.052722,0.061208,-0.180767,1,-0.189828,0.556518,0.398648,0.43509,1,-0.19692,-0.079088,-0.303885,1,0.429604,0.385317,1,0.241138,1],"poly":[1,0.603842,0.629605,-0.488067,0.234616,-0.482021,0.461138,-0.477793,-0.318146,-0.558678,1,0.669954,-0.358885,0.320856,-0.362132,0.556183,-0.321572,-0.093861,-0.476267,1,-0.407428,0.317147,-0.421493,0.55987,-0.379498,-0.193468,-0.537205,1,-0.03225,0.742873,-0.25374,0.659831,0.49018,0.471646,1,-0.0401,0.377123,-0.068411,0.082923,-0.226385,1,-0.255165,0.670671,0.504065,0.506073,1,-0.264107,-0.103771,-0.381299,1,0.539401,0.454211,1,0.289488,1],"reg":{"n":2402,"mean":[3.386761,1.5370525,1.5466278,1.1190674,1.3168193,1.1827644,1.4204829,1.0949209,1.3051624,2.3405495,4.9154871,4.349209,0.46294754,0.10449625],"cov":[0.9294873,0.29615921,0.31827687,-0.28180494,0.11939811,-0.30270225,0.24380315,-0.29328676,-0.17596661,-0.36666827,0.42253748,-0.092259539,-0.032519062,0.05161307,0.40200014,0.216514,-0.11603374,0.093837185,-0.12776594,0.17891588,-0.10972426,-0.031928134,-0.18047018,0.30321601,-0.019066889,-0.03340372,0.0096625712,0.44118188,-0.13841547,0.097466154,-0.15159084,0.18696623,-0.13270768,-0.062756429,-0.209555,0.26487524,-0.095548275,-0.0007705643,0.016574935,0.47644594,-0.013165483,0.32516843,-0.090486513,0.27898901,0.18230886,0.21557802,-0.1702746,0.13474645,-0.0097471876,-0.013696763,0.41145377,-0.019610029,0.1216212,-0.027169848,0.024061408,-0.092943857,0.20171359,0.031633468,-0.013454011,0.0051971476,0.57258078,-0.099788424,0.30834224,0.20617814,0.25718399,-0.19987457,0.19899927,-0.00093043386,-0.011192776,0.45035912,-0.099487759,-0.039239479,-0.16283009,0.21505957,0.02782129,-0.013568105,0.0072714637,0.53575928,0.21342065,0.21963961,-0.16481927,0.15488561,-0.010225756,-0.014504434,0.45785755,0.12593802,-0.010850496,0.032873723,-0.018884027,-0.018157332,0.59867991,-0.22110306,0.23425533,-0.012782628,-0.011860864,2.4497476,-0.085177249,-0.14369915,0.046319342,2.6396599,-0.18089146,-0.0200964,0.24873067,-0.0017492018,0.09361576]}}]}</script>
+<script id="data" type="application/json">{"source":"World Values Survey wave 7, country-pooled file, version 5.0","items":["Q121","Q122","Q123","Q124","Q125","Q126","Q127","Q128","Q129","Q130"],"background":["education","age10","female","immigrant"],"countries":[{"iso":"USA","name":"United States","year":2017,"n_sample":2596,"n":2455,"mean":[3.38248472505,1.53279022403,1.54134419552,1.11649694501,1.31323828921,1.18085539715,1.41588594705,1.09409368635,1.30183299389,2.34052953157],"sd":[0.964708730799,0.634228248709,0.665714549573,0.688916170892,0.639669254008,0.75523174001,0.672664678869,0.729309650702,0.675373587802,0.774837920221],"counts":[[84,292,988,783,308],[188,771,1496],[239,648,1568],[456,1257,742],[238,1210,1007],[518,975,962],[257,920,1278],[548,1128,779],[301,1112,1042],[375,955,1039,86]],"r":[1,0.4853313753,0.4978890211,-0.4141120668,0.1907546197,-0.4053975273,0.3795900056,-0.4067928535,-0.2629479252,-0.4845086251,1,0.5201367701,-0.2614914063,0.2353247481,-0.2591020587,0.4269817747,-0.2317643972,-0.0683038916,-0.3627106514,1,-0.2957237628,0.2274692173,-0.29531402,0.4243191314,-0.2694627858,-0.1369813319,-0.4025548366,1,-0.0255090738,0.6228684796,-0.1916479254,0.5499635835,0.3885802253,0.3997191255,1,-0.0312754591,0.2842879535,-0.0527221567,0.0612077661,-0.1807671718,1,-0.1898275576,0.5565183787,0.3986480348,0.4350896573,1,-0.1969204515,-0.0790880576,-0.303884727,1,0.4296038287,0.3853172157,1,0.2411383554,1],"poly":[1,0.6038419357,0.6296049368,-0.4880671167,0.2346158782,-0.4820206972,0.4611379382,-0.477793101,-0.3181464862,-0.5586779805,1,0.6699541328,-0.3588848502,0.3208563438,-0.3621316085,0.5561828107,-0.3215721266,-0.0938606498,-0.4762673722,1,-0.4074282677,0.3171467524,-0.4214927193,0.5598695189,-0.3794982483,-0.1934681881,-0.53720482,1,-0.0322498054,0.7428733554,-0.2537404953,0.659831239,0.4901798934,0.4716459217,1,-0.0400999065,0.3771233167,-0.0684107239,0.0829225572,-0.2263845683,1,-0.2551647778,0.6706705177,0.5040653329,0.5060731586,1,-0.2641071862,-0.1037714641,-0.3812994995,1,0.5394009416,0.4542107656,1,0.2894877863,1],"poly_rev":[1,0.6038419357,0.6296049368,0.4880671167,0.2346158782,0.4820206972,0.4611379382,0.477793101,0.3181464862,0.5586779805,1,0.6699541328,0.3588848502,0.3208563438,0.3621316085,0.5561828107,0.3215721266,0.0938606498,0.4762673722,1,0.4074282677,0.3171467524,0.4214927193,0.5598695189,0.3794982483,0.1934681881,0.53720482,1,0.0322498054,0.7428733554,0.2537404953,0.659831239,0.4901798934,0.4716459217,1,0.0400999065,0.3771233167,0.0684107239,-0.0829225572,0.2263845683,1,0.2551647778,0.6706705177,0.5040653329,0.5060731586,1,0.2641071862,0.1037714641,0.3812994995,1,0.5394009416,0.4542107656,1,0.2894877863,1],"reg":{"n":2402,"mean":[3.38676103247,1.53705245629,1.54662781016,1.1190674438,1.31681931724,1.18276436303,1.42048293089,1.09492089925,1.3051623647,2.34054954205,4.91548709409,4.34920899251,0.462947543714,0.104496253122],"cov":[0.929487297306,0.296159212041,0.318276869789,-0.281804937646,0.119398106742,-0.302702246254,0.243803147523,-0.293286761934,-0.175966612579,-0.366668273454,0.422537480047,-0.0922595393746,-0.0325190621033,0.0516130699081,0.402000138022,0.216514004538,-0.116033736984,0.0938371848255,-0.127765942653,0.178915876364,-0.109724264904,-0.0319281343015,-0.180470182941,0.303216013589,-0.0190668889351,-0.0334037198628,0.00966257120871,0.441181876411,-0.138415474263,0.097466154298,-0.151590840758,0.186966227297,-0.132707680432,-0.0627564285073,-0.20955499738,0.264875237594,-0.0955482745359,-0.00077056430484,0.0165749352979,0.476445943804,-0.0131654830193,0.325168426561,-0.0904865132173,0.278989014083,0.182308856184,0.215578022063,-0.17027459763,0.134746450705,-0.00974718763102,-0.0136967631791,0.411453769089,-0.0196100292655,0.121621195165,-0.0271698477008,0.024061407941,-0.0929438573506,0.201713586588,0.0316334680145,-0.0134540111479,0.00519714759428,0.572580776605,-0.0997884242654,0.308342242911,0.206178143231,0.257183986273,-0.199874566558,0.198999272091,-0.000930433856834,-0.011192775977,0.450359116951,-0.0994877585352,-0.0392394786935,-0.162830086409,0.215059573082,0.0278212901161,-0.0135681046025,0.00727146370112,0.535759281537,0.213420650083,0.219639610334,-0.164819265911,0.154885610041,-0.0102257559212,-0.0145044338659,0.457857553802,0.125938019858,-0.010850495613,0.0328737228209,-0.0188840272978,-0.0181573317529,0.598679914454,-0.221103058294,0.234255328667,-0.0127826283872,-0.0118608642458,2.44974755523,-0.0851772488635,-0.143699145617,0.0463193416842,2.63965993215,-0.180891461752,-0.0200964002995,0.248730666968,-0.0017492017793,0.0936157602942]},"habit":{"n":2402,"r_two":-0.457322360106075,"r_habit":-0.853892763359691,"chisq":[155.301794081302,71.2882952844923],"df":[19,18],"habit_share":[0.0844674823568051,0.120357118343318],"r_habit_ordinal":-1.13425844919702,"ordinal_proper":false,"shift":{"agree_benefit":0.334512795659802,"agree_harm":-0.101892818676196,"hard_to_say":-0.286019248468439},"coef":[{"factor":"habit","predictor":"education","b":0.30739006591634,"se":0.0357315163875041,"p":0},{"factor":"habit","predictor":"age10","b":0.0418202632081524,"se":0.0396300161280123,"p":0.291303056378728},{"factor":"habit","predictor":"female","b":-0.221772016715453,"se":0.129889339571488,"p":0.0877492199701513},{"factor":"habit","predictor":"immigrant","b":-0.479431352886377,"se":0.204706624053196,"p":0.0191785963112485},{"factor":"benefit","predictor":"education","b":0.0886128715263259,"se":0.0313598919428059,"p":0.00471810661685002},{"factor":"benefit","predictor":"age10","b":-0.0561469387254143,"se":0.0299145374183189,"p":0.0605302270676771},{"factor":"benefit","predictor":"female","b":0.128003171942994,"se":0.0990019264873731,"p":0.196033135367496},{"factor":"benefit","predictor":"immigrant","b":0.515672380677898,"se":0.153634544514589,"p":0.00078939377562337},{"factor":"harm","predictor":"education","b":-0.262276647918188,"se":0.0199511284688585,"p":0},{"factor":"harm","predictor":"age10","b":0.0779959317139991,"se":0.0216210971026804,"p":0.00030928144674558},{"factor":"harm","predictor":"female","b":0.0381214963237187,"se":0.0722563494306505,"p":0.597786155270251},{"factor":"harm","predictor":"immigrant","b":0.0209945440919159,"se":0.114069134647848,"p":0.853973406210568}]}},{"iso":"GBR","name":"Great Britain","year":2022,"n_sample":2609,"n":2407,"mean":[3.63938512671,1.57249688409,1.62235147486,0.882426256751,1.53178230162,0.953884503531,1.75654341504,0.754050685501,1.14665558787,2.20897382634],"sd":[0.961215091104,0.60170832368,0.624292614032,0.725880275257,0.624159835607,0.782147325545,0.499099122423,0.757450663073,0.746627378847,0.64658646014],"counts":[[59,171,835,856,486],[141,747,1519],[186,537,1684],[792,1106,509],[169,789,1449],[794,930,683],[78,430,1899],[1059,881,467],[520,1014,873],[264,1416,687,40]],"r":[1,0.4569884706,0.495363224,-0.436671426,0.2331768144,-0.4268039446,0.1738602898,-0.4535389648,-0.3449924855,-0.4825698293,1,0.4142529553,-0.2397867948,0.2448022991,-0.2220681877,0.2013466087,-0.3247235892,-0.162911819,-0.2723791797,1,-0.3456590848,0.2702775823,-0.3267888317,0.2610451819,-0.3336194314,-0.2440457845,-0.3645401189,1,-0.131647446,0.589276812,-0.0767480051,0.4440340461,0.4175766165,0.3853375899,1,-0.0995869703,0.2650052107,-0.1355488971,-0.0452352125,-0.1621904495,1,-0.0351604549,0.4326484452,0.4656662144,0.400399019,1,-0.0979871418,-0.0167970726,-0.112746779,1,0.3563089566,0.3655197954,1,0.3170265748,1],"poly":[1,0.5747712863,0.6389428684,-0.5150833561,0.2943567519,-0.5048195693,0.2440319137,-0.5383040101,-0.4140006342,-0.5648052351,1,0.5658326611,-0.3248493843,0.3472174872,-0.3046169089,0.3156639984,-0.4391804841,-0.2272189229,-0.361392969,1,-0.4791052138,0.3920449965,-0.4626234013,0.4081115975,-0.4637430884,-0.3587236988,-0.5050440907,1,-0.1822660281,0.7042568168,-0.1205705945,0.5503226517,0.5202418166,0.4772794201,1,-0.1394991933,0.3984630953,-0.1883681545,-0.0620833341,-0.2125531903,1,-0.0583095678,0.5404208626,0.5735342975,0.4989199796,1,-0.1617214331,-0.0211488473,-0.1609819868,1,0.4575551604,0.4563032264,1,0.394845204,1],"poly_rev":[1,0.5747712863,0.6389428684,0.5150833561,0.2943567519,0.5048195693,0.2440319137,0.5383040101,0.4140006342,0.5648659598,1,0.5658326611,0.3248493843,0.3472174872,0.3046169089,0.3156639984,0.4391804841,0.2272189229,0.361392969,1,0.4791052138,0.3920449965,0.4626234013,0.4081115975,0.4637430884,0.3587236988,0.5050440907,1,0.1822660281,0.7042568168,0.1205705945,0.5503226517,0.5202418166,0.4772794201,1,0.1394991933,0.3984630953,0.1883681545,0.0620833341,0.2125531903,1,0.0583095678,0.5404208626,0.5735342975,0.4989199796,1,0.1617214331,0.0211488473,0.1609819868,1,0.4575551604,0.4563032264,1,0.394845204,1],"reg":{"n":2130,"mean":[3.65680751174,1.59061032864,1.63849765258,0.876525821596,1.54694835681,0.949295774648,1.77323943662,0.740845070423,1.15680751174,2.20046948357,4.30751173709,5.12539906103,0.569483568075,0.132394366197],"cov":[0.923497553349,0.254925387616,0.290155840318,-0.309187235516,0.128144316029,-0.335868853327,0.0677491912489,-0.337924966426,-0.254285443363,-0.299885771494,0.581395528329,-0.15886955678,-0.0163022600926,0.0637765531659,0.356511135074,0.147379029146,-0.104588766354,0.0835786599982,-0.110950720764,0.0532009341157,-0.148888256736,-0.0729280647089,-0.102015317205,0.30255999753,-0.051832794166,-0.00301095755683,0.0189985379633,0.386868573268,-0.155037631457,0.102935760799,-0.162067756468,0.0734590728967,-0.15666946725,-0.111910857662,-0.142620243144,0.340434024217,-0.17925914655,0.00869062819062,0.0197011094278,0.530073410559,-0.0545573424893,0.340378012556,-0.0219060724138,0.245111438948,0.229798203658,0.180706187965,-0.334018042811,0.161333937554,-0.0207730491293,-0.0099484648615,0.388823468445,-0.0483464431493,0.0700686032588,-0.0625103367977,-0.0181685068923,-0.0599093228543,0.215945902438,0.0872757604024,-0.000680299111091,-0.0113853624329,0.624952533425,-0.00680607836781,0.26022135632,0.281792020323,0.204626916029,-0.331981555845,0.261175715637,-0.00446020415589,-0.0125417606626,0.239302324043,-0.0259144344697,-0.000592753325968,-0.0282636164568,0.0481578999596,-0.0118986629972,-0.0056080021699,0.00326278951303,0.580998815816,0.201765028877,0.181615385124,-0.406882818754,0.0766652332974,0.00110612004578,-0.0248559463876,0.565348187449,0.156431748468,-0.151107994452,0.113441387325,-0.012309775358,-0.0353310090699,0.41493636943,-0.292300381276,0.173581306218,-0.00853428068017,-0.01856852718,4.04583363655,-0.556381580543,-0.00611166608229,0.101118689592,3.26116294542,-0.0474443687331,-0.104491561865,0.245287192074,-0.000748880318076,0.114920051072]},"habit":{"n":2130,"r_two":-0.566742271239168,"r_habit":-0.928156204531025,"chisq":[193.111749317374,130.839849007279],"df":[19,18],"habit_share":[0.0513052310593294,0.1326851507104],"r_habit_ordinal":-1.40296109283452,"ordinal_proper":false,"shift":{"agree_benefit":0.177697352553629,"agree_harm":-0.141830306713525,"hard_to_say":-0.150059751157212},"coef":[{"factor":"habit","predictor":"education","b":0.00737765606683565,"se":0.0390709586520782,"p":0.85022832616341},{"factor":"habit","predictor":"age10","b":0.1221252208056,"se":0.038100632165411,"p":0.00134906217251451},{"factor":"habit","predictor":"female","b":-0.20297100856778,"se":0.135795589510529,"p":0.134997867071518},{"factor":"habit","predictor":"immigrant","b":-0.687116135411402,"se":0.200495021792301,"p":0.00061006832705135},{"factor":"benefit","predictor":"education","b":0.199486512946997,"se":0.0226558487947568,"p":0},{"factor":"benefit","predictor":"age10","b":-0.11552617938078,"se":0.0259272112750293,"p":8.35852627822931e-06},{"factor":"benefit","predictor":"female","b":0.14603332605983,"se":0.0930624343600652,"p":0.116601959821274},{"factor":"benefit","predictor":"immigrant","b":0.557530169036565,"se":0.13801322990534,"p":5.35227151172712e-05},{"factor":"harm","predictor":"education","b":-0.149263587154259,"se":0.0173515537127993,"p":0},{"factor":"harm","predictor":"age10","b":0.028853304145867,"se":0.0198774783120966,"p":0.146624663358671},{"factor":"harm","predictor":"female","b":0.00483943218764474,"se":0.0697696690229897,"p":0.944700695249726},{"factor":"harm","predictor":"immigrant","b":0.15171670756763,"se":0.105709632974946,"p":0.151224070841602}]}}]}</script>
 <script id="buildr" type="text/plain">
 # Builds the summary statistics behind the immigration-attitudes demo.
 # Input: World Values Survey wave 7, country-pooled file, version 5.0 (R format).
-# Output: wvs7-immigration-usa.json with the counts, means, standard deviations,
-# and correlations of the ten immigration items (Q121 to Q130) in the United
-# States, and their covariances with four background variables. No answers of
-# individual respondents leave R.
+# Output: wvs7-immigration-summaries.json. For the United States and Great
+# Britain it holds the counts, means, standard deviations, and correlations of
+# the ten immigration items (Q121 to Q130), their covariances with four
+# background variables, and the estimates of a model with a habit of agreeing.
+# No answers of individual respondents leave R.
 
 library(psych)
+library(lavaan)
 library(jsonlite)
 
 load("WVS_Cross-National_Wave_7_rData_v5_0.rdata")
@@ -377,42 +392,106 @@ wvs <- `WVS_Cross-National_Wave_7_v5_0`
 
 items <- paste0("Q", 121:130)
 codes <- list(1:5, 0:2, 0:2, 0:2, 0:2, 0:2, 0:2, 0:2, 0:2, 1:4)
-
-d <- wvs[wvs$B_COUNTRY_ALPHA == "USA", ]
-x <- d[items]
-x[x < 0] <- NA                       # don't know, no answer, not asked
-keep <- complete.cases(x)            # respondents who answered all ten
-x <- as.matrix(x[keep, ])
-d <- d[keep, ]
-
-bg <- data.frame(
-  education = ifelse(d$Q275 >= 0, d$Q275, NA),        # ISCED 2011, 0 to 8
-  age10     = ifelse(d$Q262 >= 16, d$Q262 / 10, NA),  # age in decades
-  female    = ifelse(d$Q260 > 0, as.numeric(d$Q260 == 2), NA),
-  immigrant = ifelse(d$Q263 > 0, as.numeric(d$Q263 == 2), NA)
-)
-reg <- complete.cases(bg)
-xb <- cbind(x[reg, ], as.matrix(bg[reg, ]))
-
+statements <- c("Q122", "Q123", "Q125", "Q127", "Q124", "Q126", "Q128", "Q129")
+countries <- c(USA = "United States", GBR = "Great Britain")
 lower <- function(m) m[lower.tri(m, diag = TRUE)]   # column by column
+reverse <- function(x) {             # higher = more favorable to immigration
+  for (v in c("Q124", "Q126", "Q128", "Q129")) x[, v] <- 2 - x[, v]
+  x[, "Q130"] <- 5 - x[, "Q130"]
+  x
+}
+
+# The eight agree-disagree statements on their raw codes: a benefit factor, a
+# harm factor, and a habit factor that raises agreement with every statement by
+# the same amount and is unrelated to the other two.
+two_factors <- '
+  benefit =~ NA*Q122 + Q123 + Q125 + Q127
+  harm    =~ NA*Q124 + Q126 + Q128 + Q129
+  benefit ~~ 1*benefit
+  harm    ~~ 1*harm
+'
+with_habit <- paste(two_factors, '
+  habit =~ 1*Q122 + 1*Q123 + 1*Q125 + 1*Q127 + 1*Q124 + 1*Q126 + 1*Q128 + 1*Q129
+  habit ~~ 0*benefit + 0*harm
+')
+with_background <- paste(with_habit, '
+  habit + benefit + harm ~ education + age10 + female + immigrant
+')
+
+summarize_country <- function(iso) {
+  d <- wvs[wvs$B_COUNTRY_ALPHA == iso, ]
+  x <- d[items]
+  x[x < 0] <- NA                       # don't know, no answer, not asked
+  keep <- complete.cases(x)            # respondents who answered all ten
+  x <- as.matrix(x[keep, ])
+  d <- d[keep, ]
+
+  bg <- data.frame(
+    education = ifelse(d$Q275 >= 0, d$Q275, NA),        # ISCED 2011, 0 to 8
+    age10     = ifelse(d$Q262 >= 16, d$Q262 / 10, NA),  # age in decades
+    female    = ifelse(d$Q260 > 0, as.numeric(d$Q260 == 2), NA),
+    immigrant = ifelse(d$Q263 > 0, as.numeric(d$Q263 == 2), NA)
+  )
+  reg <- complete.cases(bg)
+  xb <- cbind(x[reg, ], as.matrix(bg[reg, ]))
+
+  # The habit model, fitted to the respondents in the regressions
+  s8 <- data.frame(x[reg, statements], bg[reg, ])
+  m2 <- cfa(two_factors, data = s8)
+  m3 <- cfa(with_habit, data = s8)
+  m4 <- sem(with_background, data = s8)
+  est <- standardizedSolution(m4, type = "std.lv")      # factors in standard deviations
+  est <- est[est$op == "~", c("lhs", "rhs", "est.std", "se", "pvalue")]
+  loads <- standardizedSolution(m3)
+  habit_share <- range(loads$est.std[loads$lhs == "habit" & loads$op == "=~"]^2)
+  # The same habit model with the answers treated as ordered categories
+  s8o <- s8[statements]
+  for (v in statements) s8o[[v]] <- ordered(s8o[[v]])
+  m3o <- suppressWarnings(cfa(with_habit, data = s8o, ordered = statements))
+  # How the answers themselves shift with education: per ISCED level, the change
+  # in the number of "agree" answers to the four benefit and the four harm
+  # statements, and in the number of "hard to say" answers to all eight
+  slope <- function(y) unname(coef(lm(y ~ s8$education))[2])
+  shift <- c(agree_benefit = slope(rowSums(s8[statements[1:4]] == 2)),
+             agree_harm    = slope(rowSums(s8[statements[5:8]] == 2)),
+             hard_to_say   = slope(rowSums(s8[statements] == 1)))
+
+  list(
+    iso = iso, name = unname(countries[iso]), year = unique(d$A_YEAR),
+    n_sample = sum(wvs$B_COUNTRY_ALPHA == iso),
+    n = nrow(x),
+    mean = signif(colMeans(x), 12),
+    sd = signif(apply(x, 2, sd), 12),
+    counts = lapply(seq_along(items), function(j) as.integer(table(factor(x[, j], levels = codes[[j]])))),
+    r = round(lower(cor(x)), 10),
+    poly = round(lower(suppressWarnings(polychoric(x)$rho)), 10),
+    # polychoric estimates move slightly when items are reversed, so they are
+    # also stored with the harm statements and Q130 reversed
+    poly_rev = round(lower(suppressWarnings(polychoric(reverse(x))$rho)), 10),
+    reg = list(n = sum(reg), mean = signif(colMeans(xb), 12), cov = signif(lower(cov(xb)), 12)),
+    habit = list(
+      n = nrow(s8),
+      r_two = unname(lavInspect(m2, "std")$psi["benefit", "harm"]),
+      r_habit = unname(lavInspect(m3, "std")$psi["benefit", "harm"]),
+      chisq = unname(c(fitMeasures(m2, "chisq"), fitMeasures(m3, "chisq"))),
+      df = unname(c(fitMeasures(m2, "df"), fitMeasures(m3, "df"))),
+      habit_share = habit_share,
+      r_habit_ordinal = unname(lavInspect(m3o, "std")$psi["benefit", "harm"]),
+      ordinal_proper = lavInspect(m3o, "post.check"),
+      shift = as.list(shift),
+      coef = lapply(seq_len(nrow(est)), function(i) list(factor = est$lhs[i], predictor = est$rhs[i],
+                                                       b = est$est.std[i], se = est$se[i], p = est$pvalue[i]))
+    )
+  )
+}
 
 out <- list(
   source = "World Values Survey wave 7, country-pooled file, version 5.0",
   items = items,
-  background = names(bg),
-  countries = list(list(
-    iso = "USA", name = "United States", year = unique(d$A_YEAR),
-    n_sample = sum(wvs$B_COUNTRY_ALPHA == "USA"),
-    n = nrow(x),
-    mean = signif(colMeans(x), 8),
-    sd = signif(apply(x, 2, sd), 8),
-    counts = lapply(seq_along(items), function(j) as.integer(table(factor(x[, j], levels = codes[[j]])))),
-    r = round(lower(cor(x)), 6),
-    poly = round(lower(suppressWarnings(polychoric(x)$rho)), 6),
-    reg = list(n = sum(reg), mean = signif(colMeans(xb), 8), cov = signif(lower(cov(xb)), 8))
-  ))
+  background = c("education", "age10", "female", "immigrant"),
+  countries = lapply(names(countries), summarize_country)
 )
-write_json(out, "wvs7-immigration-usa.json", auto_unbox = TRUE, digits = NA)
+write_json(out, "wvs7-immigration-summaries.json", auto_unbox = TRUE, digits = NA)
 </script>
 <script>
 /* Engine for the immigration-attitudes demo. Plain ES5, no dependencies.
@@ -905,7 +984,7 @@ function unpackLower(v, n) {   /* R's lower.tri(diag = TRUE) order is column-maj
 }
 function prepare(c) {
   if (c._ready) return c;
-  c.R = unpackLower(c.r, 10); c.P = unpackLower(c.poly, 10);
+  c.R = unpackLower(c.r, 10); c.P = unpackLower(c.poly, 10); c.Prev = c.poly_rev ? unpackLower(c.poly_rev, 10) : null;
   c.reg.C = unpackLower(c.reg.cov, 14);
   c.nImm = Math.round(c.reg.mean[13] * c.reg.n);
   c._ready = true;
@@ -924,7 +1003,9 @@ function analyze(c, cfg) {
   var dirs = its.map(function (it) { return it.flip && !cfg.rev ? -1 : 1; });   /* +1: higher is more favorable */
   var di = its.map(function (it) { return it.d; });
   var R = mat(k, k), P = mat(k, k);
-  for (i = 0; i < k; i++) for (j = 0; j < k; j++) { R[i][j] = c.R[di[i]][di[j]] * sg[i] * sg[j]; P[i][j] = c.P[di[i]][di[j]] * sg[i] * sg[j]; }
+  /* polychoric correlations: the set estimated on the same coding as the page uses */
+  var Pc = cfg.rev && c.Prev ? c.Prev : c.P, ps = cfg.rev && c.Prev ? its.map(function () { return 1; }) : sg;
+  for (i = 0; i < k; i++) for (j = 0; j < k; j++) { R[i][j] = c.R[di[i]][di[j]] * sg[i] * sg[j]; P[i][j] = Pc[di[i]][di[j]] * ps[i] * ps[j]; }
   var sd = di.map(function (d) { return c.sd[d]; });
   var mu = its.map(function (it, q) { var m0 = c.mean[it.d]; return sg[q] < 0 ? it.lo + it.hi - m0 : m0; });
   var counts = its.map(function (it, q) { var ct = c.counts[it.d].slice(); return sg[q] < 0 ? ct.reverse() : ct; });
@@ -1014,7 +1095,8 @@ function omegaDrop(c, cfg, res, m) {
   dropCache[key] = out;
   return out;
 }
-function maxFactors(k) { var m = 0; while (m < 4 && k * (k - 1) / 2 - k * (m + 1) + (m + 1) * m / 2 >= 0 && m + 1 < k) m++; return Math.max(1, m); }
+/* More than one factor only when the model keeps degrees of freedom: with none, the solution is not unique */
+function maxFactors(k) { var m = 1; while (m < 4 && k * (k - 1) / 2 - k * (m + 1) + (m + 1) * m / 2 > 0) m++; return m; }
 
 /* ---------- Regressions of standardized indices on the background variables ---------- */
 /* The index is a weighted sum of z-scored items, standardized on the full sample of
@@ -1089,19 +1171,20 @@ function rCode(cfg, c, res) {
   var dirs = sel.map(function (it) { return it.flip && !cfg.rev ? -1 : 1; });
   var m = res.m, rot = m === 1 ? 'none' : cfg.rot, corArg = cfg.corr === 'poly' ? '"poly"' : '"cor"';
   var L = [];
-  L.push('# Ten questions, one attitude? Indices of attitudes toward immigration');
+  L.push('# Ten questions, one attitude? Indices of attitudes toward immigration, ' + c.name + ' ' + c.year);
   L.push('# Settings: ' + names.length + ' items; ' + (cfg.rev ? 'reversed so that higher is more favorable' : 'not reversed') + '; index: ' + METHOD_COMMENT[cfg.method] + ';');
   L.push('#   ' + m + (m === 1 ? ' factor' : ' factors') + (m > 1 ? ', ' + ROT_COMMENT[rot] : '') +
          '; ' + (cfg.corr === 'poly' ? 'polychoric' : 'Pearson') + ' correlations for the factor analysis');
   L.push('# Data: World Values Survey wave 7, country-pooled file, version 5.0 (R format),');
   L.push('# from https://www.worldvaluessurvey.org. Later versions may differ slightly.');
+  L.push('# Run it line by line, or with source("file.R", echo = TRUE) to see every result.');
   L.push('');
   L.push('library(psych)        # alpha(), KMO(), fa(), fa.parallel(), factor.scores()');
   L.push('library(GPArotation)  # the oblique rotations behind fa()');
   L.push('');
   L.push('load("WVS_Cross-National_Wave_7_rData_v5_0.rdata")');
   L.push('wvs <- `WVS_Cross-National_Wave_7_v5_0`');
-  L.push('d <- wvs[wvs$B_COUNTRY_ALPHA == "USA", ]');
+  L.push('d <- wvs[wvs$B_COUNTRY_ALPHA == "' + c.iso + '", ]');
   L.push('all10 <- paste0("Q", 121:130)');
   L.push('x <- d[all10]');
   L.push('x[x < 0] <- NA                       # don\'t know, no answer');
@@ -1213,25 +1296,39 @@ function rCode(cfg, c, res) {
   L.push('}');
   L.push('');
   L.push('# 8. A habit of agreeing? The eight statements on their raw codes, whatever is');
-  L.push('#    chosen above. The second model adds a factor that raises agreement with');
-  L.push('#    every statement by the same amount (Billiet and McClendon 2000).');
+  L.push('#    chosen above, for the respondents in the regressions. The habit factor');
+  L.push('#    raises agreement with every statement by the same amount and is unrelated');
+  L.push('#    to the two views.');
   L.push('library(lavaan)');
-  L.push('s8 <- d[c("Q122", "Q123", "Q125", "Q127", "Q124", "Q126", "Q128", "Q129")]');
+  L.push('s8 <- data.frame(d[c("Q122", "Q123", "Q125", "Q127", "Q124", "Q126", "Q128", "Q129")], bg)');
+  L.push('s8 <- s8[complete.cases(bg), ]');
   L.push("two <- '");
   L.push('  benefit =~ NA*Q122 + Q123 + Q125 + Q127');
   L.push('  harm    =~ NA*Q124 + Q126 + Q128 + Q129');
   L.push('  benefit ~~ 1*benefit');
   L.push('  harm    ~~ 1*harm');
   L.push("'");
-  L.push("agree <- paste(two, '");
+  L.push("habit <- paste(two, '");
   L.push('  habit =~ 1*Q122 + 1*Q123 + 1*Q125 + 1*Q127 + 1*Q124 + 1*Q126 + 1*Q128 + 1*Q129');
   L.push('  habit ~~ 0*benefit + 0*harm');
   L.push("')");
   L.push('m_two <- cfa(two, data = s8)');
-  L.push('m_agree <- cfa(agree, data = s8)');
-  L.push('anova(m_two, m_agree)');
-  L.push('lavInspect(m_two, "std")$psi["benefit", "harm"]     # about -0.44 on the raw codes');
-  L.push('lavInspect(m_agree, "std")$psi["benefit", "harm"]   # about -0.84');
+  L.push('m_habit <- cfa(habit, data = s8)');
+  L.push('fitMeasures(m_two, c("chisq", "df")); fitMeasures(m_habit, c("chisq", "df"))');
+  L.push('# On the raw codes the harm factor means seeing harm, so these come out negative;');
+  L.push('# the page turns the harm factor around and shows them as positive.');
+  L.push('lavInspect(m_two, "std")$psi["benefit", "harm"]');
+  L.push('lavInspect(m_habit, "std")$psi["benefit", "harm"]');
+  L.push("m_bg <- sem(paste(habit, '");
+  L.push('  habit + benefit + harm ~ education + age10 + female + immigrant');
+  L.push("'), data = s8)");
+  L.push('est <- standardizedSolution(m_bg, type = "std.lv")  # factors in standard deviations');
+  L.push('est[est$op == "~", c("lhs", "rhs", "est.std", "se", "pvalue")]   # harm: higher = sees harm');
+  L.push('# The same habit model with the answers as ordered categories gives an impossible');
+  L.push('# correlation between benefit and harm (beyond -1):');
+  L.push('s8o <- s8[1:8]; s8o[] <- lapply(s8o, ordered)');
+  L.push('m_ord <- cfa(habit, data = s8o, ordered = names(s8o))');
+  L.push('lavInspect(m_ord, "std")$psi["benefit", "harm"]');
   return L.join('\n') + '\n';
 }
 
@@ -1245,6 +1342,7 @@ if (typeof module !== 'undefined') module.exports = RCODE;
 'use strict';
 var E = ENGINE, RC = RCODE, ITEMS = E.ITEMS, METHODS = E.METHODS;
 var DATA = JSON.parse(document.getElementById('data').textContent), C = E.prepare(DATA.countries[0]);
+DATA.countries.forEach(function (c) { E.prepare(c); });
 var cfg = { items: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], rev: true, method: 'z', nf: 2, rot: 'oblimin', corr: 'pearson', rel: 'alpha' };
 var view = { scree: 'fa', load: 'pattern' };
 var A = null, paCache = {};
@@ -1252,6 +1350,8 @@ var SHORT = { sum: 'Sum of raw codes', pomp: 'Average, each rescaled 0-1', z: 'A
 var FAMNAME = { gen: 'Overall view and policy', good: 'Statements of benefit', bad: 'Statements of harm' };
 var ROTNAME = { none: 'no rotation', varimax: 'varimax', promax: 'promax', oblimin: 'oblimin', geomin: 'geomin' };
 var WORD = ['none', 'one', 'two', 'three', 'four'];
+var NOUN = { Q121: 'the overall verdict on its impact', Q122: 'useful jobs', Q123: 'cultural diversity', Q125: 'asylum', Q127: 'new lives for the poor',
+  Q124: 'crime', Q126: 'terrorism', Q128: 'unemployment', Q129: 'social conflict', Q130: 'who may come to work' };
 var EFFECT = '"From your point of view, what have been the effects of immigrants on the development of this country?" ';
 var AGREE = ' Answers: 0 = disagree, 1 = hard to say, 2 = agree.';
 var TURN = ' The reversal switch turns this around, so that 2 means disagree.';
@@ -1295,24 +1395,33 @@ function factorsWord(m) { return WORD[m] + (m === 1 ? ' factor' : ' factors'); }
 var el = {};
 ['matrix', 'matrix-cap', 'loadplot', 'loadplot-cap', 'result', 'verdict', 'itemtbl', 'itemcap', 'dimtbl', 'dimlines', 'scree', 'scree-cap', 'sol-title', 'soltbl', 'solcap',
  'phibox', 'vmfig', 'vmcurve', 'vmcap', 'sollines', 'fivetbl', 'fivelines', 'regfig', 'regtbl', 'regcap', 'rcode', 'buildcode', 'copy', 'dl', 'json', 'copy-status',
- 'rev', 'poly', 'omega', 'pcpa', 'structure', 'itembox', 'items-hint', 'method-hint', 'rot-hint', 'reginterp'].forEach(function (id) { el[id.replace(/-/g, '_')] = document.getElementById(id); });
+ 'rev', 'poly', 'omega', 'pcpa', 'structure', 'itembox', 'items-hint', 'method-hint', 'rot-hint', 'reginterp', 'habitbox', 'country', 'country-hint'].forEach(function (id) { el[id.replace(/-/g, '_')] = document.getElementById(id); });
 
 /* ---------- Names of the factors, from the questions that load on them ---------- */
 function facInfo(a) {
   var L = A.sol.L, k = A.k, share = { gen: 0, good: 0, bad: 0 }, tot = 0, strong = [], q, best = 0;
   for (q = 0; q < k; q++) { if (Math.abs(L[q][a]) > Math.abs(L[best][a])) best = q; if (Math.abs(L[q][a]) >= 0.3) strong.push(q); }
   if (!strong.length) strong = [best];
+  strong.sort(function (x, y) { return Math.abs(L[y][a]) - Math.abs(L[x][a]); });
   strong.forEach(function (q2) { var w = L[q2][a] * L[q2][a]; share[A.its[q2].fam] += w; tot += w; });
   var dir = 0; strong.forEach(function (q2) { dir += L[q2][a] * A.dirs[q2]; });
   var fav = dir >= 0, kind = share.bad / tot >= 0.6 ? 'bad' : share.good / tot >= 0.6 ? 'good' : share.gen / tot >= 0.6 ? 'gen' : 'mixed';
+  var codes = function (list) { return list.map(function (q2) { return A.its[q2].v; }).join(', '); };
+  var andList = function (list) { var v = list.map(function (q2) { return A.its[q2].v; }); return v.length < 3 ? v.join(' and ') : v.slice(0, -1).join(', ') + ', and ' + v[v.length - 1]; };
   if (strong.length === 1 || L[best][a] * L[best][a] / tot >= 0.75) {
     var it = A.its[best];
-    return { name: it.v + ' alone', high: L[best][a] * A.dirs[best] >= 0 ? 'high = favorable answer' : 'high = unfavorable answer', kind: 'one' };
+    return { name: it.v + ' alone', phrase: 'is ' + it.v + ' alone', high: L[best][a] * A.dirs[best] >= 0 ? 'high = favorable answer' : 'high = unfavorable answer', kind: 'one', strong: strong };
   }
-  var names = { bad: 'harm statements', good: 'benefit statements', gen: 'overall view and policy', mixed: 'mixed questions' };
+  var names = { bad: 'harm statements', good: 'benefit statements', gen: 'overall view and policy', mixed: '' };
   var highs = { bad: fav ? 'high = sees little harm' : 'high = sees much harm', good: fav ? 'high = sees many benefits' : 'high = sees few benefits',
                 gen: fav ? 'high = favorable' : 'high = unfavorable', mixed: fav ? 'high = favorable' : 'high = unfavorable' };
-  return { name: names[kind], high: highs[kind], kind: kind };
+  var name = names[kind], phrase = 'gathers the ' + names[kind];
+  if (kind === 'mixed') { name = codes(strong.slice(0, 3)); phrase = 'gathers ' + andList(strong.slice(0, 3)) + (strong.length > 3 ? ', among others' : ''); }
+  else if (kind !== 'gen') {
+    var inFam = strong.filter(function (q2) { return A.its[q2].fam === kind; }), selFam = A.its.filter(function (it2) { return it2.fam === kind; }).length;
+    if (inFam.length < selFam) { name += ' ' + codes(inFam); phrase = 'gathers the ' + names[kind] + ' ' + andList(inFam); }
+  }
+  return { name: name, phrase: phrase, high: highs[kind], kind: kind, strong: strong, whole: kind !== 'mixed' && name === names[kind] };
 }
 function facNames() {
   var out = [], a, seen = {};
@@ -1442,27 +1551,31 @@ function loadPlotSVG(size) {
   }
   var W = Math.max(250, Math.min(size, 330)), H = W, pad = 26, cx = W / 2, cy = H / 2, R0 = (W - 2 * pad) / 2;
   var P = function (x, y) { return { x: cx + x * R0, y: cy - y * R0 }; };
-  var s = svgOpen(W, H);
+  var s = svgOpen(W, H), pts, axes;
   s += '<circle cx="' + cx + '" cy="' + cy + '" r="' + R0 + '" fill="none" stroke="' + rule + '"/>';
-  s += '<line x1="' + (cx - R0) + '" x2="' + (cx + R0) + '" y1="' + cy + '" y2="' + cy + '" stroke="' + rule + '" stroke-dasharray="3 3"/>';
-  s += '<line x1="' + cx + '" x2="' + cx + '" y1="' + (cy - R0) + '" y2="' + (cy + R0) + '" stroke="' + rule + '" stroke-dasharray="3 3"/>';
-  if (m === 2) {
-    s += '<line x1="4" x2="20" y1="10" y2="10" stroke="' + ink + '" stroke-width="1.4"/><text x="24" y="14" font-size="11" fill="' + graphite + '">after rotation</text>';
-    s += '<line x1="4" x2="20" y1="26" y2="26" stroke="' + rule + '" stroke-dasharray="3 3" stroke-width="1.4"/><text x="24" y="30" font-size="11" fill="' + graphite + '">before rotation</text>';
-  }
-  var pts;
-  if (m === 2) {
-    pts = sol.L0.map(function (r) { return P(r[0], r[1]); });
-    if (sol.axes) sol.axes.forEach(function (ax, a) {
-      var p1 = P(ax[0], ax[1]), p0 = P(-ax[0], -ax[1]), pl = P(ax[0] * 1.09, ax[1] * 1.09);
-      s += '<line x1="' + p0.x + '" y1="' + p0.y + '" x2="' + p1.x + '" y2="' + p1.y + '" stroke="' + ink + '" stroke-width="1.4"/>';
-      s += '<text x="' + pl.x + '" y="' + (pl.y + 4) + '" text-anchor="middle" font-size="12" font-weight="600" fill="' + ink + '">F' + (a + 1) + '</text>';
-    });
+  if (m === 2 && sol.axes) {
+    /* turn the whole picture so that the F1 axis runs to the right and F2 lies above it */
+    var th = Math.atan2(sol.axes[0][1], sol.axes[0][0]), c0 = Math.cos(-th), s0 = Math.sin(-th);
+    var turn = function (v) { return [c0 * v[0] - s0 * v[1], s0 * v[0] + c0 * v[1]]; };
+    var a2 = turn(sol.axes[1]), fy = a2[1] < 0 ? -1 : 1;
+    pts = sol.L0.map(function (r) { var q = turn(r); return P(q[0], q[1] * fy); });
+    axes = [[1, 0], [a2[0], a2[1] * fy]];
   } else {
     pts = sol.L.map(function (r) { return P(r[0], r[1]); });
-    s += '<text x="' + (cx + R0 + 2) + '" y="' + (cy - 5) + '" text-anchor="end" font-size="12" font-weight="600" fill="' + ink + '">F1</text>';
-    s += '<text x="' + (cx + 5) + '" y="' + (cy - R0 + 11) + '" font-size="12" font-weight="600" fill="' + ink + '">F2</text>';
+    axes = [[1, 0], [0, 1]];
   }
+  var segs = axes.map(function (ax) { return [P(-ax[0], -ax[1]), P(ax[0], ax[1])]; });
+  var crosses = function (bx) {     /* does a label box touch one of the axis lines? */
+    return segs.some(function (sg) {
+      for (var t = 0; t <= 1; t += 0.01) { var x = sg[0].x + t * (sg[1].x - sg[0].x), y = sg[0].y + t * (sg[1].y - sg[0].y); if (x >= bx.x0 - 1 && x <= bx.x1 + 1 && y >= bx.y0 - 1 && y <= bx.y1 + 1) return true; }
+      return false;
+    });
+  };
+  axes.forEach(function (ax, a) {
+    var p1 = P(ax[0], ax[1]), p0 = P(-ax[0], -ax[1]), pl = P(ax[0] * 1.09, ax[1] * 1.09);
+    s += '<line x1="' + p0.x.toFixed(1) + '" y1="' + p0.y.toFixed(1) + '" x2="' + p1.x.toFixed(1) + '" y2="' + p1.y.toFixed(1) + '" stroke="' + ink + '" stroke-width="1.4"/>';
+    s += '<text x="' + pl.x.toFixed(1) + '" y="' + (pl.y + 4).toFixed(1) + '" text-anchor="middle" font-size="12" font-weight="600" fill="' + ink + '">F' + (a + 1) + '</text>';
+  });
   /* points closer than 9 pixels share one label */
   var groups = [];
   pts.forEach(function (p, q) {
@@ -1479,12 +1592,12 @@ function loadPlotSVG(size) {
   groups.forEach(function (g) { g.txt = g.q.map(function (q) { return ITEMS[A.sel[q]].v.replace('Q', ''); }).join(' '); });
   var placed = [];
   groups.forEach(function (g) {
-    var bounds = { x0: 2, y0: 2, x1: W - 2, y1: H - 2 }, w = 7 * g.txt.length + 2, offs = [[8, 4], [-8, 4], [0, -9], [0, 16], [8, -7], [-8, -7], [8, 15], [-8, 15]], best = null, k2;
+    var bounds = { x0: 2, y0: 2, x1: W - 2, y1: H - 2 }, w = 7 * g.txt.length + 2, offs = [[8, 4], [-8, 4], [0, -9], [0, 16], [8, -7], [-8, -7], [8, 15], [-8, 15], [12, -14], [-12, -14], [12, 22], [-12, 22]], best = null, k2;
     for (k2 = 0; k2 < offs.length; k2++) {
       var dx = offs[k2][0], dy = offs[k2][1], anchor = dx > 0 ? 'start' : dx < 0 ? 'end' : 'middle';
       var x0 = anchor === 'start' ? g.x + dx : anchor === 'end' ? g.x + dx - w : g.x - w / 2, y1 = g.y + dy, bx = { x0: x0, y0: y1 - 10, x1: x0 + w, y1: y1 };
       if (bx.x0 < bounds.x0 || bx.x1 > bounds.x1 || bx.y0 < bounds.y0 || bx.y1 > bounds.y1) continue;
-      var hit = placed.concat(groups.map(function (o) { return { x0: o.x - 5, y0: o.y - 5, x1: o.x + 5, y1: o.y + 5 }; })).some(function (o) { return !(bx.x1 < o.x0 || bx.x0 > o.x1 || bx.y1 < o.y0 || bx.y0 > o.y1); });
+      var hit = crosses(bx) || placed.concat(groups.map(function (o) { return { x0: o.x - 5, y0: o.y - 5, x1: o.x + 5, y1: o.y + 5 }; })).some(function (o) { return !(bx.x1 < o.x0 || bx.x0 > o.x1 || bx.y1 < o.y0 || bx.y0 > o.y1); });
       if (!hit) { best = { x: g.x + dx, y: y1, anchor: anchor, box: bx }; break; }
       if (!best) best = { x: g.x + dx, y: y1, anchor: anchor, box: bx };
     }
@@ -1493,17 +1606,20 @@ function loadPlotSVG(size) {
   });
   return s + '</svg>';
 }
+function loadingWord() {
+  return (A.m === 1 || A.sol.rot === 'varimax') ? 'A loading is the correlation between a question and a factor, from -1 to 1. ' :
+    'A loading says how strongly a question goes with a factor. With leaning axes, as here, it is the weight of the factor in the question, holding the other factor fixed (a pattern loading); it is not a correlation and can now and then pass 1. ';
+}
 function loadPlotCap() {
-  var sol = A.sol, src = cfg.corr === 'poly' ? ', from polychoric correlations' : '';
-  var what = 'A loading is the correlation between a question and a factor, from -1 to 1. ';
+  var sol = A.sol, src = cfg.corr === 'poly' ? ', from polychoric correlations' : '', what = loadingWord();
   if (A.m === 1) return what + 'Here each question\'s loading on a single factor' + src + '. Colors mark the three kinds of question.';
   if (A.m === 2) {
-    var s = what + 'Each dot is a question, placed by its loadings on the two factors before rotation (the dashed axes)' + src + ': further right means more of the first, higher means more of the second. The solid lines F1 and F2 are the factors after rotation; a dot close to a line loads mainly on that factor. Rotation turns the axes, not the dots, so the fit does not change. Hover over a dot for its loadings after rotation.';
-    if (oblique()) s += ' Here the axes meet at ' + fl(Math.acos(Math.max(-1, Math.min(1, sol.Phi[0][1]))) * 180 / Math.PI) + ' degrees; the cosine of that angle, ' + num(sol.Phi[0][1], 2) + ', is the correlation between the factors.';
-    else s += ' With varimax the axes stay at right angles, so the factors are uncorrelated.';
+    var s = what + 'Each dot is a question' + src + '. The square of its distance from the center is the share of the question that the two factors explain together; a dot on the circle would be explained completely. Dots that point the same way from the center are questions whose answers go together. The lines F1 and F2 are the factors, and a dot close to a line loads mainly on that factor. Every rotation keeps the dots in the same places relative to one another and only changes where the lines run, which is why all rotations fit equally well. F1 is drawn horizontally; hover over a dot for its loadings.';
+    if (oblique()) s += ' The lines meet at ' + fl(Math.acos(Math.max(-1, Math.min(1, sol.Phi[0][1]))) * 180 / Math.PI) + ' degrees; the cosine of that angle, ' + num(sol.Phi[0][1], 2) + ', is the correlation between the factors.';
+    else s += ' With varimax the lines stay at right angles, so the factors are uncorrelated.';
     return s;
   }
-  return what + 'Here each dot is a question, placed by its loadings on the first two of ' + WORD[A.m] + ' factors after rotation' + src + '. With more than two factors the questions no longer lie in one plane, so this view shows only part of the picture.';
+  return what + 'Here each dot is a question, placed by its loadings on the first two of ' + WORD[A.m] + ' factors' + src + '. With more than two factors the questions no longer lie in one plane, so this view shows only part of the picture.';
 }
 /* ---------- Eigenvalues against random data ---------- */
 function paOf() {
@@ -1537,21 +1653,19 @@ function screeSVG() {
 
 /* ---------- Varimax criterion as the axes turn ---------- */
 function vmCurveSVG() {
-  var L0 = A.sol.L0, W = 320, H = 130, ml = 40, mr = 10, mt = 10, mb = 30, ink = css('--ink'), graphite = css('--graphite'), rule = css('--rule');
-  var vals = [], th, lo = Infinity, hi = -Infinity, best = 0;
-  for (th = -90; th <= 90; th++) { var v = E.varimaxCriterion(E.rotate2(L0, th)); vals.push(v); if (v < lo) lo = v; if (v > hi) { hi = v; best = th; } }
-  var X = function (t) { return ml + (t + 90) / 180 * (W - ml - mr); }, Y = function (v) { return mt + (hi - v) / Math.max(hi - lo, 1e-9) * (H - mt - mb); };
+  var Lv = A.sol.L, W = 320, H = 130, ml = 40, mr = 10, mt = 10, mb = 30, ink = css('--ink'), graphite = css('--graphite'), rule = css('--rule');
+  var vals = [], th, lo = Infinity, hi = -Infinity;
+  for (th = -45; th <= 45; th++) { var v = E.varimaxCriterion(E.rotate2(Lv, th)); vals.push(v); if (v < lo) lo = v; if (v > hi) hi = v; }
+  var X = function (t) { return ml + (t + 45) / 90 * (W - ml - mr); }, Y = function (v) { return mt + (hi - v) / Math.max(hi - lo, 1e-9) * (H - mt - mb); };
   var s = svgOpen(W, H), d = '';
-  vals.forEach(function (v, q) { d += (q ? 'L' : 'M') + X(q - 90).toFixed(1) + ' ' + Y(v).toFixed(1); });
-  [-90, -45, 0, 45, 90].forEach(function (t) { s += '<line x1="' + X(t) + '" x2="' + X(t) + '" y1="' + mt + '" y2="' + (H - mb) + '" stroke="' + rule + '" stroke-opacity="0.6"/><text x="' + X(t) + '" y="' + (H - mb + 15) + '" text-anchor="middle" font-size="11.5" fill="' + graphite + '">' + t + '&deg;</text>'; });
+  vals.forEach(function (v, q) { d += (q ? 'L' : 'M') + X(q - 45).toFixed(1) + ' ' + Y(v).toFixed(1); });
+  [-45, -30, -15, 0, 15, 30, 45].forEach(function (t) { s += '<line x1="' + X(t) + '" x2="' + X(t) + '" y1="' + mt + '" y2="' + (H - mb) + '" stroke="' + rule + '" stroke-opacity="0.6"/><text x="' + X(t) + '" y="' + (H - mb + 15) + '" text-anchor="middle" font-size="11.5" fill="' + graphite + '">' + t + '&deg;</text>'; });
   s += '<path d="' + d + '" fill="none" stroke="' + ink + '" stroke-width="1.6"/>';
   s += '<text x="' + (ml - 6) + '" y="' + (mt + 8) + '" text-anchor="end" font-size="11.5" fill="' + graphite + '">high</text><text x="' + (ml - 6) + '" y="' + (H - mb) + '" text-anchor="end" font-size="11.5" fill="' + graphite + '">low</text>';
-  [best, best > 0 ? best - 90 : best + 90].forEach(function (t) { if (t >= -90 && t <= 90) s += '<circle cx="' + X(t) + '" cy="' + Y(hi) + '" r="3.5" fill="none" stroke="' + ink + '"/>'; });
-  s += '<text x="' + ((ml + W - mr) / 2) + '" y="' + (H - 2) + '" text-anchor="middle" font-size="11.5" fill="' + graphite + '">Angle by which the axes are turned</text>';
-  vmCurveSVG.best = best;
+  s += '<circle cx="' + X(0) + '" cy="' + Y(vals[45]) + '" r="3.5" fill="none" stroke="' + ink + '"/>';
+  s += '<text x="' + ((ml + W - mr) / 2) + '" y="' + (H - 2) + '" text-anchor="middle" font-size="11.5" fill="' + graphite + '">Axes turned away from the varimax position</text>';
   return s + '</svg>';
 }
-
 /* ---------- Who holds which view: coefficient panels ---------- */
 function outcomes() {
   var names = facNames(), unfav = A.dirs.every(function (d) { return d < 0; }) && (cfg.method === 'sum' || cfg.method === 'pomp' || cfg.method === 'z');
@@ -1622,7 +1736,7 @@ function resultHTML() {
     '<div class="stat"><span class="lab">Misfit of one factor (RMSEA)' + tip('RMSEA measures how far the correlations predicted by a model are from those observed, allowing for the size of the model. Below about 0.05 is usually called a close fit, 0.05 to 0.08 acceptable, and above 0.10 poor; these are conventions, not tests.', 'RMSEA') +
     '</span><span class="big">' + (f1.dof > 0 ? num(f1.rmsea, 3) : '-') + '</span><span class="small">' + (f1.dof > 0 ? (A.m > 1 ? factorsWord(A.m) + ': ' + (fm.dof > 0 ? num(fm.rmsea, 3) : 'no test possible') : 'lower is better') : 'three questions: no test possible') + '</span></div>' +
     '<div class="stat"><span class="lab">' + (view.scree === 'fa' ? 'Factors' : 'Components') + ' kept by parallel analysis' + tip('Parallel analysis keeps each factor that takes more of the shared variation than the same factor would in 95% of random data sets of the same size.', 'parallel analysis') +
-    '</span><span class="big">' + kept + '</span><span class="small">' + (kept > A.mmax ? 'more than ' + WORD[A.mmax] + ', the most these questions allow' : 'the dark bars in the chart below') + '</span></div>';
+    '</span><span class="big">' + kept + '</span><span class="small">' + (view.scree === 'fa' && kept > A.mmax ? 'more than ' + WORD[A.mmax] + ', the most these questions allow' : 'the dark bars in the chart below') + '</span></div>';
 }
 function verdictHTML() {
   var b = A.by[cfg.method], out = [], wt = cfg.method === 'pc' || cfg.method === 'fa';
@@ -1632,20 +1746,22 @@ function verdictHTML() {
     if (wt) out.push('The harm statements and Q130 are not reversed, but the ' + (cfg.method === 'pc' ? 'principal component' : 'factor model') + ' gives them negative weights, so the index is the same as with the reversal on, and so is its ' + relName().toLowerCase() + '.');
     else out.push('The harm statements and Q130 are not reversed, so in this index they pull against the other questions: see the red cells in the matrix and the negative loadings beside it. ' + relName() + ' falls to ' + num(relOf(b), 2) + '.');
   } else if (negs) out.push('All the chosen questions are left unreversed, so a higher code means a less favorable view; ' + (wt ? 'the page still points this index toward a favorable view.' : 'the index simply runs the other way.'));
-  var f1 = A.fits[0], f2 = A.fits.length > 1 ? A.fits[1] : null;
+  var f1 = A.fits[0], f2 = A.fits.length > 1 ? A.fits[1] : null, relv = relOf(b);
   if (!mixed) {
     if (f1.fit.dof <= 0) out.push('With three questions a one-factor model fits by construction, so the fit cannot tell one factor from more. ' + relTxt + '.');
-    else if (f1.fit.rmsea > 0.08 && f2 && f2.fit.dof > 0 && f2.fit.rmsea < f1.fit.rmsea - 0.02) {
-      var corr = Math.abs(A.phi2);
-      out.push(relTxt + ', high enough for most readers to call these questions one scale. Yet one factor fits ' + rmseaWord(f1.fit.rmsea) + ' (RMSEA ' + num(f1.fit.rmsea, 3) + ') and two fit ' + rmseaWord(f2.fit.rmsea) + ' (' + num(f2.fit.rmsea, 3) + '): ' +
-        (corr >= 0.3 ? 'the answers follow two factors that correlate ' + num(A.phi2, 2) + '.' : 'the answers follow two factors that are nearly unrelated (correlation ' + num(A.phi2, 2) + ').'));
+    else if (!f2) out.push('One factor fits these questions ' + rmseaWord(f1.fit.rmsea) + ' (RMSEA ' + num(f1.fit.rmsea, 3) + '). With only ' + WORD[A.k] + ' questions, a model with two factors would leave nothing to test, so the page cannot compare one factor with two. ' + relTxt + '.');
+    else if (f1.fit.rmsea > 0.08 && f2.fit.dof > 0 && f2.fit.rmsea < f1.fit.rmsea - 0.02) {
+      var phiNow = A.m === 2 && oblique(), phi = phiNow ? A.sol.Phi[0][1] : A.phi2, corr = Math.abs(phi);
+      var corrTxt = corr >= 0.3 ? 'the answers follow two factors that correlate ' + num(phi, 2) : 'the answers follow two factors that are nearly unrelated (correlation ' + num(phi, 2) + ')';
+      if (!phiNow) corrTxt += ' when the axes may lean' + (A.m === 2 ? '' : ' (two factors, oblimin)');
+      out.push((relv >= 0.7 ? relTxt + ', high enough for most readers to call these questions one scale. Yet one factor' : relTxt + ', below the usual 0.7, and one factor') + ' fits ' + rmseaWord(f1.fit.rmsea) + ' (RMSEA ' + num(f1.fit.rmsea, 3) + ') while two fit ' + rmseaWord(f2.fit.rmsea) + ' (' + num(f2.fit.rmsea, 3) + '): ' + corrTxt + '.');
     } else if (f1.fit.rmsea <= 0.08) out.push('One factor fits these questions ' + rmseaWord(f1.fit.rmsea) + ' (RMSEA ' + num(f1.fit.rmsea, 3) + '), so a single index loses little. ' + relTxt + '.');
     else out.push('One factor fits these questions ' + rmseaWord(f1.fit.rmsea) + ' (RMSEA ' + num(f1.fit.rmsea, 3) + '), and two fit no better. ' + relTxt + '.');
   }
   if (A.sol.heywood) {
     var hq = A.sol.h2.map(function (h, q) { return q; }).filter(function (q) { return A.sol.h2[q] > 0.994; }).map(function (q) { return A.its[q].v; });
     out.push('With ' + factorsWord(A.m) + ' the model explains 99.5% of the variation in answers to ' + hq.join(' and ') + ', the ceiling of the fitting procedure. Survey answers always contain some error, so ' +
-      (A.m > 1 ? 'a factor has been spent on a single question: a sign of too many factors.' : 'this one-factor solution deserves little trust.'));
+      (A.m > 1 ? 'this usually means the model has more factors than the data support.' : 'this one-factor solution deserves little trust.'));
   }
   if (!out.length) out.push(relTxt + '.');
   return out.slice(0, 3).join(' ');
@@ -1747,7 +1863,7 @@ function solLinesHTML() {
   var s = '', m = A.m, names = facNames(), a;
   if (m === 1) return '';
   var parts = [];
-  for (a = 0; a < m; a++) parts.push('factor ' + (a + 1) + ' ' + (names[a].kind === 'one' ? 'is ' + names[a].name : 'gathers the ' + names[a].name) + ' (' + names[a].high + ')');
+  for (a = 0; a < m; a++) parts.push('factor ' + (a + 1) + ' ' + names[a].phrase + ' (' + names[a].high + ')');
   s += '<p>' + parts.join('; ').replace(/^f/, 'F') + '.</p>';
   s += interpFactorsHTML(names);
   s += '<p>Every rotation predicts the correlations equally well: the Explained column and the fit do not change when you switch rotations. Only the way the shared variation is divided among the factors does.</p>';
@@ -1758,7 +1874,8 @@ function itemIndex(v) { for (var q = 0; q < A.k; q++) if (A.its[q].v === v) retu
 function interpFactorsHTML(names) {
   var s = '', iH = kindIndex(names, 'bad'), iB = kindIndex(names, 'good'), mixed = A.dirs.some(function (d) { return d < 0; });
   names.forEach(function (f, a) { if (f.kind === 'one') s += '<p>Factor ' + (a + 1) + ' is a single question. A factor made of one question rarely marks an attitude of its own; it is more often a sign of one factor too many.</p>'; });
-  if (iH < 0 || iB < 0 || mixed) return s;
+  if (A.m === 3 && !mixed) s += humanitarianHTML(names);
+  if (A.m !== 2 || iH < 0 || iB < 0 || mixed) return s;
   var L = A.sol.L, both = [];
   ['Q121', 'Q130'].forEach(function (v) { var q = itemIndex(v); if (q >= 0 && Math.abs(L[q][iH]) >= 0.25 && Math.abs(L[q][iB]) >= 0.25) both.push(v); });
   var goods = [], q;
@@ -1769,8 +1886,22 @@ function interpFactorsHTML(names) {
     (both.length === 2 ? ' The overall verdict on its impact (Q121) and the policy question on who may come to work (Q130) draw on both.' : both.length === 1 ? ' ' + (both[0] === 'Q121' ? 'The overall verdict on its impact (Q121)' : 'The policy question on who may come to work (Q130)') + ' draws on both.' : '') +
     (weakest === 'Q125' && L[goods[0]][iB] < 0.5 ? ' The asylum statement goes least with the other benefits; it may read as a description of what the country does rather than as a judgment of what immigrants bring.' : '') +
     (oblique() ? ' The two scales correlate ' + num(A.sol.Phi[iH][iB], 2) + ': those who see more benefits tend to see less harm, but far from always.' : '') + '</p>';
-  s += '<p><b>Another reading</b> is about wording rather than substance. The harm statements and the benefit statements also run in opposite directions, so part of the split may come from how people answer agree-disagree questions. The notes at the bottom of the page come back to this.</p>';
+  s += '<p><b>Another reading</b> is about wording rather than substance. The harm statements and the benefit statements also run in opposite directions, so part of the split may come from how people answer agree-disagree questions. A model of the eight statements alone, shown under the regressions, puts the correlation between seeing benefits and seeing little harm at ' + num(-C.habit.r_two, 2) + '; adding a habit of agreeing raises it to ' + num(-C.habit.r_habit, 2) + '.</p>';
   return s;
+}
+function humanitarianHTML(names) {
+  var a, hum = -1, other = -1, harm = -1;
+  for (a = 0; a < names.length; a++) {
+    var st = names[a].strong.map(function (q) { return A.its[q].v; });
+    if (names[a].kind === 'good' && st.indexOf('Q125') >= 0 && st.indexOf('Q127') >= 0 && st.length <= 3) hum = a;
+    else if (names[a].kind === 'bad' && names[a].whole) harm = a;
+    else other = a;
+  }
+  if (hum < 0 || harm < 0 || other < 0 || names[other].kind === 'one' || names[other].strong.length < 2) return '';
+  var tags = names[other].strong.map(function (q) { return NOUN[A.its[q].v]; }), codesOther = names[other].strong.map(function (q) { return A.its[q].v; }).join(', ');
+  if (names[other].strong.some(function (q) { var v = A.its[q].v; return v === 'Q125' || v === 'Q127'; })) return '';
+  var list = tags.length < 3 ? tags.join(' and ') : tags.slice(0, -1).join(', ') + ', and ' + tags[tags.length - 1];
+  return '<p><b>One possible reading.</b> The statements of benefit split in two. Factor ' + (hum + 1) + ' gathers the humanitarian statements: that immigration gives asylum to political refugees and helps poor people establish new lives. Factor ' + (other + 1) + ' gathers ' + list + ' (' + codesOther + '), which concern what immigration does to or for the country itself. Some people may value immigration for what it does for the immigrants, others for what it does for the country, and the two need not go together.</p>';
 }
 function interpRegHTML() {
   if (A.m !== 2 || A.dirs.some(function (d) { return d < 0; })) return '';
@@ -1779,17 +1910,18 @@ function interpRegHTML() {
   var cH = A.reg.by['f' + (iH + 1)].coefs, cB = A.reg.by['f' + (iB + 1)].coefs, cI = A.reg.by[cfg.method].coefs, s = '';
   var eH = cH[0], eB = cB[0], aH = cH[1], aB = cB[1], fH = cH[2], fB = cB[2], bH = cH[3], bB = cB[3];
   if (eH.b > 0 && eB.b > 0 && eH.p < 0.05 && eB.p < 0.05) {
-    if (eB.b > 1.5 * eH.b) s += '<p><b>Two readings of the education gap.</b> Education goes with a more favorable view on both factors, but more on benefits (' + num(eB.b, 2) + ' per level) than on harms (' + num(eH.b, 2) + '); the single index lands in between (' + num(cI[0].b, 2) + '). One reading is about substance: schooling may shape how much people value what immigration adds more than how much they worry about what it may cost. The other is about answering: the benefit statements are worded in favor of immigration and the harm statements against it, so a habit of agreeing with statements that rose with education would produce the same gap. These ten questions cannot tell the two apart.</p>';
-    else if (eH.b > 1.5 * eB.b) s += '<p><b>Two readings of the education gap.</b> Education goes with a more favorable view on both factors, but more on harms (' + num(eH.b, 2) + ' per level) than on benefits (' + num(eB.b, 2) + '). One reading is about substance: schooling may ease worries about what immigration costs more than it raises the value people see in it. The other is about answering: a habit of agreeing with statements that fell with education would produce the same gap. These ten questions cannot tell the two apart.</p>';
-    else s += '<p>Education goes with a more favorable view on both factors by similar amounts (' + num(eB.b, 2) + ' and ' + num(eH.b, 2) + ' per level).</p>';
+    var between = cI[0].b >= Math.min(eB.b, eH.b) && cI[0].b <= Math.max(eB.b, eH.b) ? '; the single index lands in between (' + num(cI[0].b, 2) + ')' : '';
+    if (eB.b > 1.5 * eH.b) s += '<p><b>Education</b> goes with a more favorable view on both factors, but more on benefits (' + num(eB.b, 2) + ' per level) than on harms (' + num(eH.b, 2) + ')' + between + '. One reading is about substance: schooling may shape how much people value what immigration adds more than how much they worry about what it may cost. The model with a habit of agreeing below offers another reading.</p>';
+    else if (eH.b > 1.5 * eB.b) s += '<p><b>Education</b> goes with a more favorable view on both factors, but more on harms (' + num(eH.b, 2) + ' per level) than on benefits (' + num(eB.b, 2) + ')' + between + '. The model with a habit of agreeing below offers another reading.</p>';
+    else s += '<p><b>Education</b> goes with a more favorable view on both factors by similar amounts: ' + num(eB.b, 2) + ' per level on benefits and ' + num(eH.b, 2) + ' on harms.</p>';
   }
-  if (aH.b < 0 && aH.p < 0.05 && Math.abs(aH.b) > 1.5 * Math.abs(aB.b)) s += '<p><b>Age</b> goes mainly with seeing more harm (' + num(aH.b, 2) + ' per decade) and much less with seeing fewer benefits (' + num(aB.b, 2) + '). A possible reading: concern about costs, more than doubt about contributions, rises with age; differences between generations and differences that come with growing older look the same in one survey.</p>';
+  if (aH.b < 0 && aH.p < 0.05 && Math.abs(aH.b) > 1.5 * Math.abs(aB.b)) s += '<p><b>Age</b> goes mainly with seeing more harm: each decade goes with a harm-factor score ' + num(-aH.b, 2) + ' standard deviations lower, against ' + (aB.b < 0 ? num(-aB.b, 2) + ' lower on the benefit factor' : 'no drop on the benefit factor (' + num(aB.b, 2) + ')') + '. A possible reading: concern about costs, more than doubt about contributions, rises with age. In a single survey, differences between generations and changes that come with growing older look the same.</p>';
   if (bH.b > 0 && bB.b > 0 && bH.p < 0.05 && bB.p < 0.05) s += '<p><b>Respondents born abroad</b>, immigrants themselves, view immigration more favorably on both factors, by about ' + num((bH.b + bB.b) / 2, 1) + ' standard deviations.</p>';
   if (fH.p >= 0.05 && fB.p >= 0.05) s += '<p><b>Women and men</b> barely differ once education, age, and birthplace are held constant.</p>';
   return s;
 }
 function vmCap() {
-  return 'What varimax maximizes. Turning the two axes together changes how unequal the loadings are; the curve measures that, and higher means that each question loads mainly on one factor. Varimax stops at a peak (circles), here at ' + vmCurveSVG.best + ' degrees from the unrotated axes; the curve repeats every 90 degrees.';
+  return 'What varimax maximizes. The curve shows how unequal the loadings are, measured by the varimax criterion, as the two axes turn together away from the varimax position; higher means that each question loads mainly on one factor. Varimax sits at the top, at 0 degrees, and turning the axes 45 degrees either way gives the least simple loadings.';
 }
 function fiveTableHTML() {
   var rows = '', m = A.m, a, names = facNames();
@@ -1830,7 +1962,48 @@ function regTableHTML() {
 }
 function regCap() {
   return 'Least squares regressions on the ' + n0(A.reg.n) + ' respondents who also answered the four background questions; standard errors in parentheses, coefficients with p &lt; 0.05 in bold. ' +
-    'Each index and each set of factor scores is standardized on all ' + n0(C.n) + ' respondents, so a coefficient is a difference in standard deviations. ISCED 3 is a high-school diploma and 6 a bachelor\'s degree. The lines in the figure are 95% confidence intervals. These are associations among respondents, not effects.';
+    'Each index and each set of factor scores is standardized on all ' + n0(C.n) + ' respondents, so a coefficient is a difference in standard deviations. ISCED 3 is upper secondary school and 6 a bachelor\'s degree. The lines in the figure are 95% confidence intervals. These are associations among respondents, not effects.';
+}
+/* The model with a habit of agreeing, estimated in R for each country */
+function hcoef(factor, pred) { var k = C.habit.coef.filter(function (x) { return x.factor === factor && x.predictor === pred; })[0]; return factor === 'harm' ? { b: -k.b, se: k.se, p: k.p } : k; }
+function habitHTML() {
+  var H = C.habit, preds = ['education', 'age10', 'female', 'immigrant'], cols = [['benefit', 'Sees benefits'], ['harm', 'Sees little harm'], ['habit', 'Agrees with any statement']];
+  var cell = function (k) { return '<td' + (k.p < 0.05 ? ' class="strong"' : '') + '>' + num(k.b, 2) + ' <span class="cap">(' + num(k.se, 2) + ')</span></td>'; };
+  var rows = preds.map(function (pn) { return '<tr><td>' + esc(E.BG_NAME[pn]) + '</td>' + cols.map(function (c) { return cell(hcoef(c[0], pn)); }).join('') + '</tr>'; }).join('');
+  var s = '<h3 class="sub3">Allowing for a habit of agreeing</h3>' +
+    '<p class="lead3">Some people tend to agree with whatever statement is put to them. On the raw codes, that habit pushes answers to the benefit and the harm statements the same way; once the harm statements are reversed, it would make the two views look further apart than they are. This second model adds the habit as a third factor and asks again who holds which view.</p>' +
+    '<div class="tblwrap"><table class="cmp"><thead><tr><th></th>' + cols.map(function (c) { return '<th>' + c[1] + '</th>'; }).join('') + '</tr></thead><tbody>' + rows + '</tbody></table></div>' +
+    '<p class="cap">A model of the eight agree-disagree statements on their raw codes, fitted with the R package lavaan to the ' + n0(H.n) + ' respondents in the regressions. It has a benefit factor, a harm factor, and a habit factor that raises agreement with every statement by the same amount and, once the background variables are held constant, is unrelated to the other two; each factor is regressed on the four background variables. Coefficients are in standard deviations of each factor, with standard errors in parentheses and p &lt; 0.05 in bold; the harm factor is turned around so that higher means seeing little harm. This model does not change with the settings above. Its code is at the end of the R code.</p>';
+  return s + habitLines();
+}
+function habitLines() {
+  var H = C.habit, s = '', he = hcoef('habit', 'education'), be = hcoef('benefit', 'education'), le = hcoef('harm', 'education');
+  var hi = hcoef('habit', 'immigrant'), bi = hcoef('benefit', 'immigrant'), li = hcoef('harm', 'immigrant');
+  s += '<p>In a model of the eight statements without the background variables, adding the habit improves the fit: chi-square ' + num(H.chisq[1], 0) + ' on ' + H.df[1] + ' degrees of freedom with it, against ' + num(H.chisq[0], 0) + ' on ' + H.df[0] + ' without it. The habit accounts for ' + Math.round(100 * H.habit_share[0]) + ' to ' + Math.round(100 * H.habit_share[1]) + '% of the variation in each statement, and seeing benefits and seeing little harm correlate ' + num(-H.r_habit, 2) + ' with it, against ' + num(-H.r_two, 2) + ' without it.</p>';
+  var order = be.b > 1.5 * le.b ? 'more with seeing benefits (' + num(be.b, 2) + ' per level) than with seeing little harm (' + num(le.b, 2) + ')' :
+              le.b > 1.5 * be.b ? 'more with seeing little harm (' + num(le.b, 2) + ' per level) than with seeing benefits (' + num(be.b, 2) + ')' :
+              'with seeing benefits (' + num(be.b, 2) + ' per level) and seeing little harm (' + num(le.b, 2) + ') by similar amounts';
+  var cmp = '', names = A.m === 2 ? facNames() : null, reversed = false;
+  if (names && !A.dirs.some(function (d) { return d < 0; })) {
+    var iH = kindIndex(names, 'bad'), iB = kindIndex(names, 'good');
+    if (iH >= 0 && iB >= 0) {
+      var fB = A.reg.by['f' + (iB + 1)].coefs[0].b, fH = A.reg.by['f' + (iH + 1)].coefs[0].b, sign = function (a, b) { return a > 1.5 * b ? 1 : b > 1.5 * a ? -1 : 0; };
+      var so = sign(fB, fH), sh = sign(be.b, le.b);
+      reversed = so !== 0 && sh !== 0 && so !== sh;
+      cmp = so === 0 && sh === 0 ? ', as in the factor scores above' : so === sh ? ', the same order as in the factor scores above' : reversed ? ', the reverse of the factor scores above' : ', unlike the factor scores above';
+    }
+  }
+  var sh2 = H.shift;
+  s += '<p><b>Education.</b> ' + (he.p < 0.05 ? 'The habit ' + (he.b > 0 ? 'rises' : 'falls') + ' with education (' + num(he.b, 2) + ' per level). ' : 'The habit shows no clear link with education (' + num(he.b, 2) + ' per level). ') +
+    'With it allowed for, education goes ' + order + cmp + '.' + (he.p < 0.05 && reversed ? ' In this model the habit, not the views, accounts for the larger education gap on benefits.' : '') + '</p>';
+  var asym = sh2.agree_benefit > 0 && sh2.agree_harm < 0 && sh2.agree_benefit > 1.5 * Math.abs(sh2.agree_harm);
+  s += '<p>The answers themselves show what both models have to explain. With each additional level of education, respondents agree with ' + num(Math.abs(sh2.agree_benefit), 2) + (sh2.agree_benefit >= 0 ? ' more' : ' fewer') + ' of the four benefit statements and ' + num(Math.abs(sh2.agree_harm), 2) + (sh2.agree_harm >= 0 ? ' more' : ' fewer') + ' of the four harm statements, and answer "hard to say" ' + num(Math.abs(sh2.hard_to_say), 2) + (sh2.hard_to_say >= 0 ? ' more' : ' fewer') + ' times out of eight. ' +
+    (asym ? 'Much more agreement with the benefits and only a little less with the harms is what a habit of agreeing that rises with education would produce, and also what a real difference in views would produce; the habit model reads it as a habit because of how it is built.' :
+            'The two shifts are of similar size, so the habit model finds little for a habit of agreeing to explain.') +
+    (!H.ordinal_proper ? ' Fitted to the answers as ordered categories rather than numbers, the same model gives an impossible estimate, a correlation of ' + num(H.r_habit_ordinal, 2) + ' between the benefit and the harm factor, a sign that its results are fragile.' : '') + '</p>';
+  if (hi.p < 0.05 && hi.b < 0) s += '<p><b>Respondents born abroad</b> agree less readily with any statement (' + num(hi.b, 2) + '). With that allowed for, they see more benefits (' + num(bi.b, 2) + ')' + (li.p < 0.05 ? ' and ' + (li.b > 0 ? 'less' : 'more') + ' harm (' + num(li.b, 2) + ')' : ' but do not see less harm (' + num(li.b, 2) + ')') + ' than those born in the country.</p>';
+  s += '<p>All of this rests on the model\'s assumptions: that the habit raises agreement with every statement by the same amount and, once the background variables are held constant, is unrelated to views on immigration. The factor scores above make no such assumption, but they cannot tell a view from a way of answering.</p>';
+  return s;
 }
 function highlightR(code) {
   return code.split('\n').map(function (line) {
@@ -1870,7 +2043,7 @@ function syncControls() {
   Array.prototype.forEach.call(document.querySelectorAll('input[name=nf]'), function (r) { r.disabled = +r.value > mmax; r.checked = +r.value === m; });
   Array.prototype.forEach.call(document.querySelectorAll('input[name=rot]'), function (r) { r.disabled = m === 1; r.checked = r.value === cfg.rot; });
 }
-function refit() { syncControls(); A = E.analyze(C, cfg); }
+function refit() { syncControls(); A = E.analyze(C, cfg); el.country_hint.textContent = n0(C.n) + ' of the ' + n0(C.n_sample) + ' respondents answered all ten questions.'; }
 function draw() {
   hideTip();
   var mainW = el.matrix.closest('main').clientWidth || 900;
@@ -1892,8 +2065,8 @@ function draw() {
   el.dimlines.innerHTML = dimLinesHTML();
   el.scree.innerHTML = screeSVG();
   el.scree.setAttribute('aria-label', 'Eigenvalues of the questions against random data.');
-  el.scree_cap.innerHTML = 'Each bar is an eigenvalue: how much of the ' + (view.scree === 'fa' ? 'shared variation a factor takes' : 'variation a component takes') + ', largest first. Each red line shows how large the same eigenvalue gets by chance: the page draws 100 sets of random answers from ' + n0(C.n) + ' people to ' + A.k + ' unrelated questions, and in 95 of them the eigenvalue stays below the line. A bar that rises above its red line beats chance; parallel analysis keeps those, the dark bars.' +
-    (view.scree === 'fa' ? tip('Why is the first red line so high? Fitted to random data, a one-factor model often lets a single question take nearly all of the factor, which pushes the chance level for the first factor close to 1. The R package psych does the same.', 'the first red line') : ' The dashed line marks 1, an older rule that keeps every component above it.');
+  el.scree_cap.innerHTML = 'Each bar is an eigenvalue: how much of the ' + (view.scree === 'fa' ? 'shared variation a factor takes' : 'variation a component takes') + ', largest first. Each red line shows how large the same eigenvalue gets by chance: the page draws 100 sets of random, normally distributed data for ' + n0(C.n) + ' people and ' + A.k + ' unrelated questions, and in 95 of them the eigenvalue stays below the line. A bar that rises above its red line beats chance; parallel analysis keeps those, the dark bars.' +
+    (view.scree === 'fa' ? tip('Why is the first red line so high? Fitted to random data, a one-factor model often lets a single question take nearly all of the factor, which pushes the chance level for the first factor close to 1. The R package psych counts factors against the same line, but its plot draws the average of the random data instead, so its red line sits lower.', 'the first red line') : ' The dashed line marks 1, an older rule that keeps every component above it.');
   el.sol_title.textContent = 'The factor solution: ' + (A.m === 1 ? 'one factor' : WORD[A.m] + ' factors, ' + ROTNAME[A.sol.rot]) + (cfg.corr === 'poly' ? ', polychoric' : '');
   el.soltbl.innerHTML = solTableHTML();
   el.solcap.innerHTML = solCap();
@@ -1909,6 +2082,7 @@ function draw() {
   el.regtbl.innerHTML = regTableHTML();
   el.regcap.innerHTML = regCap();
   el.reginterp.innerHTML = interpRegHTML();
+  el.habitbox.innerHTML = habitHTML();
   el.rcode.innerHTML = highlightR(RC.rCode(cfg, C, A));
   el.method_hint.textContent = methodHint();
   el.rot_hint.textContent = rotHint();
@@ -1924,6 +2098,8 @@ function save(text, name, type) {
   say('Saved ' + name + '.');
 }
 function bind() {
+  el.country.innerHTML = DATA.countries.map(function (c, i) { return '<option value="' + i + '">' + esc(c.name) + ', ' + c.year + '</option>'; }).join('');
+  el.country.addEventListener('change', function () { C = DATA.countries[+el.country.value]; render(); });
   el.itembox.innerHTML = itemBoxHTML();
   el.buildcode.innerHTML = highlightR(document.getElementById('buildr').textContent.replace(/^\n/, ''));
   Array.prototype.forEach.call(document.querySelectorAll('input[name=method]'), function (r) { r.addEventListener('change', function () { cfg.method = r.value; render(); }); });
@@ -1937,7 +2113,7 @@ function bind() {
   el.itembox.addEventListener('change', function (e) {
     var box = e.target; if (!box || box.type !== 'checkbox') return;
     var on = Array.prototype.filter.call(el.itembox.querySelectorAll('input'), function (c) { return c.checked; }).map(function (c) { return +c.value; });
-    if (on.length < 3) { box.checked = true; el.items_hint.textContent = 'An index here needs at least three questions.'; el.items_hint.className = 'hint warn'; return; }
+    if (on.length < 3) { box.checked = true; el.items_hint.textContent = 'Select at least three questions.'; el.items_hint.className = 'hint warn'; return; }
     el.items_hint.textContent = ''; el.items_hint.className = 'hint';
     cfg.items = on.sort(function (a, b) { return a - b; }); render();
   });
@@ -1945,8 +2121,8 @@ function bind() {
     var t = RC.rCode(cfg, C, A), fail = function () { say('Copying is blocked here; select the code and copy it by hand.', true); };
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(function () { say('Copied.'); }, fail); else fail();
   });
-  el.dl.addEventListener('click', function () { save(RC.rCode(cfg, C, A), 'immigration-index-' + cfg.method + '-' + A.m + 'f.R', 'text/plain'); });
-  el.json.addEventListener('click', function () { save(document.getElementById('data').textContent.trim() + '\n', 'wvs7-immigration-usa.json', 'application/json'); });
+  el.dl.addEventListener('click', function () { save(RC.rCode(cfg, C, A), 'immigration-index-' + C.iso.toLowerCase() + '-' + cfg.method + '-' + A.m + 'f.R', 'text/plain'); });
+  el.json.addEventListener('click', function () { save(document.getElementById('data').textContent.trim() + '\n', 'wvs7-immigration-summaries.json', 'application/json'); });
   var rT = 0;
   window.addEventListener('resize', function () { clearTimeout(rT); rT = setTimeout(draw, 120); });
   if (window.matchMedia) { var mq = window.matchMedia('(prefers-color-scheme: dark)'), redraw = function () { el.itembox.innerHTML = itemBoxHTML(); draw(); }; if (mq.addEventListener) mq.addEventListener('change', redraw); else if (mq.addListener) mq.addListener(redraw); }
