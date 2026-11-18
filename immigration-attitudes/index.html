@@ -1,0 +1,1902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ten questions, one attitude?</title>
+<meta name="description" content="Build an index of views on immigration from the World Values Survey in the United States, and see what alpha, factor analysis, and rotation say about it.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;1,400&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper: #FFFFFF;
+  --ink: #1D2A30;
+  --graphite: #57656B;
+  --rule: #CBD2D1;
+  --card: #F8F9F9;
+  --tint: #EDF0F0;
+  --neg: #B4363E;
+  --good: #0072B2;
+  --bad: #B26B00;
+  --gen: #6B7A80;
+  --warn: #8A3B12;
+  --track: #7F8B8B;
+  --serif: "Spectral", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --sans: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #141B1F;
+    --ink: #E3E9EB;
+    --graphite: #A2AFB4;
+    --rule: #3A474D;
+    --card: #1A2327;
+    --tint: #243035;
+    --neg: #E26D72;
+    --good: #5AAEE6;
+    --bad: #E0A23C;
+    --gen: #95A3A9;
+    --warn: #F0A070;
+    --track: #66757B;
+    color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--paper); color: var(--ink); }
+body { font-family: var(--sans); font-size: 15px; line-height: 1.45; }
+.wrap { max-width: 1240px; margin: 0 auto; padding: 22px 32px 56px; }
+header h1 { font-family: var(--serif); font-weight: 500; font-size: 34px; line-height: 1.12; margin: 0 0 6px; }
+header .sub { font-family: var(--serif); font-size: 17px; line-height: 1.5; color: var(--graphite); margin: 0; max-width: 80ch; }
+details.intro { margin-top: 8px; max-width: 82ch; }
+details.intro summary { cursor: pointer; color: var(--graphite); font-size: 14px; }
+details.intro ul { margin: 8px 0 0; padding-left: 1.2em; font-size: 14.5px; line-height: 1.5; }
+details.intro li { margin-bottom: 6px; }
+.main { display: grid; grid-template-columns: 262px minmax(0, 1fr); gap: 0 32px; margin-top: 20px; }
+.controls { border-right: 1px solid var(--rule); padding: 2px 24px 0 0; }
+.controls h2 { font-family: var(--serif); font-weight: 500; font-size: 17px; margin: 0 0 10px; }
+.controls > div + div { margin-top: 8px; }
+.field { margin-bottom: 16px; }
+.hint { font-size: 13px; color: var(--graphite); margin: 7px 0 0; }
+.hint.warn { color: var(--warn); }
+.label-row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 4px; }
+.label-row .name { font-size: 14.5px; }
+.label-row output { font-variant-numeric: tabular-nums; font-weight: 600; font-size: 14.5px; }
+select { font: inherit; font-size: 14.5px; width: 100%; padding: 6px 8px; border: 1px solid var(--ink); border-radius: 7px; background: var(--paper); color: var(--ink); }
+select:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.seg { display: flex; border: 1px solid var(--ink); border-radius: 7px; overflow: hidden; flex-direction: column; }
+.seg.row { flex-direction: row; }
+.seg label { position: relative; flex: 1; }
+.seg input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.seg span { display: block; padding: 7px 12px; font-size: 14.5px; border-top: 1px solid var(--ink); cursor: pointer; user-select: none; }
+.seg.row span { border-top: 0; border-left: 1px solid var(--ink); text-align: center; padding: 7px 6px; }
+.seg label:first-child span { border-top: 0; border-left: 0; }
+.seg input:checked + span { background: var(--ink); color: var(--paper); }
+.seg input:focus-visible + span { outline: 2px solid var(--ink); outline-offset: -4px; }
+.seg input:checked:focus-visible + span { outline-color: var(--paper); }
+.seg input:disabled + span { color: var(--rule); cursor: not-allowed; }
+.seg.small span { font-size: 13.5px; padding: 5px 8px; }
+.toggle { display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; font-size: 14.5px; }
+.toggle input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.toggle .track { width: 38px; height: 22px; border-radius: 11px; background: var(--track); position: relative; transition: background 0.18s; flex: none; }
+.toggle .track::after { content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: var(--paper); transition: transform 0.18s; }
+.toggle input:checked + .track { background: var(--ink); }
+.toggle input:checked + .track::after { transform: translateX(16px); }
+.toggle input:focus-visible + .track { outline: 2px solid var(--ink); outline-offset: 2px; }
+input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 22px; background: transparent; margin: 0; }
+input[type=range]::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: var(--track); }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--paper); border: 2px solid var(--ink); margin-top: -7px; cursor: pointer; }
+input[type=range]::-moz-range-track { height: 4px; border-radius: 2px; background: var(--track); }
+input[type=range]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--paper); border: 2px solid var(--ink); cursor: pointer; }
+input[type=range]:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; border-radius: 4px; }
+button { font: inherit; font-weight: 500; border-radius: 7px; padding: 6px 12px; cursor: pointer; border: 1px solid var(--ink); background: transparent; color: var(--ink); font-size: 14px; }
+button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+code, pre { font-family: var(--mono); }
+[hidden] { display: none !important; }
+details.adv { margin-top: 4px; }
+details.adv summary { cursor: pointer; font-family: var(--serif); font-size: 17px; margin-bottom: 10px; }
+
+.famhead { font-size: 13px; color: var(--graphite); margin: 10px 0 5px; display: flex; align-items: center; gap: 7px; }
+.famhead:first-child { margin-top: 0; }
+.famhead i { width: 3px; height: 13px; border-radius: 2px; display: inline-block; flex: none; }
+ul.itemlist { list-style: none; margin: 0; padding: 0; }
+ul.itemlist li { margin: 0 0 3px; display: flex; align-items: flex-start; gap: 4px; }
+ul.itemlist li label { flex: 1; }
+ul.itemlist li .tip { margin-top: 1px; }
+ul.itemlist label { display: flex; gap: 8px; align-items: baseline; cursor: pointer; font-size: 14px; line-height: 1.3; }
+ul.itemlist input { accent-color: var(--ink); margin: 0; width: 15px; height: 15px; flex: none; transform: translateY(2px); }
+ul.itemlist code { font-size: 12.5px; }
+ul.itemlist .lbl { color: var(--graphite); }
+
+.tip { display: inline-flex; align-items: center; justify-content: center; width: 17px; height: 17px; border-radius: 50%; border: 1px solid var(--graphite); color: var(--graphite);
+  font: 600 11px/1 var(--sans); cursor: help; vertical-align: 1px; margin-left: 5px; background: transparent; padding: 0; flex: none; }
+.tip:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+#tipbox { position: absolute; z-index: 50; background: var(--ink); color: var(--paper); font: 400 13px/1.45 var(--sans); padding: 8px 11px; border-radius: 7px; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25); }
+
+.figs { display: flex; flex-wrap: wrap; gap: 18px 28px; align-items: flex-start; }
+.figs figure { margin: 0; max-width: 100%; }
+.figs svg, .block svg { display: block; max-width: 100%; height: auto; }
+.figs figcaption { font-size: 13px; color: var(--graphite); margin-top: 6px; max-width: 64ch; }
+.result { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 22px; margin: 16px 0 0; padding: 12px 16px; background: var(--card); border: 1px solid var(--tint); border-radius: 8px; }
+.stat .lab { display: flex; align-items: center; font-size: 13.5px; color: var(--graphite); }
+.stat .big { display: block; font-family: var(--serif); font-size: 26px; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.stat .small { display: block; font-size: 13px; color: var(--graphite); font-variant-numeric: tabular-nums; }
+.verdict { margin: 12px 0 0; padding: 2px 0 2px 14px; border-left: 3px solid var(--ink); font-size: 15px; max-width: 86ch; }
+
+h2.sec { font-family: var(--serif); font-weight: 500; font-size: 20px; margin: 0 0 8px; display: flex; align-items: center; }
+section.block { margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--rule); }
+.tblwrap { overflow-x: auto; }
+table.cmp { border-collapse: collapse; width: 100%; font-size: 14px; font-variant-numeric: tabular-nums; }
+table.cmp th, table.cmp td { padding: 6px 8px; text-align: right; border-bottom: 1px solid var(--tint); white-space: nowrap; }
+table.cmp thead th { white-space: normal; font-weight: 500; color: var(--graphite); font-size: 12.5px; border-bottom: 1px solid var(--rule); vertical-align: bottom; }
+table.cmp th:first-child, table.cmp td:first-child { text-align: left; white-space: normal; }
+table.cmp tr.cur td { background: var(--tint); }
+table.cmp tr.cur td:first-child { box-shadow: inset 3px 0 0 var(--ink); font-weight: 600; }
+table.cmp td.warn { color: var(--warn); font-weight: 600; }
+table.cmp td.strong { font-weight: 600; }
+table.cmp td.faint { color: var(--graphite); }
+table.cmp td code { font-size: 12.5px; }
+table.cmp .fam { display: inline-block; width: 3px; height: 13px; border-radius: 2px; margin-right: 7px; vertical-align: -1px; }
+table.cmp td.dist { padding-top: 4px; padding-bottom: 4px; }
+.cap { font-size: 13px; color: var(--graphite); margin: 6px 0 0; max-width: 90ch; }
+.dimgrid { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 8px 28px; align-items: start; }
+.lines p { margin: 10px 0 0; font-size: 14.5px; max-width: 80ch; }
+.lines b { font-weight: 600; }
+.warn { color: var(--warn); }
+.sechead { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.code-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.code-head .btns { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+#copy-status { font-size: 13px; color: var(--graphite); }
+pre.r { background: var(--card); color: var(--ink); border: 1px solid var(--tint); border-radius: 8px; padding: 14px 16px; font-size: 12.8px; line-height: 1.5; overflow-x: auto; margin: 8px 0 0; }
+pre.r .c { color: var(--graphite); }
+details.more { margin-top: 12px; }
+details.more summary { cursor: pointer; color: var(--graphite); font-size: 14px; }
+.about { margin-top: 30px; padding-top: 18px; border-top: 1px solid var(--rule); font-family: var(--serif); font-size: 15.5px; line-height: 1.6; }
+.about p { margin: 0 0 9px; max-width: 80ch; }
+.about h2.sec { margin-top: 18px; }
+.about h2.sec:first-child { margin-top: 0; }
+dl.items { margin: 0; max-width: 80ch; }
+dl.items dt { font-family: var(--sans); font-weight: 600; font-size: 14px; margin-top: 10px; }
+dl.items dt code { font-weight: 500; font-size: 13px; }
+dl.items dd { margin: 2px 0 0; }
+.about .src { font-size: 14px; color: var(--graphite); padding-left: 2em; text-indent: -2em; margin-bottom: 5px; }
+
+@media (max-width: 960px) {
+  .dimgrid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 860px) {
+  .wrap { padding: 20px 18px 40px; }
+  header h1 { font-size: 29px; }
+  .main { grid-template-columns: minmax(0, 1fr); }
+  .controls { border-right: 0; border-bottom: 1px solid var(--rule); padding: 0 0 6px; margin-bottom: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 0 24px; }
+  .controls > div + div { margin-top: 0; }
+}
+@media (max-width: 560px) {
+  .controls { grid-template-columns: 1fr; }
+  .result { grid-template-columns: 1fr; }
+  table.cmp { font-size: 13px; }
+  table.cmp th, table.cmp td { padding: 5px 5px; }
+}
+@media (prefers-reduced-motion: reduce) { .toggle .track, .toggle .track::after { transition: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Ten questions, one attitude?</h1>
+    <p class="sub">In 2017 the World Values Survey, an international academic survey, asked adults in the United States ten questions about the effects of immigration. Combine the answers of the 2,455 who answered all ten into one index, then see what alpha and factor analysis say about whether one number can stand for them.</p>
+    <details class="intro"><summary>What to try</summary>
+      <ul>
+        <li><b>Turn off the reversal.</b> Five questions run the other way: agreeing that immigrants increase crime is the less favorable answer. Left as they are, these questions pull against the rest, and alpha falls from 0.82 to 0.35. The first principal component and the one-factor scores do not change, because they work out the direction of each question from the data.</li>
+        <li><b>Compare one factor with two.</b> An alpha of 0.82 is high enough for most readers to call the ten questions one scale. Yet a model with one common factor fits poorly: its RMSEA, a measure of misfit, is 0.144, where values above 0.10 are usually called poor. Two factors fit well (0.038), and parallel analysis also keeps two. One factor gathers the four statements of harm, the other the four statements of benefit.</li>
+        <li><b>Drop the asylum question.</b> It goes least with the rest (item-rest correlation 0.20), and alpha rises slightly without it, from 0.82 to 0.83. Whether it belongs in an index of views on immigration is still a question about content, not about alpha.</li>
+        <li><b>Rotate.</b> Try none, varimax, promax, and oblimin, or turn the axes by hand. The fit and the share of each question that the factors explain stay the same; only the loadings change. In the loading plot the questions stay put and the axes move. Oblimin lets the two axes lean toward each other until they meet at 62 degrees; the cosine of that angle, 0.47, is the correlation between the two factors.</li>
+        <li><b>Ask for three factors.</b> The third factor is a single question, the statement that immigration gives asylum to political refugees (<code>Q125</code>). The model explains 99.5% of the variation in its answers, the most psych allows. No survey question is answered without error, so a factor has been spent on one question: a sign of one factor too many.</li>
+        <li><b>See who holds which view.</b> With the reversal on, a high score on either factor means a favorable view: seeing few harms, or seeing many benefits. Each additional level of education goes with a score 0.22 standard deviations higher on the benefit factor and 0.11 higher on the harm factor; a bachelor's degree is three levels above a high-school diploma. The average of all ten answers lands in between, at 0.19, and hides the difference. Age works the other way round: each decade goes with seeing more harm (0.09 standard deviations) and slightly fewer benefits (0.03).</li>
+        <li><b>Open Advanced.</b> With omega instead of alpha, the reliability of the index depends on the factor model: 0.82 with one factor, 0.85 with two. With polychoric correlations the loadings rise, for <code>Q122</code> from 0.72 to 0.81, but the regressions on the two factors barely move.</li>
+      </ul>
+    </details>
+  </header>
+
+  <div class="main">
+    <aside class="controls">
+      <div>
+        <h2>The questions</h2>
+        <div class="field" id="itembox"></div>
+        <p class="hint" id="items-hint" aria-live="polite"></p>
+        <div class="field">
+          <label class="toggle"><input type="checkbox" id="rev" checked><span class="track"></span><span>Reverse the harm statements and <code>Q130</code></span></label>
+          <p class="hint">So that a higher code always means a more favorable view of immigration.</p>
+        </div>
+      </div>
+      <div>
+        <h2>The index</h2>
+        <div class="field">
+          <div class="seg" role="radiogroup" aria-label="How to combine the questions">
+            <label><input type="radio" name="method" value="sum"><span>Add up the raw codes</span></label>
+            <label><input type="radio" name="method" value="pomp"><span>Rescale each to 0-1, then average</span></label>
+            <label><input type="radio" name="method" value="z" checked><span>Average the z-scores</span></label>
+            <label><input type="radio" name="method" value="pc"><span>First principal component</span></label>
+            <label><input type="radio" name="method" value="fa"><span>One-factor scores</span></label>
+          </div>
+          <p class="hint" id="method-hint"></p>
+        </div>
+      </div>
+      <div>
+        <h2>The factor model</h2>
+        <div class="field">
+          <div class="label-row"><span class="name" id="lbl-nf">Number of factors</span></div>
+          <div class="seg row" role="radiogroup" aria-labelledby="lbl-nf" id="nfbox">
+            <label><input type="radio" name="nf" value="1"><span>1</span></label>
+            <label><input type="radio" name="nf" value="2" checked><span>2</span></label>
+            <label><input type="radio" name="nf" value="3"><span>3</span></label>
+            <label><input type="radio" name="nf" value="4"><span>4</span></label>
+          </div>
+        </div>
+        <div class="field">
+          <div class="label-row"><span class="name" id="lbl-rot">Rotation</span></div>
+          <div class="seg" role="radiogroup" aria-labelledby="lbl-rot" id="rotbox">
+            <label><input type="radio" name="rot" value="none"><span>None</span></label>
+            <label><input type="radio" name="rot" value="varimax"><span>Varimax, axes at right angles</span></label>
+            <label><input type="radio" name="rot" value="promax"><span>Promax, axes may lean</span></label>
+            <label><input type="radio" name="rot" value="oblimin" checked><span>Oblimin, axes may lean</span></label>
+            <label><input type="radio" name="rot" value="manual"><span>By hand, axes at right angles</span></label>
+          </div>
+          <p class="hint" id="rot-hint"></p>
+        </div>
+        <div class="field" id="anglebox" hidden>
+          <div class="label-row"><label class="name" for="angle">Turn the axes</label><output id="angle-out" for="angle">0&deg;</output></div>
+          <input type="range" id="angle" min="-90" max="90" step="1" value="0">
+        </div>
+      </div>
+      <div>
+        <details class="adv"><summary>Advanced</summary>
+          <div class="field">
+            <label class="toggle"><input type="checkbox" id="omega"><span class="track"></span><span>Show omega instead of alpha</span></label>
+            <p class="hint">Omega uses the loadings of the factor model chosen above, so it changes with the number of factors.</p>
+          </div>
+          <div class="field">
+            <label class="toggle"><input type="checkbox" id="poly"><span class="track"></span><span>Polychoric correlations</span></label>
+            <p class="hint">For the factor analysis only. They estimate how the opinions behind the answers correlate, before those opinions are cut into a few answer categories.</p>
+          </div>
+          <div class="field">
+            <label class="toggle"><input type="checkbox" id="pcpa"><span class="track"></span><span>Parallel analysis with components</span></label>
+            <p class="hint">Use the eigenvalues of the correlations themselves, as principal components do, instead of those left for common factors.</p>
+          </div>
+          <div class="field">
+            <label class="toggle"><input type="checkbox" id="structure"><span class="track"></span><span>Show structure loadings</span></label>
+            <p class="hint">With promax or oblimin: show the correlations of the questions with the factors instead of the weights of the factors in each question.</p>
+          </div>
+        </details>
+      </div>
+    </aside>
+
+    <main>
+      <div class="figs">
+        <figure><div id="matrix" role="img"></div><figcaption id="matrix-cap"></figcaption></figure>
+        <figure><div id="loadplot" role="img"></div><figcaption id="loadplot-cap"></figcaption></figure>
+      </div>
+      <div class="result" id="result" aria-live="polite"></div>
+      <p class="verdict" id="verdict"></p>
+
+      <section class="block">
+        <h2 class="sec">Question by question</h2>
+        <div class="tblwrap" id="itemtbl"></div>
+        <p class="cap" id="itemcap"></p>
+      </section>
+
+      <section class="block">
+        <h2 class="sec">How many attitudes?</h2>
+        <div class="dimgrid">
+          <div><div class="tblwrap" id="dimtbl"></div><div class="lines" id="dimlines"></div></div>
+          <figure style="margin:0"><div id="scree" role="img"></div><figcaption class="cap" id="scree-cap"></figcaption></figure>
+        </div>
+      </section>
+
+      <section class="block">
+        <h2 class="sec" id="sol-title">The factor solution</h2>
+        <div class="dimgrid">
+          <div><div class="tblwrap" id="soltbl"></div><p class="cap" id="solcap"></p></div>
+          <div><div id="phibox"></div><figure style="margin:12px 0 0" id="vmfig"><div id="vmcurve" role="img"></div><figcaption class="cap" id="vmcap"></figcaption></figure></div>
+        </div>
+        <div class="lines" id="sollines"></div>
+      </section>
+
+      <section class="block">
+        <h2 class="sec">Five ways to combine the same questions</h2>
+        <div class="tblwrap" id="fivetbl"></div>
+        <div class="lines" id="fivelines"></div>
+      </section>
+
+      <section class="block">
+        <h2 class="sec">Who holds which view?</h2>
+        <div id="regfig" role="img"></div>
+        <div class="tblwrap" id="regtbl" style="margin-top:12px"></div>
+        <p class="cap" id="regcap"></p>
+      </section>
+
+      <section class="block">
+        <div class="code-head">
+          <h2 class="sec">R code for these settings</h2>
+          <div class="btns"><span id="copy-status" aria-live="polite"></span><button id="json">Summary data (JSON)</button><button id="copy">Copy</button><button id="dl">Download .R</button></div>
+        </div>
+        <pre class="r"><code id="rcode"></code></pre>
+        <details class="more"><summary>The R script that computed the summary data</summary><pre class="r"><code id="buildcode"></code></pre></details>
+      </section>
+    </main>
+  </div>
+
+  <section class="about">
+    <h2 class="sec">Data</h2>
+    <p>The data come from the seventh wave of the World Values Survey, which interviewed people in 64 countries and territories between 2017 and 2022 (Haerpfer et al. 2022). The survey in the United States, in 2017, had 2,596 respondents. The page uses the 2,455 who answered all ten questions below, counting "don't know" and refusals as missing. The survey's weights are not applied, so the numbers describe these respondents rather than all American adults.</p>
+    <dl class="items">
+      <dt><code>Q121</code> Impact on the country</dt>
+      <dd>"Now we would like to know your opinion about the people from other countries who come to live in this country - the immigrants. How would you evaluate the impact of these people on the development of this country?" Five answers, coded from 1, the most negative, through 3, neither good nor bad, to 5, very good.</dd>
+      <dt><code>Q122</code> to <code>Q129</code> Effects of immigration</dt>
+      <dd>"From your point of view, what have been the effects of immigrants on the development of this country?" Eight statements, each answered 0 = disagree, 1 = hard to say, 2 = agree. Four name a benefit: fill useful jobs in the workforce (<code>Q122</code>), strengthen cultural diversity (<code>Q123</code>), give asylum to political refugees (<code>Q125</code>), and help poor people establish new lives (<code>Q127</code>). Four name a harm: increase the crime rate (<code>Q124</code>), increase the risks of terrorism (<code>Q126</code>), increase unemployment (<code>Q128</code>), and lead to social conflict (<code>Q129</code>).</dd>
+      <dt><code>Q130</code> Who may come to work</dt>
+      <dd>"How about people from other countries coming here to work. Which one of the following do you think the government should do?" 1 = let anyone come who wants to, 2 = let people come as long as there are jobs available, 3 = place strict limits on the number of foreigners who can come here, 4 = prohibit people coming here from other countries.</dd>
+      <dt>Background</dt>
+      <dd>Education is the highest level completed, on the international ISCED scale from 0, none or early childhood education only, to 8, a doctorate; 3 is upper secondary school, in the United States a high-school diploma, and 6 a bachelor's degree (<code>Q275</code>). Age is in years and enters per decade (<code>Q262</code>). Female is 1 for women (<code>Q260</code>). Born abroad is 1 for respondents who say they are immigrants to the country (<code>Q263</code>). Of the 2,455, 2,402 answered all four and enter the regressions; 251 of them were born abroad.</dd>
+    </dl>
+    <p>The survey's conditions of use do not allow its data files to be passed on, so the page holds no individual answers. It holds summary numbers computed from the file: how many people gave each answer, the means and standard deviations, the correlations among the ten questions, and their covariances with the four background questions. The R script that computed them is under the R code.</p>
+
+    <h2 class="sec">How the page computes</h2>
+    <p>Everything on the page is computed in the browser from those summary numbers, with the formulas of the R packages psych and GPArotation. The R code below runs the same analysis on the survey file and gives the same numbers to three decimals, with two exceptions. Parallel analysis compares the data with random data, so its yardstick varies a little from run to run, and in close cases R and the page can keep different numbers of factors. With three or four factors, when one question ends up almost fully explained, R and the page can settle on different solutions that fit about equally well.</p>
+
+    <h2 class="sec">Notes on method</h2>
+    <p>Alpha measures how consistently the questions in an index go together, from 0 to 1. It rises with the number of questions, and it can be high even when the questions measure two different things, as here. When the errors in the answers are unrelated, alpha is a lower bound on the reliability of the index, equal to it only if every question measures the same thing equally well. When the errors are related, as a shared habit of answering makes them, alpha can overstate the reliability. Omega, under Advanced, uses the loadings of a factor model and gives the share of the index's variation that the factors account for; it is only as good as that model.</p>
+    <p>A factor model looks for a few unobserved variables, the factors, that would explain the correlations among the questions. A loading says how strongly a question goes with a factor. The page fits the model as psych does by default, by making the correlations the model predicts as close as possible to the observed ones ("minres"). RMSEA, TLI, and BIC compare how well models with different numbers of factors fit. Parallel analysis keeps each factor whose eigenvalue, a measure of how much of the shared variation the factor could take, is larger than in 95% of random data sets of the same size. Fitted to random data, a one-factor model often lets a single question take nearly the whole factor, so the yardstick for the first factor is close to 1; psych does the same.</p>
+    <p>Rotation changes the axes, not the model: every rotation of the same solution fits the data equally well. Varimax keeps the axes at right angles and makes the loadings on each factor as unequal as possible, a few large and the rest near zero. Oblimin and promax let the axes lean toward each other, so that the factors can correlate. Promax raises the varimax loadings to the fourth power to make a target and then finds the leaning axes that come closest to it. Factor scores give each respondent a value on each factor; for two or more factors the page uses psych's default, which keeps the scores correlated as the factors are.</p>
+    <p>A correlation between questions with three answers understates how strongly the opinions behind them go together. Polychoric correlations, under Advanced, estimate the latter by treating each answer as a cut through an opinion that varies smoothly. The loadings rise, but which question goes with which hardly changes.</p>
+    <p>The two factors follow the direction of the statements: the statements of harm go together, and so do the statements of benefit. Part of this split can come from a habit of agreeing with whatever statement is put to the respondent, which pushes answers to benefit and harm statements in opposite directions once the harm statements are reversed. Fitted to the eight statements alone, a two-factor model puts the correlation between the benefit and the harm factor at 0.44. Adding the habit as one more factor, acting equally on all eight statements, improves the fit and raises that correlation to 0.84 (Billiet and McClendon 2000). The code for that model is at the end of the R code. Holding both views is also possible: a respondent can believe that immigrants fill useful jobs and that they raise unemployment. The regressions describe who holds which view; they do not say why.</p>
+
+    <h2 class="sec">References</h2>
+    <p class="src">Billiet, Jaak B., and McKee J. McClendon. 2000. "Modeling Acquiescence in Measurement Models for Two Balanced Sets of Items." <i>Structural Equation Modeling</i> 7 (4): 608-28.</p>
+    <p class="src">Haerpfer, Christian, Ronald Inglehart, Alejandro Moreno, Christian Welzel, Kseniya Kizilova, Jaime Diez-Medrano, Marta Lagos, Pippa Norris, Eduard Ponarin, and Bi Puranen, eds. 2022. <i>World Values Survey: Round Seven - Country-Pooled Datafile Version 5.0</i>. Madrid, Spain, and Vienna, Austria: JD Systems Institute and WVSA Secretariat. doi:10.14281/18241.20.</p>
+  </section>
+</div>
+
+<script id="data" type="application/json">{"source":"World Values Survey wave 7, country-pooled file, version 5.0","items":["Q121","Q122","Q123","Q124","Q125","Q126","Q127","Q128","Q129","Q130"],"background":["education","age10","female","immigrant"],"countries":[{"iso":"USA","name":"United States","year":2017,"n_sample":2596,"n":2455,"mean":[3.3824847,1.5327902,1.5413442,1.1164969,1.3132383,1.1808554,1.4158859,1.0940937,1.301833,2.3405295],"sd":[0.96470873,0.63422825,0.66571455,0.68891617,0.63966925,0.75523174,0.67266468,0.72930965,0.67537359,0.77483792],"counts":[[84,292,988,783,308],[188,771,1496],[239,648,1568],[456,1257,742],[238,1210,1007],[518,975,962],[257,920,1278],[548,1128,779],[301,1112,1042],[375,955,1039,86]],"r":[1,0.485331,0.497889,-0.414112,0.190755,-0.405398,0.37959,-0.406793,-0.262948,-0.484509,1,0.520137,-0.261491,0.235325,-0.259102,0.426982,-0.231764,-0.068304,-0.362711,1,-0.295724,0.227469,-0.295314,0.424319,-0.269463,-0.136981,-0.402555,1,-0.025509,0.622868,-0.191648,0.549964,0.38858,0.399719,1,-0.031275,0.284288,-0.052722,0.061208,-0.180767,1,-0.189828,0.556518,0.398648,0.43509,1,-0.19692,-0.079088,-0.303885,1,0.429604,0.385317,1,0.241138,1],"poly":[1,0.603842,0.629605,-0.488067,0.234616,-0.482021,0.461138,-0.477793,-0.318146,-0.558678,1,0.669954,-0.358885,0.320856,-0.362132,0.556183,-0.321572,-0.093861,-0.476267,1,-0.407428,0.317147,-0.421493,0.55987,-0.379498,-0.193468,-0.537205,1,-0.03225,0.742873,-0.25374,0.659831,0.49018,0.471646,1,-0.0401,0.377123,-0.068411,0.082923,-0.226385,1,-0.255165,0.670671,0.504065,0.506073,1,-0.264107,-0.103771,-0.381299,1,0.539401,0.454211,1,0.289488,1],"reg":{"n":2402,"mean":[3.386761,1.5370525,1.5466278,1.1190674,1.3168193,1.1827644,1.4204829,1.0949209,1.3051624,2.3405495,4.9154871,4.349209,0.46294754,0.10449625],"cov":[0.9294873,0.29615921,0.31827687,-0.28180494,0.11939811,-0.30270225,0.24380315,-0.29328676,-0.17596661,-0.36666827,0.42253748,-0.092259539,-0.032519062,0.05161307,0.40200014,0.216514,-0.11603374,0.093837185,-0.12776594,0.17891588,-0.10972426,-0.031928134,-0.18047018,0.30321601,-0.019066889,-0.03340372,0.0096625712,0.44118188,-0.13841547,0.097466154,-0.15159084,0.18696623,-0.13270768,-0.062756429,-0.209555,0.26487524,-0.095548275,-0.0007705643,0.016574935,0.47644594,-0.013165483,0.32516843,-0.090486513,0.27898901,0.18230886,0.21557802,-0.1702746,0.13474645,-0.0097471876,-0.013696763,0.41145377,-0.019610029,0.1216212,-0.027169848,0.024061408,-0.092943857,0.20171359,0.031633468,-0.013454011,0.0051971476,0.57258078,-0.099788424,0.30834224,0.20617814,0.25718399,-0.19987457,0.19899927,-0.00093043386,-0.011192776,0.45035912,-0.099487759,-0.039239479,-0.16283009,0.21505957,0.02782129,-0.013568105,0.0072714637,0.53575928,0.21342065,0.21963961,-0.16481927,0.15488561,-0.010225756,-0.014504434,0.45785755,0.12593802,-0.010850496,0.032873723,-0.018884027,-0.018157332,0.59867991,-0.22110306,0.23425533,-0.012782628,-0.011860864,2.4497476,-0.085177249,-0.14369915,0.046319342,2.6396599,-0.18089146,-0.0200964,0.24873067,-0.0017492018,0.09361576]}}]}</script>
+<script id="buildr" type="text/plain">
+# Builds the summary statistics behind the immigration-attitudes demo.
+# Input: World Values Survey wave 7, country-pooled file, version 5.0 (R format).
+# Output: wvs7-immigration-usa.json with the counts, means, standard deviations,
+# and correlations of the ten immigration items (Q121 to Q130) in the United
+# States, and their covariances with four background variables. No answers of
+# individual respondents leave R.
+
+library(psych)
+library(jsonlite)
+
+load("WVS_Cross-National_Wave_7_rData_v5_0.rdata")
+wvs <- `WVS_Cross-National_Wave_7_v5_0`
+
+items <- paste0("Q", 121:130)
+codes <- list(1:5, 0:2, 0:2, 0:2, 0:2, 0:2, 0:2, 0:2, 0:2, 1:4)
+
+d <- wvs[wvs$B_COUNTRY_ALPHA == "USA", ]
+x <- d[items]
+x[x < 0] <- NA                       # don't know, no answer, not asked
+keep <- complete.cases(x)            # respondents who answered all ten
+x <- as.matrix(x[keep, ])
+d <- d[keep, ]
+
+bg <- data.frame(
+  education = ifelse(d$Q275 >= 0, d$Q275, NA),        # ISCED 2011, 0 to 8
+  age10     = ifelse(d$Q262 >= 16, d$Q262 / 10, NA),  # age in decades
+  female    = ifelse(d$Q260 > 0, as.numeric(d$Q260 == 2), NA),
+  immigrant = ifelse(d$Q263 > 0, as.numeric(d$Q263 == 2), NA)
+)
+reg <- complete.cases(bg)
+xb <- cbind(x[reg, ], as.matrix(bg[reg, ]))
+
+lower <- function(m) m[lower.tri(m, diag = TRUE)]   # column by column
+
+out <- list(
+  source = "World Values Survey wave 7, country-pooled file, version 5.0",
+  items = items,
+  background = names(bg),
+  countries = list(list(
+    iso = "USA", name = "United States", year = unique(d$A_YEAR),
+    n_sample = sum(wvs$B_COUNTRY_ALPHA == "USA"),
+    n = nrow(x),
+    mean = signif(colMeans(x), 8),
+    sd = signif(apply(x, 2, sd), 8),
+    counts = lapply(seq_along(items), function(j) as.integer(table(factor(x[, j], levels = codes[[j]])))),
+    r = round(lower(cor(x)), 6),
+    poly = round(lower(suppressWarnings(polychoric(x)$rho)), 6),
+    reg = list(n = sum(reg), mean = signif(colMeans(xb), 8), cov = signif(lower(cov(xb)), 8))
+  ))
+)
+write_json(out, "wvs7-immigration-usa.json", auto_unbox = TRUE, digits = NA)
+</script>
+<script>
+/* Engine for the immigration-attitudes demo. Plain ES5, no dependencies.
+   Every statistic is computed from summary matrices of the World Values Survey,
+   following the formulas of the R packages psych and GPArotation. */
+var ENGINE = (function () {
+'use strict';
+
+/* ---------- Random numbers (for parallel analysis only) ---------- */
+function mulberry32(a) {
+  return function () {
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    var t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+function normalStream(seed) {
+  var r = mulberry32(seed), spare = null;
+  var g = function () {
+    if (spare !== null) { var s = spare; spare = null; return s; }
+    var u = 0, v;
+    while (u === 0) u = r();
+    v = r();
+    var m = Math.sqrt(-2 * Math.log(u));
+    spare = m * Math.sin(2 * Math.PI * v);
+    return m * Math.cos(2 * Math.PI * v);
+  };
+  g.unif = r;
+  return g;
+}
+/* Gamma(shape, 1) draw, Marsaglia and Tsang (2000); shape >= 1 */
+function rgamma(g, shape) {
+  var d = shape - 1 / 3, c = 1 / Math.sqrt(9 * d), x, v, u;
+  for (;;) {
+    do { x = g(); v = 1 + c * x; } while (v <= 0);
+    v = v * v * v; u = g.unif();
+    if (u < 1 - 0.0331 * x * x * x * x) return d * v;
+    if (Math.log(u) < 0.5 * x * x + d * (1 - v + Math.log(v))) return d * v;
+  }
+}
+
+/* ---------- Special functions ---------- */
+function lgamma(x) {
+  var c = [76.18009172947146, -86.50532032941677, 24.01409824083091, -1.231739572450155, 0.1208650973866179e-2, -0.5395239384953e-5];
+  var y = x, t = x + 5.5, s = 1.000000000190015, j;
+  t -= (x + 0.5) * Math.log(t);
+  for (j = 0; j < 6; j++) s += c[j] / ++y;
+  return -t + Math.log(2.5066282746310005 * s / x);
+}
+function betacf(x, a, b) {
+  var qab = a + b, qap = a + 1, qam = a - 1, c = 1, d = 1 - qab * x / qap, m, m2, aa, del, h;
+  if (Math.abs(d) < 1e-300) d = 1e-300;
+  d = 1 / d; h = d;
+  for (m = 1; m < 3000; m++) {
+    m2 = 2 * m;
+    aa = m * (b - m) * x / ((qam + m2) * (a + m2));
+    d = 1 + aa * d; if (Math.abs(d) < 1e-300) d = 1e-300;
+    c = 1 + aa / c; if (Math.abs(c) < 1e-300) c = 1e-300;
+    d = 1 / d; h *= d * c;
+    aa = -(a + m) * (qab + m) * x / ((a + m2) * (qap + m2));
+    d = 1 + aa * d; if (Math.abs(d) < 1e-300) d = 1e-300;
+    c = 1 + aa / c; if (Math.abs(c) < 1e-300) c = 1e-300;
+    d = 1 / d; del = d * c; h *= del;
+    if (Math.abs(del - 1) < 1e-15) break;
+  }
+  return h;
+}
+function ibeta(x, a, b) {
+  if (x <= 0) return 0;
+  if (x >= 1) return 1;
+  var bt = Math.exp(lgamma(a + b) - lgamma(a) - lgamma(b) + a * Math.log(x) + b * Math.log(1 - x));
+  return x < (a + 1) / (a + b + 2) ? bt * betacf(x, a, b) / a : 1 - bt * betacf(1 - x, b, a) / b;
+}
+function pf(f, d1, d2) { return f <= 0 ? 0 : 1 - ibeta(d2 / (d2 + d1 * f), d2 / 2, d1 / 2); }
+function qf(p, d1, d2) {
+  var lo = 0, hi = 1, k, mid;
+  while (pf(hi, d1, d2) < p) hi *= 2;
+  for (k = 0; k < 200; k++) { mid = (lo + hi) / 2; if (pf(mid, d1, d2) < p) lo = mid; else hi = mid; }
+  return (lo + hi) / 2;
+}
+/* two-sided p-value and quantile of Student's t */
+function pt2(t, df) { var x = df / (df + t * t); return ibeta(x, df / 2, 0.5); }
+function qt975(df) {
+  var lo = 0, hi = 50, k, mid;
+  for (k = 0; k < 200; k++) { mid = (lo + hi) / 2; if (pt2(mid, df) > 0.05) lo = mid; else hi = mid; }
+  return (lo + hi) / 2;
+}
+/* upper tail of the chi-square distribution, from the regularized gamma function */
+function gammaPLower(a, x) {
+  if (x <= 0) return 0;
+  var gln = lgamma(a), n, sum, del, ap, b, c, d, h, an, i;
+  if (x < a + 1) {
+    ap = a; sum = del = 1 / a;
+    for (n = 0; n < 100000; n++) { ap += 1; del *= x / ap; sum += del; if (Math.abs(del) < Math.abs(sum) * 1e-15) break; }
+    return sum * Math.exp(-x + a * Math.log(x) - gln);
+  }
+  b = x + 1 - a; c = 1 / 1e-300; d = 1 / b; h = d;
+  for (i = 1; i < 100000; i++) {
+    an = -i * (i - a); b += 2;
+    d = an * d + b; if (Math.abs(d) < 1e-300) d = 1e-300;
+    c = b + an / c; if (Math.abs(c) < 1e-300) c = 1e-300;
+    d = 1 / d; del = d * c; h *= del;
+    if (Math.abs(del - 1) < 1e-15) break;
+  }
+  return 1 - Math.exp(-x + a * Math.log(x) - gln) * h;
+}
+function pchisqUpper(x, df) { return x <= 0 ? 1 : 1 - gammaPLower(df / 2, x / 2); }
+
+/* ---------- Small dense matrices, as arrays of arrays ---------- */
+function mat(r, c, v) { var m = [], i, j; for (i = 0; i < r; i++) { m.push([]); for (j = 0; j < c; j++) m[i].push(v || 0); } return m; }
+function eye(n) { var m = mat(n, n), i; for (i = 0; i < n; i++) m[i][i] = 1; return m; }
+function copy(A) { return A.map(function (r) { return r.slice(); }); }
+function mmul(A, B) {
+  var n = A.length, p = B.length, q = B[0].length, C = mat(n, q), i, j, k, s;
+  for (i = 0; i < n; i++) for (j = 0; j < q; j++) { s = 0; for (k = 0; k < p; k++) s += A[i][k] * B[k][j]; C[i][j] = s; }
+  return C;
+}
+function tr(A) { var n = A.length, m = A[0].length, T = mat(m, n), i, j; for (i = 0; i < n; i++) for (j = 0; j < m; j++) T[j][i] = A[i][j]; return T; }
+function diagOf(A) { return A.map(function (r, i) { return r[i]; }); }
+function sub(A, idx) { return idx.map(function (a) { return idx.map(function (b) { return A[a][b]; }); }); }
+function quad(w, A, v) { var s = 0, i, j; v = v || w; for (i = 0; i < w.length; i++) for (j = 0; j < v.length; j++) s += w[i] * A[i][j] * v[j]; return s; }
+function matvec(A, v) { return A.map(function (r) { var s = 0, j; for (j = 0; j < v.length; j++) s += r[j] * v[j]; return s; }); }
+function chol(A) {
+  var n = A.length, L = mat(n, n), i, j, k, s;
+  for (i = 0; i < n; i++) for (j = 0; j <= i; j++) {
+    s = A[i][j];
+    for (k = 0; k < j; k++) s -= L[i][k] * L[j][k];
+    if (i === j) { if (!(s > 0)) return null; L[i][i] = Math.sqrt(s); } else L[i][j] = s / L[j][j];
+  }
+  return L;
+}
+/* General inverse by Gauss-Jordan elimination with partial pivoting; null if singular */
+function inv(A) {
+  var n = A.length, M = A.map(function (r, i) { var e = new Array(n).fill(0); e[i] = 1; return r.concat(e); }), i, j, k, p, t, f;
+  for (i = 0; i < n; i++) {
+    p = i; for (k = i + 1; k < n; k++) if (Math.abs(M[k][i]) > Math.abs(M[p][i])) p = k;
+    if (Math.abs(M[p][i]) < 1e-14) return null;
+    t = M[i]; M[i] = M[p]; M[p] = t;
+    f = M[i][i]; for (j = 0; j < 2 * n; j++) M[i][j] /= f;
+    for (k = 0; k < n; k++) if (k !== i) { f = M[k][i]; if (f !== 0) for (j = 0; j < 2 * n; j++) M[k][j] -= f * M[i][j]; }
+  }
+  return M.map(function (r) { return r.slice(n); });
+}
+function logdetSym(A) { var L = chol(A), s = 0, i; if (!L) return NaN; for (i = 0; i < L.length; i++) s += 2 * Math.log(L[i][i]); return s; }
+function logdetGen(A) {     /* log |det| by LU, for non-symmetric matrices */
+  var n = A.length, M = copy(A), i, k, j, p, t, f, s = 0;
+  for (i = 0; i < n; i++) {
+    p = i; for (k = i + 1; k < n; k++) if (Math.abs(M[k][i]) > Math.abs(M[p][i])) p = k;
+    if (M[p][i] === 0) return -Infinity;
+    t = M[i]; M[i] = M[p]; M[p] = t;
+    s += Math.log(Math.abs(M[i][i]));
+    for (k = i + 1; k < n; k++) { f = M[k][i] / M[i][i]; for (j = i; j < n; j++) M[k][j] -= f * M[i][j]; }
+  }
+  return s;
+}
+/* Symmetric eigen decomposition, cyclic Jacobi; values in decreasing order */
+function eigenSym(A) {
+  var n = A.length, a = copy(A), V = eye(n), sweep, p, q, i, off, th, t, c, s, tau, h;
+  for (sweep = 0; sweep < 100; sweep++) {
+    off = 0;
+    for (p = 0; p < n; p++) for (q = p + 1; q < n; q++) off += a[p][q] * a[p][q];
+    if (off < 1e-26) break;
+    for (p = 0; p < n; p++) for (q = p + 1; q < n; q++) {
+      if (Math.abs(a[p][q]) < 1e-300) continue;
+      th = (a[q][q] - a[p][p]) / (2 * a[p][q]);
+      t = (th >= 0 ? 1 : -1) / (Math.abs(th) + Math.sqrt(th * th + 1));
+      c = 1 / Math.sqrt(t * t + 1); s = t * c; tau = s / (1 + c);
+      h = t * a[p][q];
+      a[p][p] -= h; a[q][q] += h; a[p][q] = a[q][p] = 0;
+      for (i = 0; i < n; i++) {
+        if (i !== p && i !== q) {
+          var aip = a[i][p], aiq = a[i][q];
+          a[i][p] = a[p][i] = aip - s * (aiq + tau * aip);
+          a[i][q] = a[q][i] = aiq + s * (aip - tau * aiq);
+        }
+        var vip = V[i][p], viq = V[i][q];
+        V[i][p] = vip - s * (viq + tau * vip);
+        V[i][q] = viq + s * (vip - tau * viq);
+      }
+    }
+  }
+  var idx = [], k;
+  for (k = 0; k < n; k++) idx.push(k);
+  idx.sort(function (x, y) { return a[y][y] - a[x][x]; });
+  return { values: idx.map(function (k) { return a[k][k]; }), vectors: idx.map(function (k) { return V.map(function (r) { return r[k]; }); }) };
+}
+function symPow(A, pw) {   /* A^pw for a symmetric positive definite matrix */
+  var e = eigenSym(A), n = A.length, M = mat(n, n), i, j, k;
+  for (i = 0; i < n; i++) for (j = 0; j < n; j++) { var s = 0; for (k = 0; k < n; k++) s += e.vectors[k][i] * Math.pow(Math.max(e.values[k], 1e-300), pw) * e.vectors[k][j]; M[i][j] = s; }
+  return M;
+}
+/* psych::cor.smooth: repairs a correlation matrix that is not positive definite */
+function corSmooth(R) {
+  var e = eigenSym(R), n = R.length, eps = 2.220446e-16, i, j, k, tot = 0;
+  if (e.values[n - 1] >= eps) return R;
+  var v = e.values.map(function (x) { return x < eps ? 100 * eps : x; });
+  v.forEach(function (x) { tot += x; });
+  v = v.map(function (x) { return x * n / tot; });
+  var M = mat(n, n);
+  for (i = 0; i < n; i++) for (j = 0; j < n; j++) { var s = 0; for (k = 0; k < n; k++) s += e.vectors[k][i] * v[k] * e.vectors[k][j]; M[i][j] = s; }
+  for (i = 0; i < n; i++) for (j = 0; j < n; j++) if (i !== j) M[i][j] /= Math.sqrt(M[i][i] * M[j][j]);
+  for (i = 0; i < n; i++) M[i][i] = 1;
+  return M;
+}
+
+/* ---------- Factor extraction: minres, as psych::fa(fm = "minres") ---------- */
+/* Off-diagonal least squares. Iterated principal axes converge to the same solution
+   as psych's L-BFGS-B search over the uniquenesses, with the same bounds (0.005 to 1). */
+function smc(R) { var Ri = inv(R); return R.map(function (r, i) { return Ri ? 1 - 1 / Ri[i][i] : 0; }); }
+function minres(R, m, opts) {
+  opts = opts || {};
+  var p = R.length, S = copy(R), i, a, it, conv = false, nf = 0;
+  var tol = opts.tol || 1e-10, maxit = opts.maxit || 3000;
+  function clamp(x) { return Math.min(0.995, Math.max(0, x)); }
+  function F(h) {               /* one principal-axes step: communalities in, communalities out */
+    nf++;
+    for (var q = 0; q < p; q++) S[q][q] = h[q];
+    var e = eigenSym(S), out = new Array(p).fill(0), b;
+    for (b = 0; b < m; b++) { var ev = Math.max(e.values[b], 0); for (q = 0; q < p; q++) out[q] += e.vectors[b][q] * e.vectors[b][q] * ev; }
+    return out.map(clamp);
+  }
+  function dist(x, y) { var d = 0; for (var q = 0; q < p; q++) d = Math.max(d, Math.abs(x[q] - y[q])); return d; }
+  /* SQUAREM acceleration of the fixed-point iteration (Varadhan and Roland 2008) */
+  var h = smc(R).map(clamp);
+  for (it = 0; it < maxit; it++) {
+    var h1 = F(h);
+    if (dist(h1, h) < tol) { h = h1; conv = true; break; }
+    var h2 = F(h1), r = [], v = [], rr = 0, vv = 0;
+    for (i = 0; i < p; i++) { r.push(h1[i] - h[i]); v.push(h2[i] - 2 * h1[i] + h[i]); rr += r[i] * r[i]; vv += v[i] * v[i]; }
+    if (vv < 1e-300) { h = h2; continue; }
+    var al = -Math.sqrt(rr / vv); if (al > -1) al = -1;
+    var hn = []; for (i = 0; i < p; i++) hn.push(clamp(h[i] - 2 * al * r[i] + al * al * v[i]));
+    hn = F(hn);
+    h = hn;
+  }
+  for (i = 0; i < p; i++) S[i][i] = h[i];
+  var e = eigenSym(S), L = mat(p, m);
+  for (a = 0; a < m; a++) { var sv = Math.sqrt(Math.max(e.values[a], 0)); for (i = 0; i < p; i++) L[i][a] = e.vectors[a][i] * sv; }
+  /* psych: each factor's loadings sum to a positive number */
+  for (a = 0; a < m; a++) { var cs = 0; for (i = 0; i < p; i++) cs += L[i][a]; if (cs < 0) for (i = 0; i < p; i++) L[i][a] = -L[i][a]; }
+  var model = mmul(L, tr(L)), Sv = copy(R);
+  for (i = 0; i < p; i++) Sv[i][i] = model[i][i];
+  return { L: L, h2: diagOf(model), conv: conv, iter: nf, heywood: diagOf(model).some(function (x) { return x > 0.994; }), values: eigenSym(Sv).values };
+}
+/* ---------- Rotations ---------- */
+function polar(B) {   /* U V' from the SVD of a square matrix, and the sum of singular values */
+  var BtB = mmul(tr(B), B), e = eigenSym(BtB), n = B.length, M = mat(n, n), i, j, k, d = 0;
+  for (k = 0; k < n; k++) d += Math.sqrt(Math.max(e.values[k], 0));
+  for (i = 0; i < n; i++) for (j = 0; j < n; j++) { var s = 0; for (k = 0; k < n; k++) s += e.vectors[k][i] / Math.sqrt(Math.max(e.values[k], 1e-300)) * e.vectors[k][j]; M[i][j] = s; }
+  return { U: mmul(B, M), d: d };
+}
+/* stats::varimax(x, normalize = TRUE, eps = 1e-5) */
+function varimax(x0) {
+  var p = x0.length, nc = x0[0].length, sc = x0.map(function (r) { return Math.sqrt(r.reduce(function (s, v) { return s + v * v; }, 0)); });
+  var x = x0.map(function (r, i) { return r.map(function (v) { return v / sc[i]; }); }), TT = eye(nc), d = 0, it, i, j;
+  for (it = 0; it < 1000; it++) {
+    var z = mmul(x, TT), cs = new Array(nc).fill(0);
+    for (i = 0; i < p; i++) for (j = 0; j < nc; j++) cs[j] += z[i][j] * z[i][j];
+    var Y = z.map(function (r) { return r.map(function (v, jj) { return v * v * v - v * cs[jj] / p; }); });
+    var pol = polar(mmul(tr(x), Y)), dpast = d;
+    TT = pol.U; d = pol.d;
+    if (d < dpast * (1 + 1e-5)) break;
+  }
+  var L = mmul(x, TT).map(function (r, i) { return r.map(function (v) { return v * sc[i]; }); });
+  return { L: L, T: TT };
+}
+/* psych "promax": Kaiser normalization, then psych::Promax(m = 4) */
+function promax(L0) {
+  var h = L0.map(function (r) { return Math.sqrt(r.reduce(function (s, v) { return s + v * v; }, 0)); });
+  var w = L0.map(function (r, i) { return r.map(function (v) { return v / h[i]; }); });
+  var vx = varimax(w), x = vx.L, nc = x[0].length;
+  var Q = x.map(function (r) { return r.map(function (v) { return v * Math.abs(v) * Math.abs(v) * Math.abs(v); }); });
+  var xtx = mmul(tr(x), x), U = mmul(inv(xtx), mmul(tr(x), Q));
+  var dd = diagOf(inv(mmul(tr(U), U))), a, b;
+  for (a = 0; a < nc; a++) for (b = 0; b < nc; b++) U[a][b] *= Math.sqrt(dd[b]);
+  var z = mmul(x, U), Ut = mmul(vx.T, U), ui = inv(Ut);
+  return { L: z.map(function (r, i) { return r.map(function (v) { return v * h[i]; }); }), Phi: mmul(ui, tr(ui)) };
+}
+/* GPArotation::oblimin(gam = 0, normalize = FALSE, eps = 1e-5), the GPFoblq algorithm */
+function quartimin(L) {
+  var p = L.length, m = L[0].length, Gq = mat(p, m), f = 0, i, j, k;
+  for (i = 0; i < p; i++) for (j = 0; j < m; j++) {
+    var s = 0; for (k = 0; k < m; k++) if (k !== j) s += L[i][k] * L[i][k];
+    Gq[i][j] = L[i][j] * s; f += L[i][j] * L[i][j] * s;
+  }
+  return { Gq: Gq, f: f / 4 };
+}
+function oblimin(A) {
+  var m = A[0].length, Tm = eye(m), al = 1, it, i, j, k;
+  var L = mmul(A, tr(inv(Tm))), V = quartimin(L), G = tr(mmul(mmul(tr(L), V.Gq), inv(Tm))).map(function (r) { return r.map(function (v) { return -v; }); }), f = V.f, s = 1, conv = false;
+  for (it = 0; it <= 1000; it++) {
+    var cs = new Array(m).fill(0);
+    for (i = 0; i < m; i++) for (j = 0; j < m; j++) cs[j] += Tm[i][j] * G[i][j];
+    var Gp = G.map(function (r, ii) { return r.map(function (v, jj) { return v - Tm[ii][jj] * cs[jj]; }); });
+    s = 0; for (i = 0; i < m; i++) for (j = 0; j < m; j++) s += Gp[i][j] * Gp[i][j];
+    s = Math.sqrt(s);
+    if (s < 1e-5) { conv = true; break; }
+    al *= 2;
+    var Tt = null, Vt = null;
+    for (k = 0; k <= 10; k++) {
+      var X = Tm.map(function (r, ii) { return r.map(function (v, jj) { return v - al * Gp[ii][jj]; }); }), v = new Array(m).fill(0);
+      for (i = 0; i < m; i++) for (j = 0; j < m; j++) v[j] += X[i][j] * X[i][j];
+      Tt = X.map(function (r) { return r.map(function (x, jj) { return x / Math.sqrt(v[jj]); }); });
+      L = mmul(A, tr(inv(Tt)));
+      Vt = quartimin(L);
+      if (f - Vt.f > 0.5 * s * s * al) break;
+      al /= 2;
+    }
+    Tm = Tt; f = Vt.f;
+    G = tr(mmul(mmul(tr(L), Vt.Gq), inv(Tt))).map(function (r) { return r.map(function (x) { return -x; }); });
+  }
+  return { L: L, Phi: mmul(tr(Tm), Tm), conv: conv };
+}
+/* Raw varimax criterion of a loading matrix, rows normalized as stats::varimax does */
+function varimaxCriterion(L) {
+  var p = L.length, m = L[0].length, c = 0, a, i;
+  var h = L.map(function (r) { return Math.sqrt(r.reduce(function (s, v) { return s + v * v; }, 0)); });
+  for (a = 0; a < m; a++) {
+    var s2 = 0, s4 = 0;
+    for (i = 0; i < p; i++) { var q = L[i][a] / h[i]; s2 += q * q; s4 += q * q * q * q; }
+    c += s4 / p - (s2 / p) * (s2 / p);
+  }
+  return c;
+}
+function rotate2(L0, deg) {
+  var t = deg * Math.PI / 180, c = Math.cos(t), s = Math.sin(t);
+  return mmul(L0, [[c, -s], [s, c]]);
+}
+
+/* A rotated solution in psych's conventions: positive column sums, factors ordered by variance */
+function solution(R, m, rot, n, angle) {
+  var ex = minres(R, m), L0 = ex.L, L, Phi = null, p = R.length, i, a, b, conv = true;
+  if (m === 1 || rot === 'none') L = copy(L0);
+  else if (rot === 'manual') L = rotate2(L0, angle);
+  else if (rot === 'varimax') L = varimax(L0).L;
+  else if (rot === 'promax') { var pr = promax(L0); L = pr.L; Phi = pr.Phi; }
+  else { var ob = oblimin(L0); L = ob.L; Phi = ob.Phi; conv = ob.conv; }
+  if (rot !== 'manual') {
+    var sg = []; for (a = 0; a < m; a++) { var cs = 0; for (i = 0; i < p; i++) cs += L[i][a]; sg.push(cs < 0 ? -1 : 1); }
+    L = L.map(function (r) { return r.map(function (v, aa) { return v * sg[aa]; }); });
+    if (Phi) Phi = Phi.map(function (r, aa) { return r.map(function (v, bb) { return v * sg[aa] * sg[bb]; }); });
+    var ev = [];
+    for (a = 0; a < m; a++) { var s = 0; for (b = 0; b < m; b++) for (i = 0; i < p; i++) s += (Phi ? Phi[a][b] : (a === b ? 1 : 0)) * L[i][b] * L[i][a]; ev.push(s); }
+    var ord = ev.map(function (v, k) { return k; }).sort(function (x, y) { return ev[y] - ev[x]; });
+    L = L.map(function (r) { return ord.map(function (k) { return r[k]; }); });
+    if (Phi) Phi = ord.map(function (x) { return ord.map(function (y) { return Phi[x][y]; }); });
+  }
+  if (!Phi) Phi = eye(m);
+  var Str = mmul(L, Phi), h2 = [], cx = [];
+  for (i = 0; i < p; i++) {
+    var hh = 0, s2 = 0, s4 = 0;
+    for (a = 0; a < m; a++) for (b = 0; b < m; b++) hh += L[i][a] * Phi[a][b] * L[i][b];
+    for (a = 0; a < m; a++) { s2 += L[i][a] * L[i][a]; s4 += Math.pow(L[i][a], 4); }
+    h2.push(hh); cx.push(s2 * s2 / s4);
+  }
+  var vacc = [];
+  for (a = 0; a < m; a++) { var t = 0; for (b = 0; b < m; b++) for (i = 0; i < p; i++) t += Phi[a][b] * L[i][b] * L[i][a]; vacc.push(t); }
+  /* axes of the rotated factors, expressed in the space of the unrotated loadings */
+  var axes = null;
+  if (m >= 2) {
+    var M = mmul(inv(mmul(tr(L0), L0)), mmul(tr(L0), L)), Mi = inv(M);
+    if (Mi) { var T = tr(Mi); axes = []; for (a = 0; a < m; a++) { var col = T.map(function (r) { return r[a]; }), nr = Math.sqrt(col.reduce(function (s, v) { return s + v * v; }, 0)); axes.push(col.map(function (v) { return v / nr; })); } }
+  }
+  var st = fitStats(R, ex.L, n);
+  return { L0: L0, L: L, Phi: Phi, S: Str, h2: h2, u2: h2.map(function (x) { return 1 - x; }), complexity: cx, vacc: vacc, axes: axes,
+           conv: conv && ex.conv, heywood: ex.heywood, values: ex.values, fit: st, rot: m === 1 ? 'none' : rot, m: m };
+}
+
+/* ---------- Fit, as psych::fa.stats ---------- */
+function fitStats(R, L, n) {
+  var p = R.length, m = L[0].length, model = mmul(L, tr(L)), i, j;
+  var dof = p * (p - 1) / 2 - p * m + m * (m - 1) / 2;
+  for (i = 0; i < p; i++) model[i][i] = R[i][i];
+  var Mi = inv(model), MR = Mi ? mmul(Mi, R) : null, trc = 0;
+  if (!MR) return { dof: dof, chisq: NaN, rmsea: NaN, tli: NaN, bic: NaN, p: NaN };
+  for (i = 0; i < p; i++) trc += MR[i][i];
+  var obj = trc - logdetGen(MR) - p;
+  var nm = (n - 1) - (2 * p + 5) / 6 - 2 * m / 3, chisq = obj * nm;
+  var F0 = -logdetSym(R), M0 = F0 * 2 / (p * (p - 1)), Mm = obj / dof;
+  var res = 0;
+  var mod2 = mmul(L, tr(L));
+  for (i = 0; i < p; i++) for (j = 0; j < i; j++) res += Math.pow(R[i][j] - mod2[i][j], 2);
+  return {
+    dof: dof, objective: obj, chisq: Math.max(chisq, 0), p: dof > 0 ? pchisqUpper(Math.max(chisq, 0), dof) : NaN,
+    rmsea: dof > 0 ? Math.sqrt(Math.max(chisq / (dof * n) - 1 / (n - 1), 0)) : NaN,
+    tli: dof > 0 ? (M0 - Mm) / (M0 - 1 / nm) : NaN,
+    bic: dof > 0 ? chisq - dof * Math.log(n) : NaN,
+    rmsr: Math.sqrt(2 * res / (p * (p - 1)))
+  };
+}
+/* psych::KMO */
+function kmo(R) {
+  var p = R.length, Q = inv(R), i, j;
+  if (!Q) return null;
+  var A = mat(p, p), sq = 0, sr = 0, ci = new Array(p).fill(0), cr = new Array(p).fill(0);
+  for (i = 0; i < p; i++) for (j = 0; j < p; j++) if (i !== j) {
+    A[i][j] = Q[i][j] / Math.sqrt(Q[i][i] * Q[j][j]);
+    sq += A[i][j] * A[i][j]; sr += R[i][j] * R[i][j]; ci[j] += A[i][j] * A[i][j]; cr[j] += R[i][j] * R[i][j];
+  }
+  return { msa: sr / (sr + sq), msai: cr.map(function (v, k) { return v / (v + ci[k]); }) };
+}
+/* psych::cortest.bartlett */
+function bartlett(R, n) {
+  var p = R.length, chisq = -logdetSym(R) * (n - 1 - (2 * p + 5) / 6), df = p * (p - 1) / 2;
+  return { chisq: chisq, df: df, p: pchisqUpper(chisq, df) };
+}
+
+/* ---------- Parallel analysis, as psych::fa.parallel on raw data ---------- */
+/* Correlation matrices of n independent normal variables, drawn through the
+   Bartlett decomposition of the Wishart distribution; the 95th percentile of
+   their eigenvalues is the yardstick, as in psych with sim = TRUE. */
+function parallel(n, p, reps, seed) {
+  var g = normalStream(seed >>> 0), pcs = [], fas = [], r, i, j, k;
+  for (r = 0; r < reps; r++) {
+    var T = mat(p, p);
+    for (i = 0; i < p; i++) { T[i][i] = Math.sqrt(2 * rgamma(g, (n - 1 - i) / 2)); for (j = 0; j < i; j++) T[i][j] = g(); }
+    var Wm = mmul(T, tr(T)), Rr = mat(p, p);
+    for (i = 0; i < p; i++) for (j = 0; j < p; j++) Rr[i][j] = Wm[i][j] / Math.sqrt(Wm[i][i] * Wm[j][j]);
+    pcs.push(eigenSym(Rr).values);
+    fas.push(minres(Rr, 1, { tol: 1e-8, maxit: 400 }).values);
+  }
+  function q95(rows) {
+    var out = [];
+    for (k = 0; k < p; k++) {
+      var col = rows.map(function (x) { return x[k]; }).sort(function (a, b) { return a - b; });
+      var h = (col.length - 1) * 0.95, lo = Math.floor(h);      /* R's quantile type 7 */
+      out.push(col[lo] + (h - lo) * ((col[Math.min(lo + 1, col.length - 1)]) - col[lo]));
+    }
+    return out;
+  }
+  function mean(rows) { var out = []; for (k = 0; k < p; k++) out.push(rows.reduce(function (s, x) { return s + x[k]; }, 0) / rows.length); return out; }
+  return { pc95: q95(pcs), fa95: q95(fas), pcMean: mean(pcs), faMean: mean(fas), reps: reps };
+}
+function countAbove(obs, ref) { var m = 0; while (m < obs.length && obs[m] > ref[m]) m++; return m; }
+
+/* ---------- Reliability ---------- */
+function alphaOf(C) {
+  var k = C.length, t = 0, s = 0, i, j;
+  for (i = 0; i < k; i++) { t += C[i][i]; for (j = 0; j < k; j++) s += C[i][j]; }
+  return k / (k - 1) * (1 - t / s);
+}
+function itemStats(C) {
+  var k = C.length, out = [], i, j, l;
+  for (i = 0; i < k; i++) {
+    var idx = []; for (j = 0; j < k; j++) if (j !== i) idx.push(j);
+    var cr = 0, vr = 0;
+    for (j = 0; j < idx.length; j++) { cr += C[i][idx[j]]; for (l = 0; l < idx.length; l++) vr += C[idx[j]][idx[l]]; }
+    out.push({ rest: cr / Math.sqrt(C[i][i] * vr), drop: idx.length > 1 ? alphaOf(sub(C, idx)) : NaN });
+  }
+  return out;
+}
+function feldt(a, n, k) {
+  var d1 = n - 1, d2 = (n - 1) * (k - 1);
+  return { lo: 1 - (1 - a) * qf(0.975, d1, d2), hi: 1 - (1 - a) * qf(0.025, d1, d2) };
+}
+
+/* ---------- The data ---------- */
+/* Items in display order. lo and hi are the scale ends; flip marks the items whose
+   high codes are the less favorable answers, so that 'lo + hi - code' points them
+   toward a more favorable view of immigration. */
+var ITEMS = [
+  { v: 'Q121', d: 0, fam: 'gen',  lo: 1, hi: 5, flip: false, tag: 'Impact on the country' },
+  { v: 'Q122', d: 1, fam: 'good', lo: 0, hi: 2, flip: false, tag: 'Fill useful jobs' },
+  { v: 'Q123', d: 2, fam: 'good', lo: 0, hi: 2, flip: false, tag: 'Strengthen cultural diversity' },
+  { v: 'Q125', d: 4, fam: 'good', lo: 0, hi: 2, flip: false, tag: 'Give asylum to refugees' },
+  { v: 'Q127', d: 6, fam: 'good', lo: 0, hi: 2, flip: false, tag: 'Help poor people build new lives' },
+  { v: 'Q124', d: 3, fam: 'bad',  lo: 0, hi: 2, flip: true,  tag: 'Increase crime' },
+  { v: 'Q126', d: 5, fam: 'bad',  lo: 0, hi: 2, flip: true,  tag: 'Increase the risk of terrorism' },
+  { v: 'Q128', d: 7, fam: 'bad',  lo: 0, hi: 2, flip: true,  tag: 'Increase unemployment' },
+  { v: 'Q129', d: 8, fam: 'bad',  lo: 0, hi: 2, flip: true,  tag: 'Lead to social conflict' },
+  { v: 'Q130', d: 9, fam: 'gen',  lo: 1, hi: 4, flip: true,  tag: 'Who may come to work' }
+];
+var BG = ['education', 'age10', 'female', 'immigrant'];
+var BG_NAME = { education: 'Education (ISCED level)', age10: 'Age (per 10 years)', female: 'Female', immigrant: 'Born abroad' };
+
+function unpackLower(v, n) {   /* R's lower.tri(diag = TRUE) order is column-major */
+  var M = mat(n, n), k = 0, i, j;
+  for (j = 0; j < n; j++) for (i = j; i < n; i++) { M[i][j] = M[j][i] = v[k++]; }
+  return M;
+}
+function prepare(c) {
+  if (c._ready) return c;
+  c.R = unpackLower(c.r, 10); c.P = unpackLower(c.poly, 10);
+  c.reg.C = unpackLower(c.reg.cov, 14);
+  c.nImm = Math.round(c.reg.mean[13] * c.reg.n);
+  c._ready = true;
+  return c;
+}
+
+/* ---------- Everything the page shows, for one configuration ---------- */
+var METHODS = ['sum', 'pomp', 'z', 'pc', 'fa'];
+
+function analyze(c, cfg) {
+  prepare(c);
+  var sel = cfg.items.slice(), k = sel.length, n = c.n, i, j;
+  var its = sel.map(function (q) { return ITEMS[q]; });
+  /* sign of each chosen item after coding: -1 where the item is reversed */
+  var sg = its.map(function (it) { return cfg.rev && it.flip ? -1 : 1; });
+  var dirs = its.map(function (it) { return it.flip && !cfg.rev ? -1 : 1; });   /* +1: higher is more favorable */
+  var di = its.map(function (it) { return it.d; });
+  var R = mat(k, k), P = mat(k, k);
+  for (i = 0; i < k; i++) for (j = 0; j < k; j++) { R[i][j] = c.R[di[i]][di[j]] * sg[i] * sg[j]; P[i][j] = c.P[di[i]][di[j]] * sg[i] * sg[j]; }
+  var sd = di.map(function (d) { return c.sd[d]; });
+  var mu = its.map(function (it, q) { var m0 = c.mean[it.d]; return sg[q] < 0 ? it.lo + it.hi - m0 : m0; });
+  var counts = its.map(function (it, q) { var ct = c.counts[it.d].slice(); return sg[q] < 0 ? ct.reverse() : ct; });
+  var S = R.map(function (r, a) { return r.map(function (v, b) { return v * sd[a] * sd[b]; }); });
+  var Rfa = cfg.corr === 'poly' ? P : R;
+
+  /* one factor on Pearson correlations: loadings for the matrix, omega, and one-factor scores */
+  var one = minres(R, 1), lam = one.L.map(function (r) { return r[0]; });
+  var lamDir = 0; lam.forEach(function (v, q) { lamDir += v * dirs[q]; });
+  if (lamDir < 0) lam = lam.map(function (v) { return -v; });
+  var Ri = inv(R);
+  var eg = eigenSym(R), v1 = eg.vectors[0].slice();
+  var Rdir = matvec(R, dirs);
+  function orient(w) { var s = 0; for (var q = 0; q < k; q++) s += w[q] * Rdir[q]; return s < 0 ? w.map(function (x) { return -x; }) : w; }
+  v1 = orient(v1);
+  var wfa = orient(matvec(Ri, lam));
+  var W = {
+    sum: sd.slice(),
+    pomp: its.map(function (it, q) { return sd[q] / (it.hi - it.lo); }),
+    z: sel.map(function () { return 1; }),
+    pc: v1,
+    fa: wfa
+  };
+  var res = { k: k, n: n, sel: sel, its: its, dirs: dirs, sg: sg, mu: mu, sd: sd, counts: counts, R: R, P: P, Rfa: Rfa, S: S,
+              lam: lam, oneHeywood: one.heywood, eig: eg.values, W: W, by: {} };
+
+  /* the factor model for the factor-analysis section */
+  var mmax = maxFactors(k);
+  var m = Math.max(1, Math.min(cfg.nf, mmax));
+  var rot = m === 1 ? 'none' : cfg.rot;
+  res.m = m; res.mmax = mmax;
+  res.sol = solution(Rfa, m, rot, n, cfg.angle || 0);
+  res.fits = [];
+  for (var mm = 1; mm <= mmax; mm++) { var ex = minres(Rfa, mm); res.fits.push({ m: mm, fit: fitStats(Rfa, ex.L, n), heywood: ex.heywood }); }
+  res.phi2 = mmax >= 2 ? (m === 2 && (rot === 'oblimin') ? res.sol.Phi[0][1] : solution(Rfa, 2, 'oblimin', n, 0).Phi[0][1]) : NaN;
+  res.kmo = kmo(Rfa);
+  res.bart = bartlett(Rfa, n);
+  res.faValues = minres(Rfa, 1).values;
+  res.pcValues = eigenSym(Rfa).values;
+  /* the same m-factor model on Pearson correlations, for omega */
+  var solP = cfg.corr === 'poly' ? solution(R, m, rot, n, cfg.angle || 0) : res.sol;
+  var LP = mmul(mmul(solP.L, solP.Phi), tr(solP.L));
+
+  /* factor-score weights on the z-scored items: ten Berge for two or more factors,
+     regression (Thurstone) for one, with Pearson correlations as psych uses on raw data */
+  var Lf = res.sol.L, Ph = res.sol.Phi, Wf;
+  if (m === 1) Wf = matvec(Ri, Lf.map(function (r) { return r[0]; })).map(function (x) { return [x]; });
+  else {
+    var Lh = mmul(Lf, symPow(Ph, 0.5)), Rh = symPow(R, -0.5);
+    var Cm = mmul(mmul(Rh, Lh), symPow(mmul(mmul(tr(Lh), Ri), Lh), -0.5));
+    Wf = mmul(mmul(Rh, Cm), symPow(Ph, 0.5));
+  }
+  res.Wf = Wf;
+
+  function omegaW(w) { var s = 0, q; for (q = 0; q < k; q++) s += w[q] * lam[q]; return s * s / quad(w, R); }
+  var outcomes = METHODS.map(function (mth) { return { key: mth, w: W[mth] }; });
+  for (var f = 0; f < m; f++) outcomes.push({ key: 'f' + (f + 1), w: Wf.map(function (r) { return r[f]; }) });
+  res.reg = regressAll(c, res, outcomes);
+  METHODS.forEach(function (mth) {
+    var w = W[mth], metric = mth, wm = w;
+    var Cw = R.map(function (r, a) { return r.map(function (v, b) { return wm[a] * v * wm[b]; }); });
+    var al = alphaOf(Cw);
+    var t = 0; w.forEach(function (x) { t += Math.abs(x); });
+    res.by[mth] = { w: w, alpha: al, metric: metric, ci: feldt(al, n, k), items: itemStats(Cw), omega: omegaW(w), omegaM: quad(w, LP) / quad(w, R),
+                    wshare: w.map(function (x) { return x / t; }), rF: [] };
+    for (var ff = 0; ff < m; ff++) { var wf = Wf.map(function (r) { return r[ff]; }); res.by[mth].rF.push(quad(w, R, wf) / Math.sqrt(quad(w, R) * quad(wf, R, wf))); }
+  });
+  if (cfg.rel === 'omega') res.omegaDrop = omegaDrop(c, cfg, res, m);
+  res.agree = METHODS.map(function (a) { return METHODS.map(function (b) { return quad(W[a], R, W[b]) / Math.sqrt(quad(W[a], R) * quad(W[b], R)); }); });
+  return res;
+}
+/* Omega of the index without each item in turn: the chosen number of factors (or as many as
+   the remaining items allow) is refitted to the other items on Pearson correlations. */
+var dropCache = {};
+function omegaDrop(c, cfg, res, m) {
+  var metric = cfg.method;
+  var key = [c.iso, cfg.items.join('.'), cfg.rev ? 1 : 0, m, metric].join('|');
+  if (dropCache[key]) return dropCache[key];
+  var k = res.k, out = [], q;
+  for (q = 0; q < k; q++) {
+    var idx = []; for (var j = 0; j < k; j++) if (j !== q) idx.push(j);
+    var Rs = sub(res.R, idx), mm = Math.min(m, maxFactors(idx.length)), ex = minres(Rs, mm);
+    var LP = mmul(ex.L, tr(ex.L));
+    var w = idx.map(function (j) { return res.W[metric][j]; });
+    out.push(quad(w, LP) / quad(w, Rs));
+  }
+  dropCache[key] = out;
+  return out;
+}
+function maxFactors(k) { var m = 0; while (m < 4 && k * (k - 1) / 2 - k * (m + 1) + (m + 1) * m / 2 >= 0 && m + 1 < k) m++; return Math.max(1, m); }
+
+/* ---------- Regressions of standardized indices on the background variables ---------- */
+/* The index is a weighted sum of z-scored items, standardized on the full sample of
+   respondents who answered all ten items. The regression uses those of them who also
+   answered the four background questions, as lm() does when it drops missing rows. */
+function regressAll(c, res, outcomes) {
+  var k = res.k, its = res.its, sg = res.sg, n = c.reg.n, C = c.reg.C, mR = c.reg.mean, i, j;
+  var nNat = n - c.nImm, useImm = c.nImm >= 30 && nNat >= 30;
+  var preds = useImm ? [0, 1, 2, 3] : [0, 1, 2];
+  var px = preds.map(function (b) { return 10 + b; }), q = preds.length;
+  var Sxx = px.map(function (a) { return px.map(function (b) { return C[a][b]; }); }), Sxxi = inv(Sxx);
+  var xbar = px.map(function (a) { return mR[a]; });
+  /* z-scored item j on the regression sample: covariances with the predictors and with each other */
+  var zc = its.map(function (it, a) { return px.map(function (b) { return sg[a] * C[it.d][b] / c.sd[it.d]; }); });
+  var zz = its.map(function (it, a) { return its.map(function (jt, b) { return sg[a] * sg[b] * C[it.d][jt.d] / (c.sd[it.d] * c.sd[jt.d]); }); });
+  var zm = its.map(function (it, a) { return sg[a] * (mR[it.d] - c.mean[it.d]) / c.sd[it.d]; });
+  var dfr = n - q - 1, tq = qt975(dfr);
+  var out = { n: n, preds: preds.map(function (b) { return BG[b]; }), useImm: useImm, nImm: c.nImm, by: {} };
+  outcomes.forEach(function (o) {
+    var w = o.w, sc = 1 / Math.sqrt(quad(w, res.R));
+    var Sxy = px.map(function (b, t) { var s = 0; for (j = 0; j < k; j++) s += w[j] * zc[j][t]; return s * sc; });
+    var Syy = quad(w, zz) * sc * sc, ybar = 0;
+    for (j = 0; j < k; j++) ybar += w[j] * zm[j]; ybar *= sc;
+    var b = matvec(Sxxi, Sxy), bS = 0;
+    for (i = 0; i < q; i++) bS += b[i] * Sxy[i];
+    var s2 = (n - 1) * (Syy - bS) / dfr, coefs = [];
+    for (i = 0; i < q; i++) {
+      var se = Math.sqrt(s2 * Sxxi[i][i] / (n - 1)), t = b[i] / se;
+      coefs.push({ name: BG[preds[i]], b: b[i], se: se, t: t, p: pt2(t, dfr), lo: b[i] - tq * se, hi: b[i] + tq * se });
+    }
+    var b0 = ybar; for (i = 0; i < q; i++) b0 -= b[i] * xbar[i];
+    out.by[o.key] = { coefs: coefs, b0: b0, r2: bS / Syy, sdy: Math.sqrt(Syy), mean: ybar };
+  });
+  return out;
+}
+
+return { ITEMS: ITEMS, BG: BG, BG_NAME: BG_NAME, METHODS: METHODS, prepare: prepare, analyze: analyze, solution: solution, minres: minres,
+         parallel: parallel, countAbove: countAbove, varimaxCriterion: varimaxCriterion, rotate2: rotate2, varimax: varimax, eigenSym: eigenSym,
+         maxFactors: maxFactors, pchisqUpper: pchisqUpper, qt975: qt975, inv: inv, mmul: mmul, tr: tr };
+})();
+if (typeof module !== 'undefined') module.exports = ENGINE;
+
+</script>
+<script>
+/* R code for the current settings. Depends on ENGINE. */
+var RCODE = (function (E) {
+'use strict';
+var ITEMS = E.ITEMS;
+var METHOD_COMMENT = { sum: 'sum of the raw codes', pomp: 'average of the items rescaled to 0-1', z: 'average of the z-scores',
+                       pc: 'first principal component', fa: 'one-factor scores' };
+var ROT_COMMENT = { none: 'no rotation', varimax: 'varimax rotation', promax: 'promax rotation', oblimin: 'oblimin rotation', manual: 'axes turned by hand' };
+function vec(names) { return 'c(' + names.map(function (v) { return '"' + v + '"'; }).join(', ') + ')'; }
+function named(names, vals) { return 'c(' + names.map(function (v, i) { return v + ' = ' + vals[i]; }).join(', ') + ')'; }
+function wrap(prefix, body, width) {   /* breaks a long c(...) after commas */
+  var s = prefix + body;
+  if (s.length <= (width || 78)) return s;
+  var parts = body.split(', '), out = [], line = prefix, pad = new Array(prefix.length + 3).join(' '), i;
+  for (i = 0; i < parts.length; i++) {
+    var piece = parts[i] + (i < parts.length - 1 ? ',' : '');
+    if ((line + piece).length > (width || 78) && line.trim().length > 0 && line !== prefix) { out.push(line.replace(/\s+$/, '')); line = pad; }
+    line += piece + (i < parts.length - 1 ? ' ' : '');
+  }
+  out.push(line);
+  return out.join('\n');
+}
+
+function rCode(cfg, c, res) {
+  var sel = cfg.items.map(function (j) { return ITEMS[j]; }), names = sel.map(function (it) { return it.v; });
+  var flip2 = sel.filter(function (it) { return it.flip && it.hi === 2; }).map(function (it) { return it.v; });
+  var has130 = names.indexOf('Q130') >= 0;
+  var dirs = sel.map(function (it) { return it.flip && !cfg.rev ? -1 : 1; });
+  var m = res.m, rot = m === 1 ? 'none' : cfg.rot, corArg = cfg.corr === 'poly' ? '"poly"' : '"cor"';
+  var L = [];
+  L.push('# Ten questions, one attitude? Indices of attitudes toward immigration');
+  L.push('# Settings: ' + names.length + ' items; ' + (cfg.rev ? 'reversed so that higher is more favorable' : 'not reversed') + '; index: ' + METHOD_COMMENT[cfg.method] + ';');
+  L.push('#   ' + m + (m === 1 ? ' factor' : ' factors') + (m > 1 ? ', ' + ROT_COMMENT[rot] + (rot === 'manual' ? ' (' + cfg.angle + ' degrees)' : '') : '') +
+         '; ' + (cfg.corr === 'poly' ? 'polychoric' : 'Pearson') + ' correlations for the factor analysis');
+  L.push('# Data: World Values Survey wave 7, country-pooled file, version 5.0 (R format),');
+  L.push('# from https://www.worldvaluessurvey.org. Later versions may differ slightly.');
+  L.push('');
+  L.push('library(psych)        # alpha(), KMO(), fa(), fa.parallel(), factor.scores()');
+  L.push('library(GPArotation)  # the oblique rotations behind fa()');
+  L.push('');
+  L.push('load("WVS_Cross-National_Wave_7_rData_v5_0.rdata")');
+  L.push('wvs <- `WVS_Cross-National_Wave_7_v5_0`');
+  L.push('d <- wvs[wvs$B_COUNTRY_ALPHA == "USA", ]');
+  L.push('all10 <- paste0("Q", 121:130)');
+  L.push('x <- d[all10]');
+  L.push('x[x < 0] <- NA                       # don\'t know, no answer');
+  L.push('keep <- complete.cases(x)            # the ' + c.n.toLocaleString('en-US') + ' who answered all ten');
+  L.push('d <- d[keep, ]');
+  L.push(wrap('items <- ', vec(names)));
+  L.push('x <- x[keep, items]');
+  L.push('');
+  L.push('# 1. Direction. Q121 runs from bad (1) to very good (5); Q122 to Q129 from');
+  L.push('#    disagree (0) to agree (2); Q130 from "let anyone come" (1) to "prohibit" (4).');
+  if (flip2.length || has130) {
+    if (cfg.rev) {
+      L.push('#    Reverse the harm statements and Q130 so that higher is more favorable.');
+      if (flip2.length) L.push('for (v in ' + vec(flip2) + ') x[[v]] <- 2 - x[[v]]');
+      if (has130) L.push('x$Q130 <- 5 - x$Q130');
+    } else {
+      L.push('#    Left as they are here, so these items point the other way:');
+      if (flip2.length) L.push('# for (v in ' + vec(flip2) + ') x[[v]] <- 2 - x[[v]]');
+      if (has130) L.push('# x$Q130 <- 5 - x$Q130');
+    }
+  } else L.push('#    None of the chosen items needs reversing.');
+  L.push(wrap('dir <- ', named(names, dirs)) + '   # +1: higher is more favorable');
+  L.push('ref <- drop(scale(x) %*% dir)        # fixes the arbitrary sign of PC1 and factor scores');
+  L.push(wrap('lo <- ', named(names, sel.map(function (it) { return it.lo; }))));
+  L.push(wrap('hi <- ', named(names, sel.map(function (it) { return it.hi; }))));
+  L.push('R <- cor(x)');
+  L.push('round(R, 2)');
+  L.push('');
+  L.push('# 2. The index: ' + METHOD_COMMENT[cfg.method]);
+  L.push('lam <- fa(x, nfactors = 1, fm = "minres")$loadings[, 1]   # one-factor loadings');
+  if (cfg.method === 'sum') {
+    L.push('index <- rowSums(x)');
+    L.push('w <- apply(x, 2, sd)                 # its weights on the z-scored items');
+  } else if (cfg.method === 'pomp') {
+    L.push('x01 <- sweep(sweep(x, 2, lo), 2, hi - lo, "/")   # every item now runs from 0 to 1');
+    L.push('index <- rowMeans(x01)');
+    L.push('w <- apply(x, 2, sd) / (hi - lo)');
+  } else if (cfg.method === 'z') {
+    L.push('index <- rowMeans(scale(x))');
+    L.push('w <- rep(1, ncol(x))');
+  } else if (cfg.method === 'pc') {
+    L.push('pc <- prcomp(x, scale. = TRUE)');
+    L.push('index <- pc$x[, 1]');
+    L.push('w <- pc$rotation[, 1]');
+    L.push('if (cor(index, ref) < 0) { index <- -index; w <- -w }');
+  } else {
+    L.push('index <- factor.scores(x, fa(x, nfactors = 1, fm = "minres"))$scores[, 1]');
+    L.push('w <- solve(R, lam)                   # regression weights on the z-scored items');
+    L.push('if (cor(index, ref) < 0) { index <- -index; w <- -w }');
+  }
+  L.push('');
+  L.push('# 3. Reliability');
+  var am = cfg.method === 'sum' ? 'x' : cfg.method === 'pomp' ? 'x01' : cfg.method === 'z' ? 'scale(x)' : 'sweep(scale(x), 2, w, "*")';
+  L.push('a <- psych::alpha(' + am + ', check.keys = FALSE)' + (cfg.method === 'pc' || cfg.method === 'fa' ? '   # the z-scored items, weighted as in the index' : ''));
+  L.push('a$total$raw_alpha');
+  L.push('a$feldt                              # 95% interval');
+  L.push('round(data.frame(item_rest = a$item.stats$r.drop, alpha_if_dropped = a$alpha.drop$raw_alpha,');
+  L.push('                 row.names = items), 3)');
+  L.push('omega_w <- function(w, common) drop(t(w) %*% common %*% w) / drop(t(w) %*% R %*% w)');
+  L.push('omega_w(w, lam %*% t(lam))          # omega under one factor');
+  if (m > 1) {
+    L.push('fm <- fa(x, nfactors = ' + m + ', rotate = "none", fm = "minres")');
+    L.push('omega_w(w, fm$loadings %*% t(fm$loadings))   # omega under ' + m + ' factors; rotation does not matter');
+  }
+  L.push('');
+  L.push('# 4. How many attitudes?');
+  L.push(cfg.corr === 'poly' ? 'r <- polychoric(x)$rho' : 'r <- R');
+  L.push('KMO(r)');
+  L.push('cortest.bartlett(r, n = nrow(x))');
+  L.push('first <- function(v) if (length(v)) v[[1]] else NA   # psych leaves fit out when df = 0');
+  L.push('fits <- t(sapply(1:' + res.mmax + ', function(m) {');
+  L.push('  f <- fa(x, nfactors = m, rotate = "none", fm = "minres", cor = ' + corArg + ')');
+  L.push('  c(chisq = first(f$STATISTIC), df = f$dof, RMSEA = first(f$RMSEA), TLI = first(f$TLI), BIC = first(f$BIC))');
+  L.push('}))');
+  L.push('round(fits, 3)');
+  L.push('set.seed(110)');
+  L.push('fa.parallel(x, fa = "both", cor = ' + corArg + ', n.iter = 100)' + (cfg.corr === 'poly' ? '   # slow: 100 polychoric matrices' : ''));
+  L.push('');
+  L.push('# 5. The factor solution');
+  if (rot === 'manual') {
+    L.push('f0 <- fa(x, nfactors = 2, rotate = "none", fm = "minres", cor = ' + corArg + ')');
+    L.push('th <- ' + cfg.angle + ' * pi / 180');
+    L.push('L <- unclass(f0$loadings) %*% matrix(c(cos(th), sin(th), -sin(th), cos(th)), 2)');
+    L.push('round(L, 3)');
+    L.push('fs <- factor.scores(x, L, method = "tenBerge")$scores');
+  } else {
+    L.push('f <- fa(x, nfactors = ' + m + ', rotate = "' + rot + '", fm = "minres", cor = ' + corArg + ')');
+    L.push('print(f$loadings, cutoff = 0)       # pattern loadings');
+    if (m > 1 && (rot === 'promax' || rot === 'oblimin')) {
+      L.push('round(f$Phi, 3)                     # factor correlations');
+      L.push('print(f$Structure, cutoff = 0)      # structure loadings');
+    }
+    L.push('fs <- factor.scores(x, f, method = "tenBerge")$scores' + (m === 1 ? '   # regression scores for one factor' : ''));
+  }
+  L.push('colnames(fs) <- paste0("F", 1:ncol(fs))');
+  L.push('');
+  L.push('# 6. Five ways to combine the same items');
+  L.push('pc1 <- prcomp(x, scale. = TRUE)$x[, 1]');
+  L.push('fs1 <- factor.scores(x, fa(x, nfactors = 1, fm = "minres"))$scores[, 1]');
+  L.push('five <- data.frame(sum  = rowSums(x),');
+  L.push('                   pomp = rowMeans(sweep(sweep(x, 2, lo), 2, hi - lo, "/")),');
+  L.push('                   z    = rowMeans(scale(x)),');
+  L.push('                   pc1  = pc1 * sign(cor(pc1, ref)),');
+  L.push('                   fa1  = fs1 * sign(cor(fs1, ref)))');
+  L.push('round(cor(five, cbind(five, fs)), 3)');
+  L.push('');
+  L.push('# 7. Who holds which view? Each index in standard deviations');
+  L.push('bg <- data.frame(education = ifelse(d$Q275 >= 0, d$Q275, NA),      # ISCED 0 to 8');
+  L.push('                 age10     = ifelse(d$Q262 >= 16, d$Q262 / 10, NA), # decades');
+  L.push('                 female    = ifelse(d$Q260 > 0, as.numeric(d$Q260 == 2), NA),');
+  L.push('                 immigrant = ifelse(d$Q263 > 0, as.numeric(d$Q263 == 2), NA))');
+  L.push('dat <- data.frame(index = as.numeric(scale(index)), scale(fs), bg)');
+  L.push('dat <- dat[complete.cases(bg), ]     # the ' + res.reg.n.toLocaleString('en-US') + ' who also answered these four');
+  L.push('for (y in c("index", colnames(fs))) {');
+  L.push('  fit <- lm(reformulate(' + vec(res.reg.preds) + ', y), data = dat)');
+  L.push('  cat("\\n", y, "\\n"); print(round(coef(summary(fit)), 3))');
+  L.push('}');
+  L.push('');
+  L.push('# 8. A habit of agreeing? The eight statements on their raw codes, whatever is');
+  L.push('#    chosen above. The second model adds a factor that raises agreement with');
+  L.push('#    every statement by the same amount (Billiet and McClendon 2000).');
+  L.push('library(lavaan)');
+  L.push('s8 <- d[c("Q122", "Q123", "Q125", "Q127", "Q124", "Q126", "Q128", "Q129")]');
+  L.push("two <- '");
+  L.push('  benefit =~ NA*Q122 + Q123 + Q125 + Q127');
+  L.push('  harm    =~ NA*Q124 + Q126 + Q128 + Q129');
+  L.push('  benefit ~~ 1*benefit');
+  L.push('  harm    ~~ 1*harm');
+  L.push("'");
+  L.push("agree <- paste(two, '");
+  L.push('  habit =~ 1*Q122 + 1*Q123 + 1*Q125 + 1*Q127 + 1*Q124 + 1*Q126 + 1*Q128 + 1*Q129');
+  L.push('  habit ~~ 0*benefit + 0*harm');
+  L.push("')");
+  L.push('m_two <- cfa(two, data = s8)');
+  L.push('m_agree <- cfa(agree, data = s8)');
+  L.push('anova(m_two, m_agree)');
+  L.push('lavInspect(m_two, "std")$psi["benefit", "harm"]     # about -0.44 on the raw codes');
+  L.push('lavInspect(m_agree, "std")$psi["benefit", "harm"]   # about -0.84');
+  return L.join('\n') + '\n';
+}
+
+return { rCode: rCode };
+})(typeof ENGINE !== 'undefined' ? ENGINE : require('./engine.js'));
+if (typeof module !== 'undefined') module.exports = RCODE;
+
+</script>
+<script>
+(function () {
+'use strict';
+var E = ENGINE, RC = RCODE, ITEMS = E.ITEMS, METHODS = E.METHODS;
+var DATA = JSON.parse(document.getElementById('data').textContent), C = E.prepare(DATA.countries[0]);
+var cfg = { items: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], rev: true, method: 'z', nf: 2, rot: 'oblimin', angle: 0, corr: 'pearson', rel: 'alpha' };
+var view = { scree: 'fa', load: 'pattern' };
+var A = null, paCache = {};
+var SHORT = { sum: 'Sum of raw codes', pomp: 'Average, each rescaled 0-1', z: 'Average of z-scores', pc: 'First principal component', fa: 'One-factor scores' };
+var FAMNAME = { gen: 'Overall view and policy', good: 'Statements of benefit', bad: 'Statements of harm' };
+var ROTNAME = { none: 'no rotation', varimax: 'varimax', promax: 'promax', oblimin: 'oblimin', manual: 'axes turned by hand' };
+var WORD = ['none', 'one', 'two', 'three', 'four'];
+var EFFECT = '"From your point of view, what have been the effects of immigrants on the development of this country?" ';
+var AGREE = ' Answers: 0 = disagree, 1 = hard to say, 2 = agree.';
+var TURN = ' The reversal switch turns this around, so that 2 means disagree.';
+var QTEXT = {
+  Q121: '"Now we would like to know your opinion about the people from other countries who come to live in this country - the immigrants. How would you evaluate the impact of these people on the development of this country?" Five answers, coded from 1, the most negative, through 3, neither good nor bad, to 5, very good.',
+  Q122: EFFECT + 'Statement: fill useful jobs in the workforce.' + AGREE,
+  Q123: EFFECT + 'Statement: strengthen cultural diversity.' + AGREE,
+  Q125: EFFECT + 'Statement: give asylum to political refugees.' + AGREE,
+  Q127: EFFECT + 'Statement: help poor people establish new lives.' + AGREE,
+  Q124: EFFECT + 'Statement: increase the crime rate.' + AGREE + TURN,
+  Q126: EFFECT + 'Statement: increase the risks of terrorism.' + AGREE + TURN,
+  Q128: EFFECT + 'Statement: increase unemployment.' + AGREE + TURN,
+  Q129: EFFECT + 'Statement: lead to social conflict.' + AGREE + TURN,
+  Q130: '"How about people from other countries coming here to work. Which one of the following do you think the government should do?" 1 = let anyone come who wants to, 2 = let people come as long as there are jobs available, 3 = place strict limits on the number of foreigners who can come here, 4 = prohibit people coming here from other countries. The reversal switch turns this around, so that 4 means let anyone come.'
+};
+
+/* ---------- Formatting ---------- */
+function num(x, d) { if (!isFinite(x)) return '-'; var s = x.toFixed(d); return s === '-' + (0).toFixed(d) ? (0).toFixed(d) : s; }
+function rr(x) { if (!isFinite(x)) return ''; var s = Math.abs(x).toFixed(2).replace(/^0/, ''); return (x < 0 && s !== '.00' ? '-' : '') + s; }
+function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+function tip(text, what) { return '<button class="tip" type="button" aria-label="Explain: ' + esc(what) + '" data-tip="' + esc(text) + '">?</button>'; }
+function css(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+function hexRGB(h) { h = h.replace('#', ''); if (h.length === 3) h = h.split('').map(function (c) { return c + c; }).join(''); return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)]; }
+function mix(a, b, t) { var A1 = hexRGB(a), B1 = hexRGB(b); return 'rgb(' + A1.map(function (v, i) { return Math.round(v + (B1[i] - v) * t); }).join(',') + ')'; }
+function lum(a, b, t) { var A1 = hexRGB(a), B1 = hexRGB(b), c = A1.map(function (v, i) { return (v + (B1[i] - v) * t) / 255; }); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; }
+function famColor(f) { return css(f === 'good' ? '--good' : f === 'bad' ? '--bad' : '--gen'); }
+function niceTicks(lo, hi, n) {
+  var span = hi - lo, step = Math.pow(10, Math.floor(Math.log(span / n) / Math.LN10)), err = span / n / step;
+  if (err >= 7.5) step *= 10; else if (err >= 3.5) step *= 5; else if (err >= 1.5) step *= 2;
+  var t = [], v; for (v = Math.ceil(lo / step) * step; v <= hi + 1e-9; v += step) t.push(Math.abs(v) < 1e-12 ? 0 : v);
+  return { ticks: t, step: step };
+}
+function svgOpen(W, H) { return '<svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" font-family="' + esc(css('--sans')) + '">'; }
+function fl(x) { return (Math.round(x * 10) / 10).toString(); }
+function n0(x) { return x.toLocaleString('en-US'); }
+function qtip(it) { return tip(QTEXT[it.v], it.v + ' wording'); }
+function rmseaWord(r) { return r <= 0.05 ? 'closely' : r <= 0.08 ? 'acceptably' : r <= 0.10 ? 'only mediocrely' : 'poorly'; }
+function factorsWord(m) { return WORD[m] + (m === 1 ? ' factor' : ' factors'); }
+
+/* ---------- Element handles ---------- */
+var el = {};
+['matrix', 'matrix-cap', 'loadplot', 'loadplot-cap', 'result', 'verdict', 'itemtbl', 'itemcap', 'dimtbl', 'dimlines', 'scree', 'scree-cap', 'sol-title', 'soltbl', 'solcap',
+ 'phibox', 'vmfig', 'vmcurve', 'vmcap', 'sollines', 'fivetbl', 'fivelines', 'regfig', 'regtbl', 'regcap', 'rcode', 'buildcode', 'copy', 'dl', 'json', 'copy-status',
+ 'rev', 'poly', 'omega', 'pcpa', 'structure', 'itembox', 'items-hint', 'method-hint', 'rot-hint', 'anglebox', 'angle', 'angle-out'].forEach(function (id) { el[id.replace(/-/g, '_')] = document.getElementById(id); });
+
+/* ---------- Names of the factors, from the questions that load on them ---------- */
+function facInfo(a) {
+  var L = A.sol.L, k = A.k, share = { gen: 0, good: 0, bad: 0 }, tot = 0, strong = [], q, best = 0;
+  for (q = 0; q < k; q++) { if (Math.abs(L[q][a]) > Math.abs(L[best][a])) best = q; if (Math.abs(L[q][a]) >= 0.3) strong.push(q); }
+  if (!strong.length) strong = [best];
+  strong.forEach(function (q2) { var w = L[q2][a] * L[q2][a]; share[A.its[q2].fam] += w; tot += w; });
+  var dir = 0; strong.forEach(function (q2) { dir += L[q2][a] * A.dirs[q2]; });
+  var fav = dir >= 0, kind = share.bad / tot >= 0.6 ? 'bad' : share.good / tot >= 0.6 ? 'good' : share.gen / tot >= 0.6 ? 'gen' : 'mixed';
+  if (strong.length === 1 || L[best][a] * L[best][a] / tot >= 0.75) {
+    var it = A.its[best];
+    return { name: it.v + ' alone', high: L[best][a] * A.dirs[best] >= 0 ? 'high = favorable answer' : 'high = unfavorable answer', kind: 'one' };
+  }
+  var names = { bad: 'harm statements', good: 'benefit statements', gen: 'overall view and policy', mixed: 'mixed questions' };
+  var highs = { bad: fav ? 'high = sees little harm' : 'high = sees much harm', good: fav ? 'high = sees many benefits' : 'high = sees few benefits',
+                gen: fav ? 'high = favorable' : 'high = unfavorable', mixed: fav ? 'high = favorable' : 'high = unfavorable' };
+  return { name: names[kind], high: highs[kind], kind: kind };
+}
+function facNames() {
+  var out = [], a, seen = {};
+  for (a = 0; a < A.m; a++) out.push(facInfo(a));
+  out.forEach(function (f) { seen[f.name] = (seen[f.name] || 0) + 1; });
+  out.forEach(function (f, a2) { if (seen[f.name] > 1) f.name += ', ' + (a2 + 1); });
+  return out;
+}
+function oblique() { return A.m > 1 && (A.sol.rot === 'promax' || A.sol.rot === 'oblimin'); }
+function relName() { return cfg.rel === 'omega' ? 'Omega' : 'Alpha'; }
+function relOf(b) { return cfg.rel === 'omega' ? b.omegaM : b.alpha; }
+
+/* ---------- Question checklist ---------- */
+function itemBoxHTML() {
+  var s = '';
+  ['gen', 'good', 'bad'].forEach(function (f) {
+    s += '<p class="famhead"><i style="background:' + famColor(f) + '"></i>' + FAMNAME[f] + '</p><ul class="itemlist">';
+    ITEMS.forEach(function (it, j) {
+      if (it.fam !== f) return;
+      s += '<li><label><input type="checkbox" value="' + j + '"' + (cfg.items.indexOf(j) >= 0 ? ' checked' : '') + '><span><code>' + it.v + '</code> <span class="lbl">' + it.tag + '</span></span></label>' + qtip(it) + '</li>';
+    });
+    s += '</ul>';
+  });
+  return s;
+}
+
+/* ---------- Correlation matrix with loadings and weights ---------- */
+function matrixSVG(width) {
+  var k = A.k, sel = A.sel, bars = width >= 520, barW = bars ? (width < 620 ? 62 : 76) : 0, gap = bars ? 12 : 0;
+  var fit = function (lw) { return Math.floor((width - lw - 2 * barW - 2 * gap - 6) / k); };
+  var narrow = fit(196) < 34, labW = narrow ? 52 : 196;
+  var cs = Math.max(24, Math.min(44, fit(labW)));
+  var top = 54, H = top + k * cs + 8, W = labW + k * cs + (bars ? gap + barW + gap + barW + 4 : 4);
+  matrixSVG.bars = bars;
+  var paper = css('--paper'), ink = css('--ink'), neg = css('--neg'), tint = css('--tint'), graphite = css('--graphite'), mono = esc(css('--mono'));
+  var b = A.by[cfg.method], s = svgOpen(W, H), i, j;
+  var lp = lum(paper, paper, 0), li = lum(ink, ink, 0), light = lp > li ? paper : ink, darkc = lp > li ? ink : paper;
+  for (j = 0; j < k; j++) {
+    var cx = labW + j * cs + cs / 2;
+    s += '<text transform="translate(' + (cx - 2) + ',' + (top - 6) + ') rotate(-50)" font-family="' + mono + '" font-size="11.5" fill="' + ink + '">' + ITEMS[sel[j]].v + '</text>';
+  }
+  for (i = 0; i < k; i++) {
+    var it = ITEMS[sel[i]], y = top + i * cs;
+    s += '<rect x="0" y="' + (y + 4) + '" width="3" height="' + (cs - 8) + '" rx="1.5" fill="' + famColor(it.fam) + '"/>';
+    s += '<text x="9" y="' + (y + cs / 2 + (narrow ? 4 : -2)) + '" font-family="' + mono + '" font-size="11.5" fill="' + ink + '">' + it.v + '<title>' + esc(it.tag) + '</title></text>';
+    if (!narrow) s += '<text x="9" y="' + (y + cs / 2 + 12) + '" font-size="11.5" fill="' + graphite + '">' + esc(it.tag) + '</text>';
+    for (j = 0; j < k; j++) {
+      var x = labW + j * cs, r = A.R[i][j];
+      if (i === j) { s += '<rect x="' + x + '" y="' + y + '" width="' + cs + '" height="' + cs + '" fill="' + tint + '"/>'; continue; }
+      var t = Math.min(1, Math.abs(r)) * 0.92, fill = mix(paper, r >= 0 ? ink : neg, t), dark = lum(paper, r >= 0 ? ink : neg, t) < 0.5;
+      s += '<rect x="' + x + '" y="' + y + '" width="' + cs + '" height="' + cs + '" fill="' + fill + '"><title>' + ITEMS[sel[i]].v + ' and ' + ITEMS[sel[j]].v + ': ' + num(r, 3) + '</title></rect>';
+      if (cs >= 30) s += '<text x="' + (x + cs / 2) + '" y="' + (y + cs / 2 + 4) + '" text-anchor="middle" font-size="11.5" style="font-variant-numeric:tabular-nums;pointer-events:none" fill="' + (dark ? light : darkc) + '">' + rr(r) + '</text>';
+    }
+  }
+  s += '<rect x="' + labW + '" y="' + top + '" width="' + (k * cs) + '" height="' + (k * cs) + '" fill="none" stroke="' + css('--rule') + '"/>';
+  ['good', 'bad'].forEach(function (f) {
+    var idx = []; sel.forEach(function (jj, q) { if (ITEMS[jj].fam === f) idx.push(q); });
+    if (idx.length < 2) return;
+    var a = idx[0], z = idx[idx.length - 1];
+    s += '<rect x="' + (labW + a * cs + 0.75) + '" y="' + (top + a * cs + 0.75) + '" width="' + ((z - a + 1) * cs - 1.5) + '" height="' + ((z - a + 1) * cs - 1.5) + '" fill="none" stroke="' + famColor(f) + '" stroke-width="1.5"/>';
+  });
+  if (!bars) return s + '</svg>';
+  var x0 = labW + k * cs + gap, x1 = x0 + barW + gap, bl = barW - 34, maxw = Math.max(0.15, Math.max.apply(null, b.wshare.map(Math.abs)));
+  s += '<text x="' + x0 + '" y="' + (top - 8) + '" font-size="12" fill="' + graphite + '">Loading<title>Correlation of the question with the single factor of a one-factor model</title></text>';
+  s += '<text x="' + x1 + '" y="' + (top - 8) + '" font-size="12" fill="' + graphite + '">Weight<title>How much the question counts in the index chosen on the left</title></text>';
+  for (i = 0; i < k; i++) {
+    var yy = top + i * cs, lam = A.lam[i], ws = b.wshare[i], fc = famColor(ITEMS[sel[i]].fam), bh = Math.min(12, cs - 12);
+    s += '<line x1="' + x0 + '" x2="' + x0 + '" y1="' + yy + '" y2="' + (yy + cs) + '" stroke="' + css('--rule') + '"/>';
+    s += '<rect x="' + x0 + '" y="' + (yy + cs / 2 - bh / 2) + '" width="' + Math.max(0.5, Math.min(1, Math.abs(lam)) * bl) + '" height="' + bh + '" fill="' + (lam < 0 ? neg : fc) + '"/>';
+    s += '<text x="' + (x0 + barW) + '" y="' + (yy + cs / 2 + 4) + '" text-anchor="end" font-size="11.5" style="font-variant-numeric:tabular-nums" fill="' + ink + '">' + rr(lam) + '</text>';
+    s += '<line x1="' + x1 + '" x2="' + x1 + '" y1="' + yy + '" y2="' + (yy + cs) + '" stroke="' + css('--rule') + '"/>';
+    s += '<rect x="' + x1 + '" y="' + (yy + cs / 2 - bh / 2) + '" width="' + Math.max(0.5, Math.abs(ws) / maxw * bl) + '" height="' + bh + '" fill="' + (ws < 0 ? neg : fc) + '"/>';
+    s += '<text x="' + (x1 + barW) + '" y="' + (yy + cs / 2 + 4) + '" text-anchor="end" font-size="11.5" style="font-variant-numeric:tabular-nums" fill="' + ink + '">' + (ws < 0 ? '-' : '') + Math.round(Math.abs(ws) * 100) + '%</text>';
+  }
+  return s + '</svg>';
+}
+function matrixCap() {
+  var anyNeg = A.R.some(function (r) { return r.some(function (v) { return v < -0.05; }); });
+  var s = 'Correlations between the chosen questions, coded as the index uses them. Darker cells mean stronger correlations' + (anyNeg ? '; red marks a negative one' : '') + '. The boxes mark the statements of benefit and of harm.';
+  if (matrixSVG.bars) s += ' <b>Loading:</b> how closely each question follows what all the chosen questions share; it is the correlation of the question with the single factor of a one-factor model' +
+    (cfg.corr === 'poly' ? ', on ordinary correlations even with the polychoric switch on' : '') + '. <b>Weight:</b> how much each question counts in the index chosen on the left, as a share of the total. ' +
+    (cfg.method === 'z' ? 'With the average of z-scores every question counts the same.' : cfg.method === 'sum' ? 'Adding up raw codes gives more weight to questions whose answers vary more.' : 'The weights come from the method chosen.');
+  return s;
+}
+
+/* ---------- Loading plot ---------- */
+function loadPlotSVG(size) {
+  var ink = css('--ink'), graphite = css('--graphite'), rule = css('--rule'), mono = esc(css('--mono')), m = A.m, sol = A.sol, k = A.k;
+  if (m === 1) {
+    var W1 = Math.max(260, Math.min(size, 340)), rowH = 22, H1 = 34 + k * rowH + 30, ml = 56, mr = 16;
+    var X = function (v) { return ml + (v + 0.2) / 1.2 * (W1 - ml - mr); };
+    var s1 = svgOpen(W1, H1);
+    [-0.2, 0, 0.2, 0.4, 0.6, 0.8, 1].forEach(function (v) { s1 += '<line x1="' + X(v) + '" x2="' + X(v) + '" y1="24" y2="' + (24 + k * rowH) + '" stroke="' + rule + '" stroke-opacity="' + (v === 0 ? 1 : 0.5) + '"/><text x="' + X(v) + '" y="' + (40 + k * rowH) + '" text-anchor="middle" font-size="11.5" fill="' + graphite + '">' + (v === 0 ? '0' : rr(v)) + '</text>'; });
+    var order = sol.L.map(function (r, q) { return q; }).sort(function (a, b) { return sol.L[b][0] - sol.L[a][0]; });
+    order.forEach(function (q, row) {
+      var it = ITEMS[A.sel[q]], y = 24 + row * rowH + rowH / 2, v = sol.L[q][0];
+      s1 += '<text x="' + (ml - 8) + '" y="' + (y + 4) + '" text-anchor="end" font-family="' + mono + '" font-size="11.5" fill="' + ink + '">' + it.v + '</text>';
+      s1 += '<line x1="' + X(0) + '" x2="' + X(v) + '" y1="' + y + '" y2="' + y + '" stroke="' + famColor(it.fam) + '" stroke-width="2"/><circle cx="' + X(v) + '" cy="' + y + '" r="4.5" fill="' + famColor(it.fam) + '"><title>' + it.v + ': ' + num(v, 3) + '</title></circle>';
+    });
+    s1 += '<text x="' + ((ml + W1 - mr) / 2) + '" y="' + (H1 - 4) + '" text-anchor="middle" font-size="12" fill="' + graphite + '">Loading on the one factor</text>';
+    s1 += '<text x="' + ml + '" y="14" font-size="12" fill="' + graphite + '">Questions, ordered by loading</text>';
+    return s1 + '</svg>';
+  }
+  var W = Math.max(250, Math.min(size, 330)), H = W, pad = 26, cx = W / 2, cy = H / 2, R0 = (W - 2 * pad) / 2;
+  var P = function (x, y) { return { x: cx + x * R0, y: cy - y * R0 }; };
+  var s = svgOpen(W, H);
+  s += '<circle cx="' + cx + '" cy="' + cy + '" r="' + R0 + '" fill="none" stroke="' + rule + '"/>';
+  s += '<line x1="' + (cx - R0) + '" x2="' + (cx + R0) + '" y1="' + cy + '" y2="' + cy + '" stroke="' + rule + '" stroke-dasharray="3 3"/>';
+  s += '<line x1="' + cx + '" x2="' + cx + '" y1="' + (cy - R0) + '" y2="' + (cy + R0) + '" stroke="' + rule + '" stroke-dasharray="3 3"/>';
+  var pts;
+  if (m === 2) {
+    pts = sol.L0.map(function (r) { return P(r[0], r[1]); });
+    if (sol.axes) sol.axes.forEach(function (ax, a) {
+      var p1 = P(ax[0], ax[1]), p0 = P(-ax[0], -ax[1]), pl = P(ax[0] * 1.09, ax[1] * 1.09);
+      s += '<line x1="' + p0.x + '" y1="' + p0.y + '" x2="' + p1.x + '" y2="' + p1.y + '" stroke="' + ink + '" stroke-width="1.4"/>';
+      s += '<text x="' + pl.x + '" y="' + (pl.y + 4) + '" text-anchor="middle" font-size="12" font-weight="600" fill="' + ink + '">F' + (a + 1) + '</text>';
+    });
+  } else {
+    pts = sol.L.map(function (r) { return P(r[0], r[1]); });
+    s += '<text x="' + (cx + R0 + 2) + '" y="' + (cy - 5) + '" text-anchor="end" font-size="12" font-weight="600" fill="' + ink + '">F1</text>';
+    s += '<text x="' + (cx + 5) + '" y="' + (cy - R0 + 11) + '" font-size="12" font-weight="600" fill="' + ink + '">F2</text>';
+  }
+  /* points closer than 9 pixels share one label */
+  var groups = [];
+  pts.forEach(function (p, q) {
+    var g = null;
+    groups.forEach(function (gg) { if (!g && Math.abs(gg.x - p.x) < 9 && Math.abs(gg.y - p.y) < 9) g = gg; });
+    if (g) { g.q.push(q); g.x = (g.x * (g.q.length - 1) + p.x) / g.q.length; g.y = (g.y * (g.q.length - 1) + p.y) / g.q.length; }
+    else groups.push({ x: p.x, y: p.y, q: [q] });
+  });
+  pts.forEach(function (p, q) {
+    var it = ITEMS[A.sel[q]];
+    s += '<circle cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) + '" r="4.5" fill="' + famColor(it.fam) + '" fill-opacity="0.9"><title>' + it.v + ' ' + esc(it.tag) + '</title></circle>';
+  });
+  groups.forEach(function (g) { g.txt = g.q.map(function (q) { return ITEMS[A.sel[q]].v.replace('Q', ''); }).join(' '); });
+  var placed = [];
+  groups.forEach(function (g) {
+    var bounds = { x0: 2, y0: 2, x1: W - 2, y1: H - 2 }, w = 7 * g.txt.length + 2, offs = [[8, 4], [-8, 4], [0, -9], [0, 16], [8, -7], [-8, -7], [8, 15], [-8, 15]], best = null, k2;
+    for (k2 = 0; k2 < offs.length; k2++) {
+      var dx = offs[k2][0], dy = offs[k2][1], anchor = dx > 0 ? 'start' : dx < 0 ? 'end' : 'middle';
+      var x0 = anchor === 'start' ? g.x + dx : anchor === 'end' ? g.x + dx - w : g.x - w / 2, y1 = g.y + dy, bx = { x0: x0, y0: y1 - 10, x1: x0 + w, y1: y1 };
+      if (bx.x0 < bounds.x0 || bx.x1 > bounds.x1 || bx.y0 < bounds.y0 || bx.y1 > bounds.y1) continue;
+      var hit = placed.concat(groups.map(function (o) { return { x0: o.x - 5, y0: o.y - 5, x1: o.x + 5, y1: o.y + 5 }; })).some(function (o) { return !(bx.x1 < o.x0 || bx.x0 > o.x1 || bx.y1 < o.y0 || bx.y0 > o.y1); });
+      if (!hit) { best = { x: g.x + dx, y: y1, anchor: anchor, box: bx }; break; }
+      if (!best) best = { x: g.x + dx, y: y1, anchor: anchor, box: bx };
+    }
+    placed.push(best.box);
+    s += '<text x="' + best.x.toFixed(1) + '" y="' + best.y.toFixed(1) + '" text-anchor="' + best.anchor + '" font-family="' + mono + '" font-size="11" fill="' + ink + '">' + g.txt + '</text>';
+  });
+  return s + '</svg>';
+}
+function loadPlotCap() {
+  var sol = A.sol, src = cfg.corr === 'poly' ? ' (polychoric correlations)' : '';
+  if (A.m === 1) return 'Loadings on one factor' + src + ': how closely each question follows what all of them share. Colors mark the three kinds of question.';
+  if (A.m === 2) {
+    var s = 'Each dot is a question, placed by its loadings on two factors before rotation' + src + '; labels give the question number. The solid lines are the axes of the factors after rotation. Rotation turns the axes, not the dots, so the fit does not change.';
+    if (oblique()) s += ' Here the axes meet at ' + fl(Math.acos(Math.max(-1, Math.min(1, sol.Phi[0][1]))) * 180 / Math.PI) + ' degrees; the cosine of that angle, ' + num(sol.Phi[0][1], 2) + ', is the correlation between the factors.';
+    else if (sol.rot !== 'none') s += ' The axes stay at right angles, so the factors are uncorrelated.';
+    return s;
+  }
+  return 'Loadings on the first two of ' + WORD[A.m] + ' factors' + src + '. With more than two factors the questions no longer lie in one plane, so this view is only part of the picture.';
+}
+
+/* ---------- Eigenvalues against random data ---------- */
+function paOf() {
+  var key = C.n + ':' + A.k;
+  if (!paCache[key]) paCache[key] = E.parallel(C.n, A.k, 100, 110);
+  return paCache[key];
+}
+function paKeep() { var pa = paOf(); return { fa: E.countAbove(A.faValues, pa.fa95), pc: E.countAbove(A.pcValues, pa.pc95) }; }
+function screeSVG() {
+  var isFa = view.scree === 'fa', ev = isFa ? A.faValues : A.pcValues, pa = paOf(), ref = isFa ? pa.fa95 : pa.pc95, k = ev.length;
+  var W = 320, H = 188, ml = 32, mr = 8, mt = 10, mb = 36, ink = css('--ink'), graphite = css('--graphite'), rule = css('--rule');
+  var top = Math.max(1.2, Math.ceil(Math.max(ev[0], ref[0]) + 0.25)), bot = Math.min(0, Math.floor(Math.min.apply(null, ev.concat(ref)) * 2) / 2);
+  var bw = (W - ml - mr) / k, Y = function (v) { return mt + (top - v) / (top - bot) * (H - mt - mb); };
+  var s = svgOpen(W, H), i, keep = E.countAbove(ev, ref);
+  var tk = niceTicks(bot, top, 4);
+  tk.ticks.forEach(function (v) { s += '<text x="' + (ml - 6) + '" y="' + (Y(v) + 4) + '" text-anchor="end" font-size="11.5" fill="' + graphite + '">' + num(v, tk.step < 1 ? 1 : 0) + '</text>'; });
+  if (!isFa) s += '<line x1="' + ml + '" x2="' + (W - mr) + '" y1="' + Y(1) + '" y2="' + Y(1) + '" stroke="' + rule + '" stroke-dasharray="3 3"/>';
+  for (i = 0; i < k; i++) {
+    var x = ml + i * bw, y0 = Y(Math.max(0, ev[i])), y1 = Y(Math.min(0, ev[i]));
+    s += '<rect x="' + (x + bw * 0.2) + '" y="' + y0 + '" width="' + (bw * 0.6) + '" height="' + Math.max(0.5, y1 - y0) + '" fill="' + ink + '" fill-opacity="' + (i < keep ? 0.85 : 0.3) + '"><title>' + (i + 1) + ': ' + num(ev[i], 3) + ' (random data: ' + num(ref[i], 3) + ')</title></rect>';
+    s += '<line x1="' + (x + bw * 0.08) + '" x2="' + (x + bw * 0.92) + '" y1="' + Y(ref[i]) + '" y2="' + Y(ref[i]) + '" stroke="' + css('--neg') + '" stroke-width="2"/>';
+    s += '<text x="' + (x + bw / 2) + '" y="' + (H - mb + 15) + '" text-anchor="middle" font-size="11.5" fill="' + graphite + '">' + (i + 1) + '</text>';
+  }
+  s += '<line x1="' + ml + '" x2="' + (W - mr) + '" y1="' + Y(0) + '" y2="' + Y(0) + '" stroke="' + graphite + '"/>';
+  s += '<text x="' + ((ml + W - mr) / 2) + '" y="' + (H - 3) + '" text-anchor="middle" font-size="11.5" fill="' + graphite + '">' + (isFa ? 'Factor' : 'Component') + '</text>';
+  return s + '</svg>';
+}
+
+/* ---------- Varimax criterion as the axes turn ---------- */
+function vmCurveSVG() {
+  var L0 = A.sol.L0, W = 320, H = 130, ml = 40, mr = 10, mt = 10, mb = 30, ink = css('--ink'), graphite = css('--graphite'), rule = css('--rule');
+  var vals = [], th, lo = Infinity, hi = -Infinity, best = 0;
+  for (th = -90; th <= 90; th++) { var v = E.varimaxCriterion(E.rotate2(L0, th)); vals.push(v); if (v < lo) lo = v; if (v > hi) { hi = v; best = th; } }
+  var X = function (t) { return ml + (t + 90) / 180 * (W - ml - mr); }, Y = function (v) { return mt + (hi - v) / Math.max(hi - lo, 1e-9) * (H - mt - mb); };
+  var s = svgOpen(W, H), d = '';
+  vals.forEach(function (v, q) { d += (q ? 'L' : 'M') + X(q - 90).toFixed(1) + ' ' + Y(v).toFixed(1); });
+  [-90, -45, 0, 45, 90].forEach(function (t) { s += '<line x1="' + X(t) + '" x2="' + X(t) + '" y1="' + mt + '" y2="' + (H - mb) + '" stroke="' + rule + '" stroke-opacity="0.6"/><text x="' + X(t) + '" y="' + (H - mb + 15) + '" text-anchor="middle" font-size="11.5" fill="' + graphite + '">' + t + '&deg;</text>'; });
+  s += '<path d="' + d + '" fill="none" stroke="' + ink + '" stroke-width="1.6"/>';
+  s += '<text x="' + (ml - 6) + '" y="' + (mt + 8) + '" text-anchor="end" font-size="11.5" fill="' + graphite + '">high</text><text x="' + (ml - 6) + '" y="' + (H - mb) + '" text-anchor="end" font-size="11.5" fill="' + graphite + '">low</text>';
+  [best, best > 0 ? best - 90 : best + 90].forEach(function (t) { if (t >= -90 && t <= 90) s += '<circle cx="' + X(t) + '" cy="' + Y(hi) + '" r="3.5" fill="none" stroke="' + ink + '"/>'; });
+  if (A.sol.rot === 'manual') {
+    var cv = E.varimaxCriterion(E.rotate2(L0, cfg.angle));
+    s += '<line x1="' + X(cfg.angle) + '" x2="' + X(cfg.angle) + '" y1="' + mt + '" y2="' + (H - mb) + '" stroke="' + css('--neg') + '" stroke-width="1.5"/><circle cx="' + X(cfg.angle) + '" cy="' + Y(cv) + '" r="4" fill="' + css('--neg') + '"/>';
+  }
+  s += '<text x="' + ((ml + W - mr) / 2) + '" y="' + (H - 2) + '" text-anchor="middle" font-size="11.5" fill="' + graphite + '">Angle by which the axes are turned</text>';
+  vmCurveSVG.best = best;
+  return s + '</svg>';
+}
+
+/* ---------- Who holds which view: coefficient panels ---------- */
+function outcomes() {
+  var names = facNames(), unfav = A.dirs.every(function (d) { return d < 0; }) && (cfg.method === 'sum' || cfg.method === 'pomp' || cfg.method === 'z');
+  var o = [{ key: cfg.method, label: 'Index: ' + SHORT[cfg.method].toLowerCase(), sub: unfav ? 'high = unfavorable' : 'high = favorable', main: true }];
+  names.forEach(function (f, a) { o.push({ key: 'f' + (a + 1), label: 'Factor ' + (a + 1) + ': ' + f.name, sub: f.high }); });
+  return o;
+}
+function regSVG(width) {
+  var outs = outcomes(), preds = A.reg.preds, rows = outs.length, ink = css('--ink'), graphite = css('--graphite'), rule = css('--rule');
+  var unit = { education: 'per ISCED level', age10: 'per decade', female: 'women vs. men', immigrant: 'born abroad vs. here' };
+  var wide = width >= 760, labW = 200, rowH = 36, top = 40, panelW = wide ? Math.floor((width - labW) / preds.length) : Math.min(width - labW, 420);
+  var H = wide ? top + rows * rowH + 34 : preds.length * (top + rows * rowH + 40), W = wide ? labW + panelW * preds.length : labW + panelW;
+  var s = svgOpen(W, H);
+  preds.forEach(function (pn, pi) {
+    var ox = wide ? labW + pi * panelW : labW, oy = wide ? 0 : pi * (top + rows * rowH + 40);
+    var lo = 0, hi = 0;
+    outs.forEach(function (o) { var c = A.reg.by[o.key].coefs[pi]; lo = Math.min(lo, c.lo); hi = Math.max(hi, c.hi); });
+    var padv = (hi - lo) * 0.08 || 0.05; lo -= padv; hi += padv;
+    var x0 = ox + (wide && pi > 0 ? 26 : 12), x1 = ox + panelW - 26, X = function (v) { return x0 + (v - lo) / (hi - lo) * (x1 - x0); };
+    s += '<text x="' + ((x0 + x1) / 2) + '" y="' + (oy + 14) + '" text-anchor="middle" font-size="12.5" font-weight="600" fill="' + ink + '">' + esc(E.BG_NAME[pn].replace(/ \(.*\)$/, '')) + '</text>';
+    s += '<text x="' + ((x0 + x1) / 2) + '" y="' + (oy + 29) + '" text-anchor="middle" font-size="11.5" fill="' + graphite + '">' + unit[pn] + '</text>';
+    var tk = niceTicks(lo, hi, 3);
+    tk.ticks.forEach(function (v) { s += '<line x1="' + X(v) + '" x2="' + X(v) + '" y1="' + (oy + top) + '" y2="' + (oy + top + rows * rowH) + '" stroke="' + rule + '" stroke-opacity="' + (v === 0 ? 1 : 0.45) + '"' + (v === 0 ? '' : ' stroke-dasharray="2 3"') + '/><text x="' + X(v) + '" y="' + (oy + top + rows * rowH + 15) + '" text-anchor="middle" font-size="11.5" fill="' + graphite + '">' + num(v, tk.step < 0.1 ? 2 : 1) + '</text>'; });
+    outs.forEach(function (o, ri) {
+      var c = A.reg.by[o.key].coefs[pi], y = oy + top + ri * rowH + rowH / 2;
+      if (pi === 0 || !wide) {
+        s += '<text x="' + (labW - 12) + '" y="' + (y - 2) + '" text-anchor="end" font-size="12" fill="' + ink + '"' + (o.main ? ' font-weight="600"' : '') + '>' + esc(o.label) + '</text>';
+        s += '<text x="' + (labW - 12) + '" y="' + (y + 12) + '" text-anchor="end" font-size="11.5" fill="' + graphite + '">' + esc(o.sub) + '</text>';
+      }
+      s += '<line x1="' + X(c.lo) + '" x2="' + X(c.hi) + '" y1="' + y + '" y2="' + y + '" stroke="' + ink + '" stroke-width="1.6"/>';
+      s += '<circle cx="' + X(c.b) + '" cy="' + y + '" r="' + (o.main ? 4.5 : 4) + '" fill="' + (o.main ? ink : css('--paper')) + '" stroke="' + ink + '" stroke-width="1.6"><title>' + esc(o.label) + ': ' + num(c.b, 3) + ' (95% interval ' + num(c.lo, 3) + ' to ' + num(c.hi, 3) + ')</title></circle>';
+    });
+  });
+  return s + '</svg>';
+}
+
+/* ---------- Text ---------- */
+function methodHint() {
+  var five = [], three = [];
+  A.its.forEach(function (it, q) { if (it.hi - it.lo === 2) three.push(A.sd[q]); else five.push({ v: it.v, sd: A.sd[q] }); });
+  var avg = three.length ? three.reduce(function (s, x) { return s + x; }, 0) / three.length : NaN;
+  switch (cfg.method) {
+    case 'sum': return 'Each question counts in proportion to how much its answers vary' +
+      (five.length && three.length ? ': here ' + five.map(function (p) { return p.v + ' counts ' + num(p.sd / avg, 1) + ' times'; }).join(' and ') + ' as much as an average three-answer question.' : '.');
+    case 'pomp': return 'Every question runs from 0 to 1 before averaging. A question whose answers spread more still counts for more.';
+    case 'z': return 'Each question is standardized first, so each counts the same. Many analyses use this index.';
+    case 'pc': return 'Weights from the first principal component: the weighted sum that varies most. These weights also give the highest possible alpha.';
+    default: return 'Scores from a one-factor model. Questions that follow the factor more closely get more weight.';
+  }
+}
+function rotHint() {
+  if (A.m === 1) return 'With one factor there is nothing to rotate.';
+  switch (A.sol.rot) {
+    case 'none': return 'Before rotation, the first factor takes as much of the shared variation as it can and the second takes what is left.';
+    case 'varimax': return 'Turns the axes, kept at right angles, until each factor has a few large loadings and many near zero.';
+    case 'promax': return 'Starts from varimax and lets the axes lean toward each other, so that the factors can correlate.';
+    case 'oblimin': return 'Lets the axes lean toward each other, so that each question can load on one factor and stay near zero on the others. The default in psych.';
+    default: return 'Turn the axes yourself and watch the loadings change. The fit does not.';
+  }
+}
+function resultHTML() {
+  var b = A.by[cfg.method], f1 = A.fits[0].fit, fm = A.fits[A.m - 1].fit, keep = paKeep(), kept = view.scree === 'fa' ? keep.fa : keep.pc;
+  var rel = cfg.rel === 'omega' ?
+    '<div class="stat"><span class="lab">Omega, ' + WORD[A.m] + '-factor model' + tip('The share of the index\'s variation that the chosen factor model credits to what the questions have in common. Unlike alpha, it uses the loadings, so it changes with the number of factors. It uses ordinary correlations, because the index is built from the coded answers.', 'omega') +
+      '</span><span class="big">' + num(b.omegaM, 2) + '</span><span class="small">alpha for comparison: ' + num(b.alpha, 2) + '</span></div>' :
+    '<div class="stat"><span class="lab">Alpha' + tip('Cronbach\'s alpha: how consistently the chosen questions go together, weighted as in this index, from 0 to 1. 0.7 or more is a common rule of thumb for an index. A high alpha does not show that the questions measure one thing.', 'alpha') +
+      '</span><span class="big">' + num(b.alpha, 2) + '</span><span class="small">95% interval ' + num(b.ci.lo, 2) + ' to ' + num(b.ci.hi, 2) + '</span></div>';
+  return rel +
+    '<div class="stat"><span class="lab">Misfit of one factor (RMSEA)' + tip('RMSEA measures how far the correlations predicted by a model are from those observed, allowing for the size of the model. Below about 0.05 is usually called a close fit, 0.05 to 0.08 acceptable, and above 0.10 poor; these are conventions, not tests.', 'RMSEA') +
+    '</span><span class="big">' + (f1.dof > 0 ? num(f1.rmsea, 3) : '-') + '</span><span class="small">' + (f1.dof > 0 ? (A.m > 1 ? factorsWord(A.m) + ': ' + (fm.dof > 0 ? num(fm.rmsea, 3) : 'no test possible') : 'lower is better') : 'three questions: no test possible') + '</span></div>' +
+    '<div class="stat"><span class="lab">' + (view.scree === 'fa' ? 'Factors' : 'Components') + ' kept by parallel analysis' + tip('Parallel analysis keeps each factor that takes more of the shared variation than the same factor would in 95% of random data sets of the same size.', 'parallel analysis') +
+    '</span><span class="big">' + kept + '</span><span class="small">' + (kept > A.mmax ? 'more than ' + WORD[A.mmax] + ', the most these questions allow' : 'the dark bars in the chart below') + '</span></div>';
+}
+function verdictHTML() {
+  var b = A.by[cfg.method], out = [], wt = cfg.method === 'pc' || cfg.method === 'fa';
+  var pos = A.dirs.some(function (d) { return d > 0; }), negs = A.dirs.some(function (d) { return d < 0; }), mixed = pos && negs;
+  var relTxt = relName() + ' is ' + num(relOf(b), 2);
+  if (mixed) {
+    if (wt) out.push('The harm statements and Q130 are not reversed, but the ' + (cfg.method === 'pc' ? 'principal component' : 'factor model') + ' gives them negative weights, so the index is the same as with the reversal on, and so is its ' + relName().toLowerCase() + '.');
+    else out.push('The harm statements and Q130 are not reversed, so in this index they pull against the other questions: see the red cells in the matrix and the negative loadings beside it. ' + relName() + ' falls to ' + num(relOf(b), 2) + '.');
+  } else if (negs) out.push('All the chosen questions are left unreversed, so a higher code means a less favorable view; ' + (wt ? 'the page still points this index toward a favorable view.' : 'the index simply runs the other way.'));
+  var f1 = A.fits[0], f2 = A.fits.length > 1 ? A.fits[1] : null;
+  if (!mixed) {
+    if (f1.fit.dof <= 0) out.push('With three questions a one-factor model fits by construction, so the fit cannot tell one factor from more. ' + relTxt + '.');
+    else if (f1.fit.rmsea > 0.08 && f2 && f2.fit.dof > 0 && f2.fit.rmsea < f1.fit.rmsea - 0.02) {
+      var corr = Math.abs(A.phi2);
+      out.push(relTxt + ', high enough for most readers to call these questions one scale. Yet one factor fits ' + rmseaWord(f1.fit.rmsea) + ' (RMSEA ' + num(f1.fit.rmsea, 3) + ') and two fit ' + rmseaWord(f2.fit.rmsea) + ' (' + num(f2.fit.rmsea, 3) + '): ' +
+        (corr >= 0.3 ? 'the answers follow two factors that correlate ' + num(A.phi2, 2) + '.' : 'the answers follow two factors that are nearly unrelated (correlation ' + num(A.phi2, 2) + ').'));
+    } else if (f1.fit.rmsea <= 0.08) out.push('One factor fits these questions ' + rmseaWord(f1.fit.rmsea) + ' (RMSEA ' + num(f1.fit.rmsea, 3) + '), so a single index loses little. ' + relTxt + '.');
+    else out.push('One factor fits these questions ' + rmseaWord(f1.fit.rmsea) + ' (RMSEA ' + num(f1.fit.rmsea, 3) + '), and two fit no better. ' + relTxt + '.');
+  }
+  if (A.sol.heywood) {
+    var hq = A.sol.h2.map(function (h, q) { return q; }).filter(function (q) { return A.sol.h2[q] > 0.994; }).map(function (q) { return A.its[q].v; });
+    out.push('With ' + factorsWord(A.m) + ' the model explains 99.5% of the variation in answers to ' + hq.join(' and ') + ', the most psych allows. No survey question is answered without error, so ' +
+      (A.m > 1 ? 'a factor has been spent on a single question: a sign of too many factors.' : 'this one-factor solution deserves little trust.'));
+  }
+  if (!out.length) out.push(relTxt + '.');
+  return out.slice(0, 3).join(' ');
+}
+function distBar(counts, labels) {
+  var tot = counts.reduce(function (s, x) { return s + x; }, 0), W = 84, H = 12, x = 0, s = '<svg width="' + W + '" height="' + H + '" style="display:block">';
+  var paper = css('--paper'), ink = css('--ink'), n = counts.length;
+  counts.forEach(function (c, i) {
+    var w = c / tot * W, t = 0.15 + 0.8 * i / Math.max(1, n - 1);
+    s += '<rect x="' + x.toFixed(2) + '" y="0" width="' + Math.max(0, w).toFixed(2) + '" height="' + H + '" fill="' + mix(paper, ink, t) + '"><title>' + labels[i] + '</title></rect>';
+    x += w;
+  });
+  return s + '</svg>';
+}
+function itemTableHTML() {
+  var b = A.by[cfg.method], rows = '', q, omega = cfg.rel === 'omega', drop = omega ? A.omegaDrop : b.items.map(function (st) { return st.drop; }), ref = omega ? b.omegaM : b.alpha;
+  for (q = 0; q < A.k; q++) {
+    var it = A.its[q], st = b.items[q], lowRest = st.rest < 0.3, up = drop[q] > ref + 0.005, flip = cfg.rev && it.flip;
+    var ct = A.counts[q], tot = ct.reduce(function (s, x) { return s + x; }, 0);
+    var labels = ct.map(function (c, i) { var coded = it.lo + i; return 'code ' + coded + (flip ? ' (raw answer ' + (it.hi + it.lo - coded) + ')' : '') + ': ' + Math.round(100 * c / tot) + '%'; });
+    rows += '<tr><td><span class="fam" style="background:' + famColor(it.fam) + '"></span><code>' + it.v + '</code> ' + it.tag + (flip ? ' <span class="cap">(reversed)</span>' : '') + qtip(it) + '</td>' +
+      '<td class="dist">' + distBar(ct, labels) + '</td><td>' + num(A.mu[q], 2) + '</td><td>' + num(A.sd[q], 2) + '</td>' +
+      '<td' + (lowRest ? ' class="warn"' : '') + '>' + num(st.rest, 2) + '</td><td' + (up ? ' class="warn"' : '') + '>' + num(drop[q], 3) + '</td>' +
+      '<td>' + num(A.lam[q], 2) + '</td><td>' + Math.round(100 * b.wshare[q]) + '%</td></tr>';
+  }
+  return '<table class="cmp"><thead><tr><th>Question</th><th>Answers' + tip('The share of each answer, from the lowest code (light) to the highest (dark), as coded for the index. Hover over a segment for its share.', 'answers') + '</th><th>Mean</th><th>SD</th>' +
+    '<th>Item-rest r' + tip('The correlation of the question with the sum of the other chosen questions, weighted as in this index. Values below 0.3 are marked; that is a rule of thumb, not a law.', 'item-rest r') + '</th>' +
+    '<th>' + relName() + ' without it' + tip(relName() + ' of the index built from the other questions. Marked when leaving the question out would raise it.', relName() + ' without it') + '</th>' +
+    '<th>Loading' + tip('The correlation of the question with the single factor of a one-factor model of the chosen questions. Negative when the question runs against the others.', 'loading') + '</th>' +
+    '<th>Weight' + tip('How much the question counts in the index, as a share of the total. Adding up raw codes does not give every question the same weight.', 'weight') + '</th></tr></thead><tbody>' + rows + '</tbody></table>';
+}
+function itemCap() {
+  return 'Means and standard deviations are on each question\'s own scale, as coded for the index. Item-rest correlations and ' + relName().toLowerCase() + ' use the questions as this index weights them.' +
+    (A.oneHeywood ? ' <span class="warn">The one-factor model explains almost all of one question\'s variation here, so its loadings deserve little trust.</span>' : '');
+}
+function dimTableHTML() {
+  var rows = '', ok = A.fits.filter(function (f) { return f.fit.dof > 0; }), minBic = Math.min.apply(null, ok.map(function (f) { return f.fit.bic; }));
+  A.fits.forEach(function (f) {
+    var st = f.fit, good = st.dof > 0;
+    rows += '<tr' + (f.m === A.m ? ' class="cur"' : '') + '><td>' + factorsWord(f.m).replace(/^./, function (c) { return c.toUpperCase(); }) +
+      (f.heywood ? ' <span class="warn">(one question almost fully explained' + tip('The model explains 99.5% of one question\'s variation, the most psych allows. Since no survey question is answered without error, this usually means too many factors.', 'one question almost fully explained') + ')</span>' : '') + '</td>' +
+      '<td>' + (good ? num(st.rmsea, 3) : '-') + '</td><td>' + (good ? num(st.tli, 3) : '-') + '</td><td' + (good && st.bic === minBic ? ' class="strong"' : '') + '>' + (good ? num(st.bic, 1) : '-') + '</td></tr>';
+  });
+  return '<table class="cmp"><thead><tr><th>Model of the ' + A.k + ' questions</th><th>RMSEA' +
+    tip('Misfit, allowing for the size of the model. Below about 0.05 is usually called close and above 0.10 poor.', 'RMSEA') + '</th><th>TLI' +
+    tip('How much better the model fits than a model in which the questions are unrelated, from 0 to 1. Above about 0.95 is usually called good.', 'TLI') + '</th><th>BIC' +
+    tip('A score that rewards fit and penalizes extra factors. Lower is better; the lowest is in bold.', 'BIC') + '</th></tr></thead><tbody>' + rows + '</tbody></table>' +
+    '<p class="cap">Lower RMSEA and BIC, and higher TLI, mean a better fit. A dash means the model has too few questions to test. Fitted to ' + (cfg.corr === 'poly' ? 'polychoric' : 'ordinary') + ' correlations as <code>psych::fa()</code> does, for ' + n0(C.n) + ' respondents; the rotation does not change the fit.</p>';
+}
+function dimLinesHTML() {
+  var keep = paKeep(), s = '', km = A.kmo.msa;
+  s += '<p><b>KMO</b> (Kaiser-Meyer-Olkin), a check on whether the questions share enough to be worth a factor analysis, is ' + num(km, 2) + '. ' +
+    (km >= 0.6 ? 'Values above 0.6 are usually taken as enough.' : km >= 0.5 ? 'Values below 0.6 are usually taken as weak grounds for a factor analysis.' : 'Below 0.5, a factor analysis is usually not advised.') + '</p>';
+  var nf = keep.fa, nc = keep.pc;
+  s += '<p><b>Parallel analysis</b> keeps ' + (nf === 0 ? 'no factor' : factorsWord(nf)) + ' and ' + (nc === 0 ? 'no component' : WORD[nc] + (nc === 1 ? ' component' : ' components')) + ': those that take more of the shared variation than in 95% of random data sets of the same size.' +
+    (nf > A.mmax ? ' That is more factors than ' + A.k + ' questions allow; the most is ' + WORD[A.mmax] + '.' : '') +
+    (nf === 0 ? ' With few questions the yardstick for the first factor is high, so parallel analysis can reject even a factor that is plainly there.' : '') + '</p>';
+  if (A.fits.length > 1) {
+    var ok = A.fits.filter(function (f) { return f.fit.dof > 0; }), best = ok.reduce(function (a, f) { return !a || f.fit.bic < a.fit.bic ? f : a; }, null);
+    if (best) s += '<p><b>BIC</b> is lowest with ' + factorsWord(best.m) + (best.m !== nf && nf > 0 && nf <= A.mmax ? ', while parallel analysis keeps ' + WORD[nf] + '. They ask different questions: whether a factor is larger than chance, and whether it improves the fit enough to be worth its extra loadings' : '') + '.</p>';
+  }
+  return s;
+}
+function solTableHTML() {
+  var sol = A.sol, m = A.m, useS = view.load === 'structure' && oblique(), M = useS ? sol.S : sol.L, rows = '', q, a, names = facNames();
+  var tot = sol.h2.reduce(function (x, y) { return x + y; }, 0);
+  for (q = 0; q < A.k; q++) {
+    var it = A.its[q];
+    rows += '<tr><td><span class="fam" style="background:' + famColor(it.fam) + '"></span><code>' + it.v + '</code> ' + it.tag + qtip(it) + '</td>';
+    for (a = 0; a < m; a++) rows += '<td class="' + (Math.abs(M[q][a]) >= 0.3 ? 'strong' : 'faint') + '">' + num(M[q][a], 2) + '</td>';
+    rows += '<td>' + num(sol.h2[q], 2) + '</td></tr>';
+  }
+  var ss = '<tr><td>Variation explained by the factor' + tip(oblique() ? 'For correlated factors, psych splits the variation the factors share between them; the numbers add up to the total the factors explain.' : 'The sum of the squared loadings on the factor.', 'variation explained') + '</td>';
+  for (a = 0; a < m; a++) ss += '<td>' + num(sol.vacc[a], 2) + '</td>';
+  ss += '<td>' + num(tot, 2) + '</td></tr><tr><td>Share of all the variation</td>';
+  for (a = 0; a < m; a++) ss += '<td>' + num(sol.vacc[a] / A.k, 2) + '</td>';
+  ss += '<td>' + num(tot / A.k, 2) + '</td></tr>';
+  var head = '<tr><th>Question</th>';
+  for (a = 0; a < m; a++) head += '<th>F' + (a + 1) + tip('Factor ' + (a + 1) + ': ' + names[a].name + ' (' + names[a].high + ').', 'factor ' + (a + 1)) + '</th>';
+  head += '<th>Explained' + tip('The share of the question\'s variation that the factors explain together (h2 in psych). It is the same under every rotation.', 'explained') + '</th></tr>';
+  return '<table class="cmp"><thead>' + head + '</thead><tbody>' + rows + ss + '</tbody></table>';
+}
+function solCap() {
+  var useS = view.load === 'structure' && oblique();
+  return (useS ? 'Structure loadings: the correlations of the questions with the factors.' : (oblique() ? 'Pattern loadings: how much each factor contributes to a question, holding the other factors fixed. With leaning axes these are not correlations; Advanced shows the correlations.' : 'Loadings: with uncorrelated factors, these are the correlations of the questions with the factors.')) +
+    ' Loadings of 0.30 or more, up or down, are in bold.' + (A.sol.conv ? '' : ' <span class="warn">The rotation did not settle.</span>');
+}
+function phiHTML() {
+  var m = A.m, sol = A.sol;
+  if (m === 1) return '';
+  if (!oblique()) return '<p class="cap">' + (sol.rot === 'none' ? 'Before rotation' : sol.rot === 'manual' ? 'With the axes turned at right angles' : 'With varimax') + ', the factors are uncorrelated by construction.</p>';
+  var s = '<table class="cmp" style="width:auto"><thead><tr><th>Correlation between factors</th>', a, b;
+  for (a = 0; a < m; a++) s += '<th>F' + (a + 1) + '</th>';
+  s += '</tr></thead><tbody>';
+  for (a = 0; a < m; a++) { s += '<tr><td>F' + (a + 1) + '</td>'; for (b = 0; b < m; b++) s += '<td>' + (b <= a ? num(sol.Phi[a][b], 2) : '') + '</td>'; s += '</tr>'; }
+  return s + '</tbody></table>';
+}
+function solLinesHTML() {
+  var s = '', m = A.m, names = facNames(), a;
+  if (m > 1) {
+    var parts = [];
+    for (a = 0; a < m; a++) parts.push('factor ' + (a + 1) + ' ' + (names[a].kind === 'one' ? 'is ' + names[a].name : 'gathers the ' + names[a].name) + ' (' + names[a].high + ')');
+    s += '<p>' + parts.join('; ').replace(/^f/, 'F') + '.</p>';
+    s += '<p>Every rotation predicts the correlations equally well: the Explained column and the fit do not change when you switch rotations. Only the way the shared variation is divided among the factors does.</p>';
+  }
+  return s;
+}
+function vmCap() {
+  return 'The varimax criterion as the two axes turn together: higher means that each question loads mainly on one factor. Varimax turns the axes to a peak of this curve (circles), here at ' + vmCurveSVG.best + ' degrees; the curve repeats every 90 degrees.' +
+    (A.sol.rot === 'manual' ? ' The red line is your angle.' : ' Choose "By hand" to turn the axes yourself.');
+}
+function fiveTableHTML() {
+  var rows = '', m = A.m, a, names = facNames();
+  var head = '<tr><th>Index</th><th>' + relName() + tip(cfg.rel === 'omega' ? 'Omega of each index under the chosen factor model.' : 'Alpha of the questions as each index weights them.', relName().toLowerCase() + ' in the table') + '</th>';
+  for (a = 0; a < m; a++) head += '<th>r with F' + (a + 1) + tip('Correlation of the index with the scores on factor ' + (a + 1) + ': ' + names[a].name + '.', 'r with factor ' + (a + 1)) + '</th>';
+  head += '<th>Education' + tip('Coefficient of education, per ISCED level, in standard deviations of the index, from the regressions in the next section.', 'education') + '</th><th>r with the chosen index</th></tr>';
+  METHODS.forEach(function (mt, i) {
+    var b = A.by[mt];
+    rows += '<tr' + (mt === cfg.method ? ' class="cur"' : '') + '><td>' + SHORT[mt] + '</td><td>' + num(relOf(b), 3) + '</td>';
+    for (a = 0; a < m; a++) rows += '<td>' + num(b.rF[a], 2) + '</td>';
+    rows += '<td>' + num(A.reg.by[mt].coefs[0].b, 3) + '</td><td>' + num(A.agree[i][METHODS.indexOf(cfg.method)], 3) + '</td></tr>';
+  });
+  return '<table class="cmp"><thead>' + head + '</thead><tbody>' + rows + '</tbody></table>';
+}
+function fiveLinesHTML() {
+  var lo = 1, i, j;
+  for (i = 0; i < 5; i++) for (j = 0; j < 5; j++) lo = Math.min(lo, A.agree[i][j]);
+  var pos = A.dirs.some(function (d) { return d > 0; }), negs = A.dirs.some(function (d) { return d < 0; }), s = '';
+  if (pos && negs) s += '<p>With questions pointing both ways, the indices built from the codes and the weighted ones part company: the lowest correlation among them is ' + num(lo, 2) + '. The principal component and the factor scores work out each question\'s direction; adding up codes does not.</p>';
+  else if (negs) s += '<p>All the chosen questions run from favorable to unfavorable, so the three indices built from the codes run opposite to the principal component and the factor scores, which the page points toward a favorable view.</p>';
+  else if (lo > 0.95) s += '<p>Once the questions point the same way, the five indices correlate at least ' + num(lo, 3) + ' with one another. How the questions are weighted matters little; which questions go in, and which way they point, matter more.</p>';
+  else s += '<p>The lowest correlation among the five indices is ' + num(lo, 3) + '.</p>';
+  if (A.m > 1) {
+    var b = A.by[cfg.method];
+    s += '<p>The chosen index correlates ' + b.rF.map(function (r, a) { return num(r, 2) + ' with factor ' + (a + 1); }).join(' and ') + '. One number stands in for ' + WORD[A.m] + ' sets of answers that only partly agree.</p>';
+  }
+  return s;
+}
+function regTableHTML() {
+  var outs = outcomes(), rows = '';
+  var head = '<tr><th></th>' + outs.map(function (o, i) { return '<th>' + (i === 0 ? 'Index' : 'Factor ' + i) + tip(o.label + ' (' + o.sub + ').', i === 0 ? 'index' : 'factor ' + i) + '</th>'; }).join('') + '</tr>';
+  A.reg.preds.forEach(function (pn, pi) {
+    rows += '<tr><td>' + esc(E.BG_NAME[pn]) + '</td>' + outs.map(function (o) { var c = A.reg.by[o.key].coefs[pi]; return '<td' + (c.p < 0.05 ? ' class="strong"' : '') + '>' + num(c.b, 3) + ' <span class="cap">(' + num(c.se, 3) + ')</span></td>'; }).join('') + '</tr>';
+  });
+  rows += '<tr><td>Intercept</td>' + outs.map(function (o) { return '<td>' + num(A.reg.by[o.key].b0, 3) + '</td>'; }).join('') + '</tr>';
+  rows += '<tr><td>R-squared</td>' + outs.map(function (o) { return '<td>' + num(A.reg.by[o.key].r2, 3) + '</td>'; }).join('') + '</tr>';
+  return '<table class="cmp"><thead>' + head + '</thead><tbody>' + rows + '</tbody></table>';
+}
+function regCap() {
+  return 'Least squares regressions on the ' + n0(A.reg.n) + ' respondents who also answered the four background questions; standard errors in parentheses, coefficients with p &lt; 0.05 in bold. ' +
+    'Each index and each set of factor scores is standardized on all ' + n0(C.n) + ' respondents, so a coefficient is a difference in standard deviations. ISCED 3 is a high-school diploma and 6 a bachelor\'s degree. The lines in the figure are 95% confidence intervals. These are associations among respondents, not effects.';
+}
+function highlightR(code) {
+  return code.split('\n').map(function (line) {
+    var i = line.indexOf('#');
+    while (i >= 0 && ((line.slice(0, i).match(/"/g) || []).length % 2 || (line.slice(0, i).match(/`/g) || []).length % 2)) i = line.indexOf('#', i + 1);
+    if (i < 0) return esc(line);
+    return esc(line.slice(0, i)) + '<span class="c">' + esc(line.slice(i)) + '</span>';
+  }).join('\n');
+}
+
+/* ---------- Tooltips ---------- */
+var tipBox = document.createElement('div'), tipOwner = null, tipT = 0;
+tipBox.id = 'tipbox'; tipBox.setAttribute('role', 'tooltip'); tipBox.hidden = true; document.body.appendChild(tipBox);
+function showTip(btn) {
+  clearTimeout(tipT);
+  if (tipOwner && tipOwner !== btn) tipOwner.removeAttribute('aria-describedby');
+  tipOwner = btn; tipBox.textContent = btn.getAttribute('data-tip'); tipBox.hidden = false; btn.setAttribute('aria-describedby', 'tipbox');
+  tipBox.style.maxWidth = Math.min(340, window.innerWidth - 16) + 'px';
+  var r = btn.getBoundingClientRect(), bw = tipBox.offsetWidth, bh = tipBox.offsetHeight;
+  var x = Math.max(8, Math.min(r.left + r.width / 2 - bw / 2, window.innerWidth - bw - 8)), y = r.top - bh - 8;
+  if (y < 8) y = r.bottom + 8;
+  tipBox.style.left = (x + window.scrollX) + 'px'; tipBox.style.top = (y + window.scrollY) + 'px';
+}
+function hideTip() { if (tipOwner) tipOwner.removeAttribute('aria-describedby'); tipOwner = null; tipBox.hidden = true; }
+function hideSoon() { clearTimeout(tipT); tipT = setTimeout(hideTip, 200); }
+function tipOf(t) { return t && t.closest ? t.closest('.tip') : null; }
+document.addEventListener('mouseover', function (e) { var b = tipOf(e.target); if (b) showTip(b); else if (e.target.closest && e.target.closest('#tipbox')) clearTimeout(tipT); });
+document.addEventListener('mouseout', function (e) { if (tipOf(e.target) || (e.target.closest && e.target.closest('#tipbox'))) hideSoon(); });
+document.addEventListener('focusin', function (e) { var b = tipOf(e.target); if (b) showTip(b); });
+document.addEventListener('focusout', function (e) { if (tipOf(e.target)) hideSoon(); });
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape') hideTip(); });
+document.addEventListener('click', function (e) { var b = tipOf(e.target); if (b) { e.preventDefault(); if (tipOwner === b && !tipBox.hidden) hideTip(); else showTip(b); } });
+
+/* ---------- Render ---------- */
+function syncControls() {
+  var mmax = E.maxFactors(cfg.items.length), m = Math.min(cfg.nf, mmax);
+  Array.prototype.forEach.call(document.querySelectorAll('input[name=nf]'), function (r) { r.disabled = +r.value > mmax; r.checked = +r.value === m; });
+  if (cfg.rot === 'manual' && m !== 2) cfg.rot = 'oblimin';
+  Array.prototype.forEach.call(document.querySelectorAll('input[name=rot]'), function (r) { r.disabled = m === 1 || (r.value === 'manual' && m !== 2); r.checked = r.value === cfg.rot; });
+  el.anglebox.hidden = !(cfg.rot === 'manual' && m === 2);
+  el.angle_out.innerHTML = cfg.angle + '&deg;';
+}
+function refit() { syncControls(); A = E.analyze(C, cfg); }
+function draw() {
+  hideTip();
+  var mainW = el.matrix.closest('main').clientWidth || 900;
+  var wide = mainW >= 860, sw = wide ? Math.min(330, Math.max(260, Math.round(mainW * 0.34))) : Math.min(mainW, 340), mw = wide ? mainW - sw - 28 : mainW;
+  el.matrix.innerHTML = matrixSVG(mw);
+  el.matrix.parentNode.style.width = Math.min(mainW, +el.matrix.firstChild.getAttribute('width')) + 'px';
+  el.matrix.setAttribute('aria-label', 'Correlation matrix of the ' + A.k + ' chosen questions, with one-factor loadings and the weight of each question in the index.');
+  el.matrix_cap.innerHTML = matrixCap();
+  el.loadplot.innerHTML = loadPlotSVG(sw);
+  el.loadplot.parentNode.style.width = Math.min(mainW, +el.loadplot.firstChild.getAttribute('width')) + 'px';
+  el.loadplot.setAttribute('aria-label', 'Loading plot of the ' + A.m + '-factor solution.');
+  el.loadplot_cap.innerHTML = loadPlotCap();
+  el.result.innerHTML = resultHTML();
+  el.verdict.innerHTML = verdictHTML();
+  el.itemtbl.innerHTML = itemTableHTML();
+  el.itemcap.innerHTML = itemCap();
+  el.dimtbl.innerHTML = dimTableHTML();
+  el.dimlines.innerHTML = dimLinesHTML();
+  el.scree.innerHTML = screeSVG();
+  el.scree.setAttribute('aria-label', 'Eigenvalues of the questions against random data.');
+  el.scree_cap.innerHTML = (view.scree === 'fa' ? 'How much of the shared variation each factor could take (its eigenvalue, bars)' : 'How much of the total variation each component takes (its eigenvalue, bars)') +
+    ', against the 95th percentile from random data of the same size (red). Dark bars are kept.' + (view.scree === 'pc' ? ' The dashed line marks 1, an older rule that keeps every component above it.' : '');
+  el.sol_title.textContent = 'The factor solution: ' + (A.m === 1 ? 'one factor' : WORD[A.m] + ' factors, ' + ROTNAME[A.sol.rot]) + (cfg.corr === 'poly' ? ', polychoric' : '');
+  el.soltbl.innerHTML = solTableHTML();
+  el.solcap.innerHTML = solCap();
+  el.phibox.innerHTML = phiHTML();
+  el.vmfig.hidden = A.m !== 2;
+  if (A.m === 2) { el.vmcurve.innerHTML = vmCurveSVG(); el.vmcurve.setAttribute('aria-label', 'Varimax criterion by angle of rotation.'); el.vmcap.innerHTML = vmCap(); }
+  el.sollines.innerHTML = solLinesHTML();
+  el.fivetbl.innerHTML = fiveTableHTML();
+  el.fivelines.innerHTML = fiveLinesHTML();
+  el.regfig.innerHTML = regSVG(mainW);
+  el.regfig.setAttribute('aria-label', 'Regression coefficients of the index and the factor scores on education, age, gender, and birthplace.');
+  el.regtbl.innerHTML = regTableHTML();
+  el.regcap.innerHTML = regCap();
+  el.rcode.innerHTML = highlightR(RC.rCode(cfg, C, A));
+  el.method_hint.textContent = methodHint();
+  el.rot_hint.textContent = rotHint();
+}
+var pending = 0;
+function render() { if (pending) return; pending = setTimeout(function () { pending = 0; refit(); draw(); }, 16); }
+
+function say(t, keep) { el.copy_status.textContent = t; clearTimeout(say.t); if (!keep) say.t = setTimeout(function () { el.copy_status.textContent = ''; }, 4000); }
+function save(text, name, type) {
+  var blob = new Blob([text], { type: type }), a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click();
+  setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 200);
+  say('Saved ' + name + '.');
+}
+function bind() {
+  el.itembox.innerHTML = itemBoxHTML();
+  el.buildcode.innerHTML = highlightR(document.getElementById('buildr').textContent.replace(/^\n/, ''));
+  Array.prototype.forEach.call(document.querySelectorAll('input[name=method]'), function (r) { r.addEventListener('change', function () { cfg.method = r.value; render(); }); });
+  Array.prototype.forEach.call(document.querySelectorAll('input[name=nf]'), function (r) { r.addEventListener('change', function () { cfg.nf = +r.value; render(); }); });
+  Array.prototype.forEach.call(document.querySelectorAll('input[name=rot]'), function (r) { r.addEventListener('change', function () { cfg.rot = r.value; render(); }); });
+  el.angle.addEventListener('input', function () { cfg.angle = +el.angle.value; if (cfg.rot !== 'manual') cfg.rot = 'manual'; render(); });
+  el.rev.addEventListener('change', function () { cfg.rev = el.rev.checked; render(); });
+  el.poly.addEventListener('change', function () { cfg.corr = el.poly.checked ? 'poly' : 'pearson'; render(); });
+  el.omega.addEventListener('change', function () { cfg.rel = el.omega.checked ? 'omega' : 'alpha'; render(); });
+  el.pcpa.addEventListener('change', function () { view.scree = el.pcpa.checked ? 'pc' : 'fa'; draw(); });
+  el.structure.addEventListener('change', function () { view.load = el.structure.checked ? 'structure' : 'pattern'; draw(); });
+  el.itembox.addEventListener('change', function (e) {
+    var box = e.target; if (!box || box.type !== 'checkbox') return;
+    var on = Array.prototype.filter.call(el.itembox.querySelectorAll('input'), function (c) { return c.checked; }).map(function (c) { return +c.value; });
+    if (on.length < 3) { box.checked = true; el.items_hint.textContent = 'An index here needs at least three questions.'; el.items_hint.className = 'hint warn'; return; }
+    el.items_hint.textContent = ''; el.items_hint.className = 'hint';
+    cfg.items = on.sort(function (a, b) { return a - b; }); render();
+  });
+  el.copy.addEventListener('click', function () {
+    var t = RC.rCode(cfg, C, A), fail = function () { say('Copying is blocked here; select the code and copy it by hand.', true); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(function () { say('Copied.'); }, fail); else fail();
+  });
+  el.dl.addEventListener('click', function () { save(RC.rCode(cfg, C, A), 'immigration-index-' + cfg.method + '-' + A.m + 'f.R', 'text/plain'); });
+  el.json.addEventListener('click', function () { save(document.getElementById('data').textContent.trim() + '\n', 'wvs7-immigration-usa.json', 'application/json'); });
+  var rT = 0;
+  window.addEventListener('resize', function () { clearTimeout(rT); rT = setTimeout(draw, 120); });
+  if (window.matchMedia) { var mq = window.matchMedia('(prefers-color-scheme: dark)'), redraw = function () { el.itembox.innerHTML = itemBoxHTML(); draw(); }; if (mq.addEventListener) mq.addEventListener('change', redraw); else if (mq.addListener) mq.addListener(redraw); }
+}
+function readControls() {
+  var m = document.querySelector('input[name=method]:checked'), nf = document.querySelector('input[name=nf]:checked'), rot = document.querySelector('input[name=rot]:checked');
+  if (m) cfg.method = m.value; if (nf) cfg.nf = +nf.value; if (rot) cfg.rot = rot.value;
+  cfg.rev = el.rev.checked; cfg.corr = el.poly.checked ? 'poly' : 'pearson'; cfg.angle = +el.angle.value; cfg.rel = el.omega.checked ? 'omega' : 'alpha';
+  view.scree = el.pcpa.checked ? 'pc' : 'fa'; view.load = el.structure.checked ? 'structure' : 'pattern';
+}
+bind(); readControls(); refit(); draw();
+})();
+
+</script>
+</body>
+</html>
