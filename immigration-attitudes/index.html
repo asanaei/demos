@@ -164,11 +164,9 @@ dl.items dt code { font-weight: 500; font-size: 13px; }
 dl.items dd { margin: 2px 0 0; }
 .about .src { font-size: 14px; color: var(--graphite); padding-left: 2em; text-indent: -2em; margin-bottom: 5px; }
 .about a { color: var(--ink); text-underline-offset: 3px; word-break: break-all; }
-.figwrap { position: relative; }
 h3.sub3 { font-family: var(--serif); font-weight: 500; font-size: 17px; margin: 22px 0 6px; }
 p.lead3 { font-size: 14.5px; margin: 0 0 10px; max-width: 80ch; }
 p.introlead { font-size: 14px; color: var(--graphite); margin: 8px 0 0; }
-.figwrap .tip.hdr { position: absolute; margin: 0; }
 
 @media (max-width: 960px) {
   .dimgrid { grid-template-columns: minmax(0, 1fr); }
@@ -1525,16 +1523,15 @@ function itemBoxHTML() {
   return s;
 }
 
-/* ---------- Correlation matrix with loadings and weights ---------- */
+/* ---------- Correlation matrix ---------- */
 function matrixSVG(width) {
-  var k = A.k, sel = A.sel, bars = width >= 520, barW = bars ? (width < 620 ? 62 : 76) : 0, gap = bars ? 12 : 0;
-  var fit = function (lw) { return Math.floor((width - lw - 2 * barW - 2 * gap - 6) / k); };
+  var k = A.k, sel = A.sel;
+  var fit = function (lw) { return Math.floor((width - lw - 6) / k); };
   var narrow = fit(196) < 34, labW = narrow ? 52 : 196;
   var cs = Math.max(24, Math.min(44, fit(labW)));
-  var top = 54, H = top + k * cs + 8, W = labW + k * cs + (bars ? gap + barW + gap + barW + 4 : 4);
-  matrixSVG.bars = bars; matrixSVG.hdr = [];
+  var top = 54, H = top + k * cs + 8, W = labW + k * cs + 4;
   var paper = css('--paper'), ink = css('--ink'), neg = css('--neg'), tint = css('--tint'), graphite = css('--graphite'), mono = esc(css('--mono'));
-  var b = A.by[cfg.method], s = svgOpen(W, H), i, j;
+  var s = svgOpen(W, H), i, j;
   var lp = lum(paper, paper, 0), li = lum(ink, ink, 0), light = lp > li ? paper : ink, darkc = lp > li ? ink : paper;
   for (j = 0; j < k; j++) {
     var cx = labW + j * cs + cs / 2;
@@ -1560,53 +1557,11 @@ function matrixSVG(width) {
     var a = idx[0], z = idx[idx.length - 1];
     s += '<rect x="' + (labW + a * cs + 0.75) + '" y="' + (top + a * cs + 0.75) + '" width="' + ((z - a + 1) * cs - 1.5) + '" height="' + ((z - a + 1) * cs - 1.5) + '" fill="none" stroke="' + famColor(f) + '" stroke-width="1.5"/>';
   });
-  if (!bars) return s + '</svg>';
-  var x0 = labW + k * cs + gap, x1 = x0 + barW + gap, bl = barW - 34, maxw = Math.max(0.15, Math.max.apply(null, b.wshare.map(Math.abs)));
-  s += '<text x="' + x0 + '" y="' + (top - 22) + '" font-size="12" fill="' + ink + '">Loading</text><text x="' + x0 + '" y="' + (top - 8) + '" font-size="11.5" fill="' + graphite + '">one factor</text>';
-  s += '<text x="' + x1 + '" y="' + (top - 22) + '" font-size="12" fill="' + ink + '">Weight</text><text x="' + x1 + '" y="' + (top - 8) + '" font-size="11.5" fill="' + graphite + '">in the index</text>';
-  matrixSVG.hdr = [{ x: x0 + 47, y: top - 36, what: 'loading' }, { x: x1 + 43, y: top - 36, what: 'weight' }];
-  for (i = 0; i < k; i++) {
-    var yy = top + i * cs, lam = A.lam[i], ws = b.wshare[i], fc = famColor(ITEMS[sel[i]].fam), bh = Math.min(12, cs - 12);
-    s += '<line x1="' + x0 + '" x2="' + x0 + '" y1="' + yy + '" y2="' + (yy + cs) + '" stroke="' + css('--rule') + '"/>';
-    s += '<rect x="' + x0 + '" y="' + (yy + cs / 2 - bh / 2) + '" width="' + Math.max(0.5, Math.min(1, Math.abs(lam)) * bl) + '" height="' + bh + '" fill="' + (lam < 0 ? neg : fc) + '"/>';
-    s += '<text x="' + (x0 + barW) + '" y="' + (yy + cs / 2 + 4) + '" text-anchor="end" font-size="11.5" style="font-variant-numeric:tabular-nums" fill="' + ink + '">' + rr(lam) + '</text>';
-    s += '<line x1="' + x1 + '" x2="' + x1 + '" y1="' + yy + '" y2="' + (yy + cs) + '" stroke="' + css('--rule') + '"/>';
-    s += '<rect x="' + x1 + '" y="' + (yy + cs / 2 - bh / 2) + '" width="' + Math.max(0.5, Math.abs(ws) / maxw * bl) + '" height="' + bh + '" fill="' + (ws < 0 ? neg : fc) + '"/>';
-    s += '<text x="' + (x1 + barW) + '" y="' + (yy + cs / 2 + 4) + '" text-anchor="end" font-size="11.5" style="font-variant-numeric:tabular-nums" fill="' + ink + '">' + (ws < 0 ? '-' : '') + Math.round(Math.abs(ws) * 100) + '%</text>';
-  }
   return s + '</svg>';
 }
 function matrixCap() {
   var anyNeg = A.R.some(function (r) { return r.some(function (v) { return v < -0.05; }); });
-  var s = 'Correlations between the chosen questions, coded as the index uses them. Darker cells mean stronger correlations' + (anyNeg ? '; red marks a negative one' : '') + '. The boxes mark the statements of benefit and of harm.';
-  if (matrixSVG.bars) s += ' The two columns on the right show how closely each question follows what all of them share (loading) and how much it counts in the index (weight); the question marks explain both.';
-  return s;
-}
-function loadingTip() {
-  var hi = 0, lo = 0, q;
-  for (q = 0; q < A.k; q++) { if (A.lam[q] > A.lam[hi]) hi = q; if (A.lam[q] < A.lam[lo]) lo = q; }
-  return 'Picture one hidden opinion about immigration behind all the chosen answers. A model with one factor estimates it, and the loading is the correlation between a question and that hidden opinion: near 1, the question follows it closely; near 0, it has little to do with it; below 0, it runs the other way. Here ' +
-    A.its[hi].v + ' (' + A.its[hi].tag.toLowerCase() + ') follows it most, at ' + num(A.lam[hi], 2) + ', and ' + A.its[lo].v + ' (' + A.its[lo].tag.toLowerCase() + ') least, at ' + num(A.lam[lo], 2) + '.' +
-    (cfg.corr === 'poly' ? ' These loadings use ordinary correlations even with the polychoric switch on.' : '');
-}
-function weightTip() {
-  var even = Math.round(100 / A.k);
-  return 'How much each question counts in the index chosen on the left, as a share of all the weight. ' +
-    (cfg.method === 'z' ? 'With the average of z-scores every question counts the same, ' + even + '% each.' :
-     cfg.method === 'sum' ? 'Adding up raw codes is not neutral: a question whose answers spread more, such as Q121 with five codes, counts for more.' :
-     cfg.method === 'pomp' ? 'Rescaling to 0-1 evens out the scales, but a question whose answers spread more still counts for more.' :
-     'The method sets the weights from the data, so questions that go more with the rest count for more.');
-}
-function placeHeaderTips() {
-  var fig = el.matrix.parentNode;
-  fig.classList.add('figwrap');
-  Array.prototype.forEach.call(fig.querySelectorAll('.tip.hdr'), function (b) { b.remove(); });
-  (matrixSVG.hdr || []).forEach(function (h) {
-    var holder = document.createElement('span');
-    holder.innerHTML = tip(h.what === 'loading' ? loadingTip() : weightTip(), h.what);
-    var b = holder.firstChild; b.classList.add('hdr'); b.style.left = h.x + 'px'; b.style.top = h.y + 'px';
-    fig.appendChild(b);
-  });
+  return 'Correlations between the chosen questions, coded as the index uses them. Darker cells mean stronger correlations' + (anyNeg ? '; red marks a negative one' : '') + '. The boxes mark the statements of benefit and of harm.';
 }
 /* ---------- Loading plot ---------- */
 function loadPlotSVG(size) {
@@ -1821,7 +1776,7 @@ function verdictHTML() {
   var relTxt = relName() + ' is ' + num(relOf(b), 2);
   if (mixed) {
     if (wt) out.push('The harm statements and Q130 are not reversed, but the ' + (cfg.method === 'pc' ? 'principal component' : 'factor model') + ' gives them negative weights, so the index is the same as with the reversal on, and so is its ' + relName().toLowerCase() + '.');
-    else out.push('The harm statements and Q130 are not reversed, so in this index they pull against the other questions: see the red cells in the matrix and the negative loadings beside it. ' + relName() + ' falls to ' + num(relOf(b), 2) + '.');
+    else out.push('The harm statements and Q130 are not reversed, so in this index they pull against the other questions: see the red cells in the matrix. ' + relName() + ' falls to ' + num(relOf(b), 2) + '.');
   } else if (negs) out.push('All the chosen questions are left unreversed, so a higher code means a less favorable view; ' + (wt ? 'the page still points this index toward a favorable view.' : 'the index simply runs the other way.'));
   var f1 = A.fits[0], f2 = A.fits.length > 1 ? A.fits[1] : null, relv = relOf(b);
   if (!mixed) {
@@ -1862,17 +1817,16 @@ function itemTableHTML() {
     rows += '<tr><td><span class="fam" style="background:' + famColor(it.fam) + '"></span><code>' + it.v + '</code> ' + it.tag + (flip ? ' <span class="cap">(reversed)</span>' : '') + qtip(it) + '</td>' +
       '<td class="dist">' + distBar(ct, labels) + '</td><td>' + num(A.mu[q], 2) + '</td><td>' + num(A.sd[q], 2) + '</td>' +
       '<td' + (lowRest ? ' class="warn"' : '') + '>' + num(st.rest, 2) + '</td><td' + (up ? ' class="warn"' : '') + '>' + num(drop[q], 3) + '</td>' +
-      '<td>' + num(A.lam[q], 2) + '</td><td>' + Math.round(100 * b.wshare[q]) + '%</td></tr>';
+      '</tr>';
   }
   return '<table class="cmp"><thead><tr><th>Question</th><th>Answers' + tip('The share of each answer, from the lowest code (light) to the highest (dark), as coded for the index. Hover over a segment for its share.', 'answers') + '</th><th>Mean</th><th>SD</th>' +
     '<th>Item-rest r' + tip('The correlation of the question with the sum of the other chosen questions, weighted as in this index. Values below 0.3 are marked; that is a rule of thumb, not a law.', 'item-rest r') + '</th>' +
     '<th>' + relName() + ' without it' + tip(relName() + ' of the index built from the other questions. Marked when leaving the question out would raise it.', relName() + ' without it') + '</th>' +
-    '<th>Loading' + tip('The correlation of the question with the single factor of a one-factor model of the chosen questions. Negative when the question runs against the others.', 'loading') + '</th>' +
-    '<th>Weight' + tip('How much the question counts in the index, as a share of the total. Adding up raw codes does not give every question the same weight.', 'weight') + '</th></tr></thead><tbody>' + rows + '</tbody></table>';
+    '</tr></thead><tbody>' + rows + '</tbody></table>';
 }
 function itemCap() {
   return 'Means and standard deviations are on each question\'s own scale, as coded for the index. Item-rest correlations and ' + relName().toLowerCase() + ' use the questions as this index weights them.' +
-    (A.oneHeywood ? ' <span class="warn">Warning:</span> the one-factor model explains almost all of one question\'s variation here, so its loadings deserve little trust.' : '');
+    (A.oneHeywood ? ' <span class="warn">Warning:</span> the one-factor model explains almost all of one question\'s variation here, so it deserves little trust.' : '');
 }
 function dimTableHTML() {
   var rows = '', ok = A.fits.filter(function (f) { return f.fit.dof > 0; }), minBic = Math.min.apply(null, ok.map(function (f) { return f.fit.bic; }));
@@ -2128,9 +2082,8 @@ function draw() {
   var wide = mainW >= 860, sw = wide ? Math.min(330, Math.max(260, Math.round(mainW * 0.34))) : Math.min(mainW, 340), mw = wide ? mainW - sw - 28 : mainW;
   el.matrix.innerHTML = matrixSVG(mw);
   el.matrix.parentNode.style.width = Math.min(mainW, +el.matrix.firstChild.getAttribute('width')) + 'px';
-  el.matrix.setAttribute('aria-label', 'Correlation matrix of the ' + A.k + ' chosen questions, with one-factor loadings and the weight of each question in the index.');
+  el.matrix.setAttribute('aria-label', 'Correlation matrix of the ' + A.k + ' chosen questions.');
   el.matrix_cap.innerHTML = matrixCap();
-  placeHeaderTips();
   el.loadplot.innerHTML = loadPlotSVG(sw);
   el.loadplot.parentNode.style.width = Math.min(mainW, +el.loadplot.firstChild.getAttribute('width')) + 'px';
   el.loadplot.setAttribute('aria-label', 'Loading plot of the ' + A.m + '-factor solution.');
