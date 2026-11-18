@@ -202,9 +202,9 @@ p.introlead { font-size: 14px; color: var(--graphite); margin: 8px 0 0; }
         <li><b>Drop the asylum question.</b> It goes least with the rest (item-rest correlation 0.20), and alpha rises slightly without it, from 0.82 to 0.83. Whether it belongs in an index of views on immigration is still a question about content, not about alpha.</li>
         <li><b>Rotate.</b> Try varimax, promax, oblimin, and geomin. The fit and the share of each question that the factors explain stay the same; only the loadings change. In the loading plot the questions keep their places relative to one another; only the lines of the factors move. Varimax keeps the axes at right angles; oblimin lets them lean toward each other until they meet at 62 degrees, and the cosine of that angle, 0.47, is the correlation between the two factors. All four rotations find the same two factors.</li>
         <li><b>Ask for three factors.</b> The third factor is a single question, the statement that immigration gives asylum to political refugees (<code>Q125</code>). The model explains 99.5% of the variation in its answers, the ceiling of the fitting procedure. Survey answers always contain some error, so a factor that explains one question completely is a sign of one factor too many.</li>
-        <li><b>See who holds which view.</b> With the reversal on, a high score on either factor means a favorable view: seeing little harm, or seeing many benefits. Each additional level of education goes with a score 0.22 standard deviations higher on the benefit factor and 0.11 higher on the harm factor; a bachelor's degree is three levels above a high-school diploma. The average of all ten answers lands in between, at 0.19, and hides the difference. Age works the other way round: each decade goes with seeing more harm (0.09 standard deviations) and slightly fewer benefits (0.03). Below the regressions, a model that allows for a habit of agreeing tells a different story.</li>
+        <li><b>See who holds which view.</b> With the reversal on, a high score on either factor means a favorable view: seeing little threat, or seeing many benefits. Each additional level of education goes with a score 0.22 standard deviations higher on the benefit factor and 0.11 higher on the threat factor; a bachelor's degree is three levels above a high-school diploma. The average of all ten answers lands in between, at 0.19, and hides the difference. Age works the other way round: each decade goes with seeing more threat (0.09 standard deviations) and slightly fewer benefits (0.03). Below the regressions, a model that allows for a habit of agreeing tells a different story.</li>
         <li><b>Open Advanced.</b> With omega instead of alpha, the reliability of the index depends on the factor model: 0.82 with one factor, 0.85 with two. With polychoric correlations the loadings rise, for <code>Q122</code> from 0.72 to 0.81; the benefit factor now comes first, but the regressions on the two factors barely move.</li>
-        <li><b>Switch to Great Britain.</b> The ten questions split the same way, but parallel analysis and BIC both favor three factors there. The third is not a single question: it gathers the statements that immigration gives asylum to political refugees and helps poor people establish new lives, a humanitarian side of the benefits. In the model with a habit of agreeing, the habit shows no clear link with education in Britain, while in the United States it rises with it.</li>
+        <li><b>Switch to Great Britain.</b> The ten questions split the same way, but parallel analysis and BIC both favor three factors there. The third factor, the humanitarian one, is not a single question: it gathers the statements that immigration gives asylum to political refugees and helps poor people establish new lives. In the model with a habit of agreeing, the habit shows no clear link with education in Britain, while in the United States it rises with it.</li>
       </ul>
     </details>
   </header>
@@ -1133,9 +1133,90 @@ function regressAll(c, res, outcomes) {
   return out;
 }
 
+/* ---------- Names for the factors of a solution with all ten questions ---------- */
+var ITEM_SHORT = { Q121: 'overall impact', Q122: 'jobs', Q123: 'cultural diversity', Q124: 'crime', Q125: 'asylum', Q126: 'terrorism',
+                   Q127: 'new lives for the poor', Q128: 'unemployment', Q129: 'social conflict', Q130: 'who may come to work' };
+var THREAT_CODES = ['Q124', 'Q126', 'Q128', 'Q129'], HUMANITARIAN_CODES = ['Q125', 'Q127'];
+/* Names come from the pattern loadings and state the direction first: "Low threat perception" when a high score means seeing little threat.
+   A threat factor carries most of its squared loading on the four harm statements. A humanitarian factor carries more on asylum and new
+   lives than on the other benefit statements, and only when a separate benefit factor exists. A factor with a single question at 0.30 or
+   more is named for that question. With one factor the name is overall favorability. With four factors no names are given.
+   Under an oblique rotation a pattern loading is the part of a question that belongs to one factor once the other factors are held fixed.
+   There, the threat factor is social when unemployment on it is at most 0.6 times the average of crime, terrorism, and social conflict, and
+   the benefit factor is economic when unemployment on it is 0.30 or more. Both must hold. Under varimax the same questions load on both
+   factors, so the general names stay. */
+function contentNames(L, codes, dirs, oblique) {
+  var k = codes.length, m = L[0].length, a, r, kinds = [], out = [];
+  if (k !== 10 || m > 3) return null;
+  if (m === 1) kinds = [{ kind: 'overall' }];
+  else {
+    var sq = function (a2, test) { var s = 0; for (var r2 = 0; r2 < k; r2++) if (test(codes[r2])) s += L[r2][a2] * L[r2][a2]; return s; };
+    var isT = function (v) { return THREAT_CODES.indexOf(v) >= 0; }, isH = function (v) { return HUMANITARIAN_CODES.indexOf(v) >= 0; };
+    var isB = function (v) { return v !== 'Q130' && !isT(v) && !isH(v); };
+    var rest = [];
+    for (a = 0; a < m; a++) {
+      var big = [];
+      for (r = 0; r < k; r++) if (Math.abs(L[r][a]) >= 0.3) big.push(r);
+      if (big.length === 1) kinds[a] = { kind: 'single', code: codes[big[0]] };
+      else rest.push(a);
+    }
+    var tIdx = -1, tBest = 0;
+    rest.forEach(function (a2) { var t = sq(a2, isT); if (t > tBest) { tBest = t; tIdx = a2; } });
+    if (tIdx >= 0) kinds[tIdx] = { kind: 'threat' };
+    var others = rest.filter(function (a2) { return a2 !== tIdx; }), hIdx = -1, hBest = 0;
+    if (others.length >= 2) others.forEach(function (a2) { var d = sq(a2, isH) - sq(a2, isB); if (d > hBest) { hBest = d; hIdx = a2; } });
+    others.forEach(function (a2) { kinds[a2] = { kind: a2 === hIdx ? 'humanitarian' : 'benefit' }; });
+  }
+  var Q128 = codes.indexOf('Q128'), tI = -1, bI = -1, split = false, a3, ratio, socialHalf, econHalf;
+  for (a3 = 0; a3 < m; a3++) {
+    if (kinds[a3].kind === 'threat') tI = a3;
+    if (kinds[a3].kind === 'benefit' && (bI < 0 || Math.abs(L[Q128][a3]) > Math.abs(L[Q128][bI]))) bI = a3;
+  }
+  if (oblique && Q128 >= 0 && tI >= 0 && bI >= 0) {
+    ratio = Math.abs(L[Q128][tI]) / ((Math.abs(L[codes.indexOf('Q124')][tI]) + Math.abs(L[codes.indexOf('Q126')][tI]) + Math.abs(L[codes.indexOf('Q129')][tI])) / 3);
+    socialHalf = ratio <= 0.6;
+    econHalf = Math.abs(L[Q128][bI]) >= 0.30;
+    split = socialHalf && econHalf;
+  }
+  for (a = 0; a < m; a++) {
+    var kd = kinds[a], dir = 0, best = 0, any = false, fav, name, good, bad, s, refined;
+    for (r = 0; r < k; r++) {
+      if (Math.abs(L[r][a]) > Math.abs(L[best][a])) best = r;
+      if (Math.abs(L[r][a]) >= 0.3) { dir += L[r][a] * dirs[r]; any = true; }
+    }
+    if (!any) dir = L[best][a] * dirs[best];
+    fav = dir >= 0;
+    if (kd.kind === 'overall') {
+      name = (fav ? 'High' : 'Low') + ' overall favorability';
+      good = 'more favorable toward immigrants'; bad = 'less favorable toward immigrants';
+    } else if (kd.kind === 'threat') {
+      refined = split && a === tI;
+      name = (fav ? 'Low ' : 'High ') + (refined ? 'social threat' : 'threat') + ' perception';
+      good = refined ? 'sees little social threat' : 'sees little threat';
+      bad = refined ? 'sees much social threat' : 'sees much threat';
+    } else if (kd.kind === 'benefit') {
+      refined = split && a === bI;
+      name = (fav ? 'High ' : 'Low ') + (refined ? 'economic benefit perception' : 'benefit perception');
+      good = refined ? 'sees economic benefits' : 'sees many benefits';
+      bad = refined ? 'sees few economic benefits' : 'sees few benefits';
+    } else if (kd.kind === 'humanitarian') {
+      name = (fav ? 'High' : 'Low') + ' humanitarian support';
+      good = 'more willing to give asylum and help new lives for the poor';
+      bad = 'less willing to give asylum and help new lives for the poor';
+    } else {
+      s = ITEM_SHORT[kd.code];
+      name = (fav ? 'High ' : 'Low ') + s + ' support';
+      good = 'more favorable on ' + s; bad = 'less favorable on ' + s;
+    }
+    out.push({ name: name, high: 'high = ' + (fav ? good : bad), kind: kd.kind });
+  }
+  return out;
+}
+
 return { ITEMS: ITEMS, BG: BG, BG_NAME: BG_NAME, METHODS: METHODS, prepare: prepare, analyze: analyze, solution: solution, minres: minres,
          parallel: parallel, countAbove: countAbove, varimaxCriterion: varimaxCriterion, rotate2: rotate2, varimax: varimax, eigenSym: eigenSym,
-         maxFactors: maxFactors, pchisqUpper: pchisqUpper, qt975: qt975, inv: inv, mmul: mmul, tr: tr };
+         maxFactors: maxFactors, pchisqUpper: pchisqUpper, qt975: qt975, inv: inv, mmul: mmul, tr: tr,
+         contentNames: contentNames, ITEM_SHORT: ITEM_SHORT };
 })();
 if (typeof module !== 'undefined') module.exports = ENGINE;
 
@@ -1398,7 +1479,7 @@ var el = {};
  'rev', 'poly', 'omega', 'pcpa', 'structure', 'itembox', 'items-hint', 'method-hint', 'rot-hint', 'reginterp', 'habitbox', 'country', 'country-hint'].forEach(function (id) { el[id.replace(/-/g, '_')] = document.getElementById(id); });
 
 /* ---------- Names of the factors, from the questions that load on them ---------- */
-function facInfo(a) {
+function facInfo(a, named) {
   var L = A.sol.L, k = A.k, share = { gen: 0, good: 0, bad: 0 }, tot = 0, strong = [], q, best = 0;
   for (q = 0; q < k; q++) { if (Math.abs(L[q][a]) > Math.abs(L[best][a])) best = q; if (Math.abs(L[q][a]) >= 0.3) strong.push(q); }
   if (!strong.length) strong = [best];
@@ -1406,28 +1487,24 @@ function facInfo(a) {
   strong.forEach(function (q2) { var w = L[q2][a] * L[q2][a]; share[A.its[q2].fam] += w; tot += w; });
   var dir = 0; strong.forEach(function (q2) { dir += L[q2][a] * A.dirs[q2]; });
   var fav = dir >= 0, kind = share.bad / tot >= 0.6 ? 'bad' : share.good / tot >= 0.6 ? 'good' : share.gen / tot >= 0.6 ? 'gen' : 'mixed';
-  var codes = function (list) { return list.map(function (q2) { return A.its[q2].v; }).join(', '); };
-  var andList = function (list) { var v = list.map(function (q2) { return A.its[q2].v; }); return v.length < 3 ? v.join(' and ') : v.slice(0, -1).join(', ') + ', and ' + v[v.length - 1]; };
+  var name = named ? named[a].name : '', label = 'F' + (a + 1) + (name ? ': ' + name : '');
+  var shortOf = function (q2) { return E.ITEM_SHORT[A.its[q2].v]; };
+  var andList = function (list) { var v = list.map(shortOf); return v.length < 3 ? v.join(' and ') : v.slice(0, -1).join(', ') + ', and ' + v[v.length - 1]; };
   if (strong.length === 1 || L[best][a] * L[best][a] / tot >= 0.75) {
-    var it = A.its[best];
-    return { name: it.v + ' alone', phrase: 'is ' + it.v + ' alone', high: L[best][a] * A.dirs[best] >= 0 ? 'high = favorable answer' : 'high = unfavorable answer', kind: 'one', strong: strong };
+    return { name: name, label: label, phrase: 'gathers ' + shortOf(best) + ' alone', kind: 'one', strong: strong,
+             high: named ? named[a].high : (L[best][a] * A.dirs[best] >= 0 ? 'high = favorable answer' : 'high = unfavorable answer') };
   }
-  var names = { bad: 'harm statements', good: 'benefit statements', gen: 'overall view and policy', mixed: '' };
   var highs = { bad: fav ? 'high = sees little harm' : 'high = sees much harm', good: fav ? 'high = sees many benefits' : 'high = sees few benefits',
                 gen: fav ? 'high = favorable' : 'high = unfavorable', mixed: fav ? 'high = favorable' : 'high = unfavorable' };
-  var name = names[kind], phrase = 'gathers the ' + names[kind];
-  if (kind === 'mixed') { name = codes(strong.slice(0, 3)); phrase = 'gathers ' + andList(strong.slice(0, 3)) + (strong.length > 3 ? ', among others' : ''); }
-  else if (kind !== 'gen') {
-    var inFam = strong.filter(function (q2) { return A.its[q2].fam === kind; }), selFam = A.its.filter(function (it2) { return it2.fam === kind; }).length;
-    if (inFam.length < selFam) { name += ' ' + codes(inFam); phrase = 'gathers the ' + names[kind] + ' ' + andList(inFam); }
-  }
-  return { name: name, phrase: phrase, high: highs[kind], kind: kind, strong: strong, whole: kind !== 'mixed' && name === names[kind] };
+  var inFam = strong.filter(function (q2) { return A.its[q2].fam === kind; }).length, selFam = A.its.filter(function (it2) { return it2.fam === kind; }).length;
+  return { name: name, label: label, phrase: 'gathers ' + andList(strong.slice(0, 4)) + (strong.length > 4 ? ', among others' : ''),
+           high: named ? named[a].high : highs[kind], kind: kind, strong: strong, whole: kind !== 'mixed' && (kind === 'gen' || inFam === selFam) };
 }
 function facNames() {
-  var out = [], a, seen = {};
-  for (a = 0; a < A.m; a++) out.push(facInfo(a));
-  out.forEach(function (f) { seen[f.name] = (seen[f.name] || 0) + 1; });
-  out.forEach(function (f, a2) { if (seen[f.name] > 1) f.name += ', ' + (a2 + 1); });
+  var out = [], a, seen = {}, named = E.contentNames(A.sol.L, A.its.map(function (it) { return it.v; }), A.dirs, oblique());
+  for (a = 0; a < A.m; a++) out.push(facInfo(a, named));
+  out.forEach(function (f) { if (f.name) seen[f.name] = (seen[f.name] || 0) + 1; });
+  out.forEach(function (f, a2) { if (f.name && seen[f.name] > 1) { f.name += ', ' + (a2 + 1); f.label = 'F' + (a2 + 1) + ': ' + f.name; } });
   return out;
 }
 function oblique() { return A.m > 1 && (A.sol.rot === 'promax' || A.sol.rot === 'oblimin' || A.sol.rot === 'geomin'); }
@@ -1670,7 +1747,7 @@ function vmCurveSVG() {
 function outcomes() {
   var names = facNames(), unfav = A.dirs.every(function (d) { return d < 0; }) && (cfg.method === 'sum' || cfg.method === 'pomp' || cfg.method === 'z');
   var o = [{ key: cfg.method, label: 'Index: ' + SHORT[cfg.method].toLowerCase(), sub: unfav ? 'high = unfavorable' : 'high = favorable', main: true }];
-  names.forEach(function (f, a) { o.push({ key: 'f' + (a + 1), label: 'Factor ' + (a + 1) + ': ' + f.name, sub: f.high }); });
+  names.forEach(function (f, a) { o.push({ key: 'f' + (a + 1), label: f.label, sub: f.high }); });
   return o;
 }
 function regSVG(width) {
@@ -1840,7 +1917,7 @@ function solTableHTML() {
   for (a = 0; a < m; a++) ss += '<td>' + num(sol.vacc[a] / A.k, 2) + '</td>';
   ss += '<td>' + num(tot / A.k, 2) + '</td></tr>';
   var head = '<tr><th>Question</th>';
-  for (a = 0; a < m; a++) head += '<th>F' + (a + 1) + tip('Factor ' + (a + 1) + ': ' + names[a].name + ' (' + names[a].high + ').', 'factor ' + (a + 1)) + '</th>';
+  for (a = 0; a < m; a++) head += '<th>F' + (a + 1) + tip(names[a].label + '. ' + names[a].high.replace(/^high/, 'High') + '.', 'factor ' + (a + 1)) + (names[a].name ? '<br><span class="cap">' + esc(names[a].name) + '</span>' : '') + '</th>';
   head += '<th>Explained' + tip('The share of the question\'s variation that the factors explain together (h2 in the R output). It is the same under every rotation.', 'explained') + '</th></tr>';
   return '<table class="cmp"><thead>' + head + '</thead><tbody>' + rows + ss + '</tbody></table>';
 }
@@ -1863,8 +1940,9 @@ function solLinesHTML() {
   var s = '', m = A.m, names = facNames(), a;
   if (m === 1) return '';
   var parts = [];
-  for (a = 0; a < m; a++) parts.push('factor ' + (a + 1) + ' ' + names[a].phrase + ' (' + names[a].high + ')');
-  s += '<p>' + parts.join('; ').replace(/^f/, 'F') + '.</p>';
+  for (a = 0; a < m; a++) parts.push('F' + (a + 1) + (names[a].name ? ' (' + names[a].name + ')' : '') + ' ' + names[a].phrase + ' (' + names[a].high + ')');
+  s += '<p>' + parts.join('; ') + '.</p>';
+  if (m === 4 && A.k === 10) s += '<p>With four factors the page shows numbers only. The names fit solutions with up to three factors.</p>';
   s += interpFactorsHTML(names);
   s += '<p>Every rotation predicts the correlations equally well: the Explained column and the fit do not change when you switch rotations. Only the way the shared variation is divided among the factors does.</p>';
   return s;
@@ -1911,11 +1989,11 @@ function interpRegHTML() {
   var eH = cH[0], eB = cB[0], aH = cH[1], aB = cB[1], fH = cH[2], fB = cB[2], bH = cH[3], bB = cB[3];
   if (eH.b > 0 && eB.b > 0 && eH.p < 0.05 && eB.p < 0.05) {
     var between = cI[0].b >= Math.min(eB.b, eH.b) && cI[0].b <= Math.max(eB.b, eH.b) ? '; the single index lands in between (' + num(cI[0].b, 2) + ')' : '';
-    if (eB.b > 1.5 * eH.b) s += '<p><b>Education</b> goes with a more favorable view on both factors, but more on benefits (' + num(eB.b, 2) + ' per level) than on harms (' + num(eH.b, 2) + ')' + between + '. One reading is about substance: schooling may shape how much people value what immigration adds more than how much they worry about what it may cost. The model with a habit of agreeing below offers another reading.</p>';
-    else if (eH.b > 1.5 * eB.b) s += '<p><b>Education</b> goes with a more favorable view on both factors, but more on harms (' + num(eH.b, 2) + ' per level) than on benefits (' + num(eB.b, 2) + ')' + between + '. The model with a habit of agreeing below offers another reading.</p>';
-    else s += '<p><b>Education</b> goes with a more favorable view on both factors by similar amounts: ' + num(eB.b, 2) + ' per level on benefits and ' + num(eH.b, 2) + ' on harms.</p>';
+    if (eB.b > 1.5 * eH.b) s += '<p><b>Education</b> goes with a more favorable view on both factors, but more on benefits (' + num(eB.b, 2) + ' per level) than on threat (' + num(eH.b, 2) + ')' + between + '. One reading is about substance: schooling may shape how much people value what immigration adds more than how much they worry about what it may cost. The model with a habit of agreeing below offers another reading.</p>';
+    else if (eH.b > 1.5 * eB.b) s += '<p><b>Education</b> goes with a more favorable view on both factors, but more on threat (' + num(eH.b, 2) + ' per level) than on benefits (' + num(eB.b, 2) + ')' + between + '. The model with a habit of agreeing below offers another reading.</p>';
+    else s += '<p><b>Education</b> goes with a more favorable view on both factors by similar amounts: ' + num(eB.b, 2) + ' per level on benefits and ' + num(eH.b, 2) + ' on threat.</p>';
   }
-  if (aH.b < 0 && aH.p < 0.05 && Math.abs(aH.b) > 1.5 * Math.abs(aB.b)) s += '<p><b>Age</b> goes mainly with seeing more harm: each decade goes with a harm-factor score ' + num(-aH.b, 2) + ' standard deviations lower, against ' + (aB.b < 0 ? num(-aB.b, 2) + ' lower on the benefit factor' : 'no drop on the benefit factor (' + num(aB.b, 2) + ')') + '. A possible reading: concern about costs, more than doubt about contributions, rises with age. In a single survey, differences between generations and changes that come with growing older look the same.</p>';
+  if (aH.b < 0 && aH.p < 0.05 && Math.abs(aH.b) > 1.5 * Math.abs(aB.b)) s += '<p><b>Age</b> goes mainly with seeing more threat: each decade goes with a threat-factor score ' + num(-aH.b, 2) + ' standard deviations lower, against ' + (aB.b < 0 ? num(-aB.b, 2) + ' lower on the benefit factor' : 'no drop on the benefit factor (' + num(aB.b, 2) + ')') + '. A possible reading: concern about costs, more than doubt about contributions, rises with age. In a single survey, differences between generations and changes that come with growing older look the same.</p>';
   if (bH.b > 0 && bB.b > 0 && bH.p < 0.05 && bB.p < 0.05) s += '<p><b>Respondents born abroad</b>, immigrants themselves, view immigration more favorably on both factors, by about ' + num((bH.b + bB.b) / 2, 1) + ' standard deviations.</p>';
   if (fH.p >= 0.05 && fB.p >= 0.05) s += '<p><b>Women and men</b> barely differ once education, age, and birthplace are held constant.</p>';
   return s;
@@ -1926,7 +2004,7 @@ function vmCap() {
 function fiveTableHTML() {
   var rows = '', m = A.m, a, names = facNames();
   var head = '<tr><th>Index</th><th>' + relName() + tip(cfg.rel === 'omega' ? 'Omega of each index under the chosen factor model.' : 'Alpha of the questions as each index weights them.', relName().toLowerCase() + ' in the table') + '</th>';
-  for (a = 0; a < m; a++) head += '<th>r with F' + (a + 1) + tip('Correlation of the index with the scores on factor ' + (a + 1) + ': ' + names[a].name + '.', 'r with factor ' + (a + 1)) + '</th>';
+  for (a = 0; a < m; a++) head += '<th>r with F' + (a + 1) + tip('Correlation of the index with the scores on ' + names[a].label + '.', 'r with factor ' + (a + 1)) + '</th>';
   head += '<th>Education' + tip('Coefficient of education, per ISCED level, in standard deviations of the index, from the regressions in the next section.', 'education') + '</th><th>r with the chosen index</th></tr>';
   METHODS.forEach(function (mt, i) {
     var b = A.by[mt];
