@@ -96,6 +96,7 @@ button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 code, pre { font-family: var(--mono); }
 [hidden] { display: none !important; }
 details.adv { margin-top: 4px; }
+.advrow { display: flex; align-items: center; gap: 4px; }
 details.adv summary { cursor: pointer; font-family: var(--serif); font-size: 17px; margin-bottom: 10px; }
 
 .famhead { font-size: 13px; color: var(--graphite); margin: 10px 0 5px; display: flex; align-items: center; gap: 7px; }
@@ -162,6 +163,9 @@ dl.items dt { font-family: var(--sans); font-weight: 600; font-size: 14px; margi
 dl.items dt code { font-weight: 500; font-size: 13px; }
 dl.items dd { margin: 2px 0 0; }
 .about .src { font-size: 14px; color: var(--graphite); padding-left: 2em; text-indent: -2em; margin-bottom: 5px; }
+.about a { color: var(--ink); text-underline-offset: 3px; word-break: break-all; }
+.figwrap { position: relative; }
+.figwrap .tip.hdr { position: absolute; margin: 0; }
 
 @media (max-width: 960px) {
   .dimgrid { grid-template-columns: minmax(0, 1fr); }
@@ -192,9 +196,9 @@ dl.items dd { margin: 2px 0 0; }
         <li><b>Turn off the reversal.</b> Five questions run the other way: agreeing that immigrants increase crime is the less favorable answer. Left as they are, these questions pull against the rest, and alpha falls from 0.82 to 0.35. The first principal component and the one-factor scores do not change, because they work out the direction of each question from the data.</li>
         <li><b>Compare one factor with two.</b> An alpha of 0.82 is high enough for most readers to call the ten questions one scale. Yet a model with one common factor fits poorly: its RMSEA, a measure of misfit, is 0.144, where values above 0.10 are usually called poor. Two factors fit well (0.038), and parallel analysis also keeps two. One factor gathers the four statements of harm, the other the four statements of benefit.</li>
         <li><b>Drop the asylum question.</b> It goes least with the rest (item-rest correlation 0.20), and alpha rises slightly without it, from 0.82 to 0.83. Whether it belongs in an index of views on immigration is still a question about content, not about alpha.</li>
-        <li><b>Rotate.</b> Try none, varimax, promax, and oblimin, or turn the axes by hand. The fit and the share of each question that the factors explain stay the same; only the loadings change. In the loading plot the questions stay put and the axes move. Oblimin lets the two axes lean toward each other until they meet at 62 degrees; the cosine of that angle, 0.47, is the correlation between the two factors.</li>
-        <li><b>Ask for three factors.</b> The third factor is a single question, the statement that immigration gives asylum to political refugees (<code>Q125</code>). The model explains 99.5% of the variation in its answers, the most psych allows. No survey question is answered without error, so a factor has been spent on one question: a sign of one factor too many.</li>
-        <li><b>See who holds which view.</b> With the reversal on, a high score on either factor means a favorable view: seeing few harms, or seeing many benefits. Each additional level of education goes with a score 0.22 standard deviations higher on the benefit factor and 0.11 higher on the harm factor; a bachelor's degree is three levels above a high-school diploma. The average of all ten answers lands in between, at 0.19, and hides the difference. Age works the other way round: each decade goes with seeing more harm (0.09 standard deviations) and slightly fewer benefits (0.03).</li>
+        <li><b>Rotate.</b> Try varimax, promax, oblimin, and geomin. The fit and the share of each question that the factors explain stay the same; only the loadings change. In the loading plot the questions stay put and the axes move. Varimax keeps the axes at right angles; oblimin lets them lean toward each other until they meet at 62 degrees, and the cosine of that angle, 0.47, is the correlation between the two factors. All four rotations find the same two factors.</li>
+        <li><b>Ask for three factors.</b> The third factor is a single question, the statement that immigration gives asylum to political refugees (<code>Q125</code>). The model explains 99.5% of the variation in its answers, the ceiling of the fitting procedure. Survey answers always contain some error, so a factor that explains one question completely is a sign of one factor too many.</li>
+        <li><b>See who holds which view.</b> With the reversal on, a high score on either factor means a favorable view: seeing little harm, or seeing many benefits. Each additional level of education goes with a score 0.22 standard deviations higher on the benefit factor and 0.11 higher on the harm factor; a bachelor's degree is three levels above a high-school diploma. The average of all ten answers lands in between, at 0.19, and hides the difference. Age works the other way round: each decade goes with seeing more harm (0.09 standard deviations) and slightly fewer benefits (0.03). The page offers two readings of the education gap below the regressions.</li>
         <li><b>Open Advanced.</b> With omega instead of alpha, the reliability of the index depends on the factor model: 0.82 with one factor, 0.85 with two. With polychoric correlations the loadings rise, for <code>Q122</code> from 0.72 to 0.81, but the regressions on the two factors barely move.</li>
       </ul>
     </details>
@@ -238,36 +242,31 @@ dl.items dd { margin: 2px 0 0; }
         <div class="field">
           <div class="label-row"><span class="name" id="lbl-rot">Rotation</span></div>
           <div class="seg" role="radiogroup" aria-labelledby="lbl-rot" id="rotbox">
-            <label><input type="radio" name="rot" value="none"><span>None</span></label>
             <label><input type="radio" name="rot" value="varimax"><span>Varimax, axes at right angles</span></label>
             <label><input type="radio" name="rot" value="promax"><span>Promax, axes may lean</span></label>
             <label><input type="radio" name="rot" value="oblimin" checked><span>Oblimin, axes may lean</span></label>
-            <label><input type="radio" name="rot" value="manual"><span>By hand, axes at right angles</span></label>
+            <label><input type="radio" name="rot" value="geomin"><span>Geomin, axes may lean</span></label>
           </div>
           <p class="hint" id="rot-hint"></p>
-        </div>
-        <div class="field" id="anglebox" hidden>
-          <div class="label-row"><label class="name" for="angle">Turn the axes</label><output id="angle-out" for="angle">0&deg;</output></div>
-          <input type="range" id="angle" min="-90" max="90" step="1" value="0">
         </div>
       </div>
       <div>
         <details class="adv"><summary>Advanced</summary>
           <div class="field">
-            <label class="toggle"><input type="checkbox" id="omega"><span class="track"></span><span>Show omega instead of alpha</span></label>
-            <p class="hint">Omega uses the loadings of the factor model chosen above, so it changes with the number of factors.</p>
+            <div class="advrow"><label class="toggle"><input type="checkbox" id="omega"><span class="track"></span><span>Omega instead of alpha</span></label><button class="tip" type="button" aria-label="Explain: omega" data-tip="Alpha treats every question as an equally good measure of one thing. Omega drops that assumption: it takes the loadings of the factor model chosen above and reports the share of the index's variation that comes from what the questions have in common. It therefore changes with the number of factors.">?</button></div>
+            <p class="hint">A measure of reliability that uses the factor model.</p>
           </div>
           <div class="field">
-            <label class="toggle"><input type="checkbox" id="poly"><span class="track"></span><span>Polychoric correlations</span></label>
-            <p class="hint">For the factor analysis only. They estimate how the opinions behind the answers correlate, before those opinions are cut into a few answer categories.</p>
+            <div class="advrow"><label class="toggle"><input type="checkbox" id="poly"><span class="track"></span><span>Polychoric correlations</span></label><button class="tip" type="button" aria-label="Explain: polychoric correlations" data-tip="With only a few answers per question, three for most of these, an ordinary correlation understates how closely two opinions go together, because the answers are coarse. A polychoric correlation estimates the correlation between the opinions behind the answers, assuming each opinion varies smoothly and is cut into the few answer categories. Only the factor analysis uses it; alpha and the indices use the answers as they are.">?</button></div>
+            <p class="hint">For the factor analysis only.</p>
           </div>
           <div class="field">
-            <label class="toggle"><input type="checkbox" id="pcpa"><span class="track"></span><span>Parallel analysis with components</span></label>
-            <p class="hint">Use the eigenvalues of the correlations themselves, as principal components do, instead of those left for common factors.</p>
+            <div class="advrow"><label class="toggle"><input type="checkbox" id="pcpa"><span class="track"></span><span>Count components</span></label><button class="tip" type="button" aria-label="Explain: count components" data-tip="Parallel analysis can count two kinds of dimensions. Factors describe only the variation the questions share. Principal components describe all of it, including what is particular to each question. With this switch on, the chart and the count use components, as the original version of parallel analysis did.">?</button></div>
+            <p class="hint">In parallel analysis, instead of factors.</p>
           </div>
           <div class="field">
-            <label class="toggle"><input type="checkbox" id="structure"><span class="track"></span><span>Show structure loadings</span></label>
-            <p class="hint">With promax or oblimin: show the correlations of the questions with the factors instead of the weights of the factors in each question.</p>
+            <div class="advrow"><label class="toggle"><input type="checkbox" id="structure"><span class="track"></span><span>Structure loadings</span></label><button class="tip" type="button" aria-label="Explain: structure loadings" data-tip="When the factors correlate, as with promax, oblimin, and geomin, a loading can mean two things. Pattern loadings, shown by default, say how much a factor contributes to a question with the other factor held fixed. Structure loadings are the plain correlations between the question and each factor. They are larger, because correlated factors share credit for the same answers.">?</button></div>
+            <p class="hint">Correlations of questions with factors.</p>
           </div>
         </details>
       </div>
@@ -315,6 +314,7 @@ dl.items dd { margin: 2px 0 0; }
         <div id="regfig" role="img"></div>
         <div class="tblwrap" id="regtbl" style="margin-top:12px"></div>
         <p class="cap" id="regcap"></p>
+        <div class="lines" id="reginterp"></div>
       </section>
 
       <section class="block">
@@ -348,14 +348,15 @@ dl.items dd { margin: 2px 0 0; }
 
     <h2 class="sec">Notes on method</h2>
     <p>Alpha measures how consistently the questions in an index go together, from 0 to 1. It rises with the number of questions, and it can be high even when the questions measure two different things, as here. When the errors in the answers are unrelated, alpha is a lower bound on the reliability of the index, equal to it only if every question measures the same thing equally well. When the errors are related, as a shared habit of answering makes them, alpha can overstate the reliability. Omega, under Advanced, uses the loadings of a factor model and gives the share of the index's variation that the factors account for; it is only as good as that model.</p>
-    <p>A factor model looks for a few unobserved variables, the factors, that would explain the correlations among the questions. A loading says how strongly a question goes with a factor. The page fits the model as psych does by default, by making the correlations the model predicts as close as possible to the observed ones ("minres"). RMSEA, TLI, and BIC compare how well models with different numbers of factors fit. Parallel analysis keeps each factor whose eigenvalue, a measure of how much of the shared variation the factor could take, is larger than in 95% of random data sets of the same size. Fitted to random data, a one-factor model often lets a single question take nearly the whole factor, so the yardstick for the first factor is close to 1; psych does the same.</p>
-    <p>Rotation changes the axes, not the model: every rotation of the same solution fits the data equally well. Varimax keeps the axes at right angles and makes the loadings on each factor as unequal as possible, a few large and the rest near zero. Oblimin and promax let the axes lean toward each other, so that the factors can correlate. Promax raises the varimax loadings to the fourth power to make a target and then finds the leaning axes that come closest to it. Factor scores give each respondent a value on each factor; for two or more factors the page uses psych's default, which keeps the scores correlated as the factors are.</p>
+    <p>A factor model looks for a few unobserved variables, the factors, that would explain the correlations among the questions. A loading is the correlation between a question and a factor: near 0, the question has little to do with the factor; near 1, it follows the factor closely. The page fits the model as psych does by default, by making the correlations the model predicts as close as possible to the observed ones ("minres"). RMSEA, TLI, and BIC compare how well models with different numbers of factors fit. Parallel analysis keeps each factor whose eigenvalue, a measure of how much of the shared variation the factor takes, is larger than in 95% of random data sets of the same size. Fitted to random data, a one-factor model often lets a single question take nearly the whole factor, so the yardstick for the first factor is close to 1; psych does the same. Chapter 6 of Revelle's online book is a readable guide to all of this, with R code (Revelle, in preparation).</p>
+    <p>Rotation changes the axes, not the model: every rotation of the same solution fits the data equally well. Varimax keeps the axes at right angles and makes the loadings on each factor as unequal as possible, a few large and the rest near zero. Promax, oblimin, and geomin let the axes lean toward each other, so that the factors can correlate. Promax raises the varimax loadings to the fourth power to make a target and then finds the leaning axes that come closest to it. Oblimin, the default in psych, and geomin, the default of the <code>efa()</code> function in the R package lavaan, each reward loadings near zero in their own way. Factor scores give each respondent a value on each factor; for two or more factors the page uses psych's default, which keeps the scores correlated as the factors are.</p>
     <p>A correlation between questions with three answers understates how strongly the opinions behind them go together. Polychoric correlations, under Advanced, estimate the latter by treating each answer as a cut through an opinion that varies smoothly. The loadings rise, but which question goes with which hardly changes.</p>
-    <p>The two factors follow the direction of the statements: the statements of harm go together, and so do the statements of benefit. Part of this split can come from a habit of agreeing with whatever statement is put to the respondent, which pushes answers to benefit and harm statements in opposite directions once the harm statements are reversed. Fitted to the eight statements alone, a two-factor model puts the correlation between the benefit and the harm factor at 0.44. Adding the habit as one more factor, acting equally on all eight statements, improves the fit and raises that correlation to 0.84 (Billiet and McClendon 2000). The code for that model is at the end of the R code. Holding both views is also possible: a respondent can believe that immigrants fill useful jobs and that they raise unemployment. The regressions describe who holds which view; they do not say why.</p>
+    <p>The two factors follow the direction of the statements: the statements of harm go together, and so do the statements of benefit. Part of this split can come from a habit of agreeing with whatever statement is put to the respondent, which pushes answers to benefit and harm statements in opposite directions once the harm statements are reversed. Fitted to the eight statements alone, a two-factor model puts the correlation between the benefit and the harm factor at 0.44. Adding the habit as one more factor, acting equally on all eight statements, improves the fit and raises that correlation to 0.84 (Billiet and McClendon 2000). The code for that model is at the end of the R code. Because the benefit and the harm statements are worded in opposite directions, any difference between groups in that habit shows up as a difference between the two factors, so these questions cannot fully separate the two. Holding both views is also possible: a respondent can believe that immigrants fill useful jobs and that they raise unemployment. The regressions describe who holds which view; they do not say why.</p>
 
     <h2 class="sec">References</h2>
     <p class="src">Billiet, Jaak B., and McKee J. McClendon. 2000. "Modeling Acquiescence in Measurement Models for Two Balanced Sets of Items." <i>Structural Equation Modeling</i> 7 (4): 608-28.</p>
     <p class="src">Haerpfer, Christian, Ronald Inglehart, Alejandro Moreno, Christian Welzel, Kseniya Kizilova, Jaime Diez-Medrano, Marta Lagos, Pippa Norris, Eduard Ponarin, and Bi Puranen, eds. 2022. <i>World Values Survey: Round Seven - Country-Pooled Datafile Version 5.0</i>. Madrid, Spain, and Vienna, Austria: JD Systems Institute and WVSA Secretariat. doi:10.14281/18241.20.</p>
+    <p class="src">Revelle, William. In preparation. "Constructs, Components, and Factor Models." Chapter 6 in <i>An Introduction to Psychometric Theory with Applications in R</i>. Evanston, IL: Personality Project. <a href="https://www.personality-project.org/r/book/Chapter6.pdf">https://www.personality-project.org/r/book/Chapter6.pdf</a>.</p>
   </section>
 </div>
 
@@ -691,7 +692,7 @@ function promax(L0) {
   var z = mmul(x, U), Ut = mmul(vx.T, U), ui = inv(Ut);
   return { L: z.map(function (r, i) { return r.map(function (v) { return v * h[i]; }); }), Phi: mmul(ui, tr(ui)) };
 }
-/* GPArotation::oblimin(gam = 0, normalize = FALSE, eps = 1e-5), the GPFoblq algorithm */
+/* Oblique rotation criteria of GPArotation: quartimin (oblimin with gam = 0) and geomin (delta = 0.01) */
 function quartimin(L) {
   var p = L.length, m = L[0].length, Gq = mat(p, m), f = 0, i, j, k;
   for (i = 0; i < p; i++) for (j = 0; j < m; j++) {
@@ -700,9 +701,19 @@ function quartimin(L) {
   }
   return { Gq: Gq, f: f / 4 };
 }
-function oblimin(A) {
+function geomin(L) {
+  var p = L.length, m = L[0].length, Gq = mat(p, m), f = 0, i, j, delta = 0.01;
+  for (i = 0; i < p; i++) {
+    var lg = 0; for (j = 0; j < m; j++) lg += Math.log(L[i][j] * L[i][j] + delta);
+    var pro = Math.exp(lg / m); f += pro;
+    for (j = 0; j < m; j++) Gq[i][j] = (2 / m) * L[i][j] / (L[i][j] * L[i][j] + delta) * pro;
+  }
+  return { Gq: Gq, f: f };
+}
+/* GPArotation's GPFoblq algorithm (normalize = FALSE, eps = 1e-5, maxit = 1000), from the identity */
+function gpfOblq(A, crit) {
   var m = A[0].length, Tm = eye(m), al = 1, it, i, j, k;
-  var L = mmul(A, tr(inv(Tm))), V = quartimin(L), G = tr(mmul(mmul(tr(L), V.Gq), inv(Tm))).map(function (r) { return r.map(function (v) { return -v; }); }), f = V.f, s = 1, conv = false;
+  var L = mmul(A, tr(inv(Tm))), V = crit(L), G = tr(mmul(mmul(tr(L), V.Gq), inv(Tm))).map(function (r) { return r.map(function (v) { return -v; }); }), f = V.f, s = 1, conv = false;
   for (it = 0; it <= 1000; it++) {
     var cs = new Array(m).fill(0);
     for (i = 0; i < m; i++) for (j = 0; j < m; j++) cs[j] += Tm[i][j] * G[i][j];
@@ -717,7 +728,7 @@ function oblimin(A) {
       for (i = 0; i < m; i++) for (j = 0; j < m; j++) v[j] += X[i][j] * X[i][j];
       Tt = X.map(function (r) { return r.map(function (x, jj) { return x / Math.sqrt(v[jj]); }); });
       L = mmul(A, tr(inv(Tt)));
-      Vt = quartimin(L);
+      Vt = crit(L);
       if (f - Vt.f > 0.5 * s * s * al) break;
       al /= 2;
     }
@@ -743,14 +754,13 @@ function rotate2(L0, deg) {
 }
 
 /* A rotated solution in psych's conventions: positive column sums, factors ordered by variance */
-function solution(R, m, rot, n, angle) {
+function solution(R, m, rot, n) {
   var ex = minres(R, m), L0 = ex.L, L, Phi = null, p = R.length, i, a, b, conv = true;
   if (m === 1 || rot === 'none') L = copy(L0);
-  else if (rot === 'manual') L = rotate2(L0, angle);
   else if (rot === 'varimax') L = varimax(L0).L;
   else if (rot === 'promax') { var pr = promax(L0); L = pr.L; Phi = pr.Phi; }
-  else { var ob = oblimin(L0); L = ob.L; Phi = ob.Phi; conv = ob.conv; }
-  if (rot !== 'manual') {
+  else { var ob = gpfOblq(L0, rot === 'geomin' ? geomin : quartimin); L = ob.L; Phi = ob.Phi; conv = ob.conv; }
+  {
     var sg = []; for (a = 0; a < m; a++) { var cs = 0; for (i = 0; i < p; i++) cs += L[i][a]; sg.push(cs < 0 ? -1 : 1); }
     L = L.map(function (r) { return r.map(function (v, aa) { return v * sg[aa]; }); });
     if (Phi) Phi = Phi.map(function (r, aa) { return r.map(function (v, bb) { return v * sg[aa] * sg[bb]; }); });
@@ -946,16 +956,16 @@ function analyze(c, cfg) {
   var m = Math.max(1, Math.min(cfg.nf, mmax));
   var rot = m === 1 ? 'none' : cfg.rot;
   res.m = m; res.mmax = mmax;
-  res.sol = solution(Rfa, m, rot, n, cfg.angle || 0);
+  res.sol = solution(Rfa, m, rot, n);
   res.fits = [];
   for (var mm = 1; mm <= mmax; mm++) { var ex = minres(Rfa, mm); res.fits.push({ m: mm, fit: fitStats(Rfa, ex.L, n), heywood: ex.heywood }); }
-  res.phi2 = mmax >= 2 ? (m === 2 && (rot === 'oblimin') ? res.sol.Phi[0][1] : solution(Rfa, 2, 'oblimin', n, 0).Phi[0][1]) : NaN;
+  res.phi2 = mmax >= 2 ? (m === 2 && (rot === 'oblimin') ? res.sol.Phi[0][1] : solution(Rfa, 2, 'oblimin', n).Phi[0][1]) : NaN;
   res.kmo = kmo(Rfa);
   res.bart = bartlett(Rfa, n);
   res.faValues = minres(Rfa, 1).values;
   res.pcValues = eigenSym(Rfa).values;
   /* the same m-factor model on Pearson correlations, for omega */
-  var solP = cfg.corr === 'poly' ? solution(R, m, rot, n, cfg.angle || 0) : res.sol;
+  var solP = cfg.corr === 'poly' ? solution(R, m, rot, n) : res.sol;
   var LP = mmul(mmul(solP.L, solP.Phi), tr(solP.L));
 
   /* factor-score weights on the z-scored items: ten Berge for two or more factors,
@@ -1055,7 +1065,8 @@ var RCODE = (function (E) {
 var ITEMS = E.ITEMS;
 var METHOD_COMMENT = { sum: 'sum of the raw codes', pomp: 'average of the items rescaled to 0-1', z: 'average of the z-scores',
                        pc: 'first principal component', fa: 'one-factor scores' };
-var ROT_COMMENT = { none: 'no rotation', varimax: 'varimax rotation', promax: 'promax rotation', oblimin: 'oblimin rotation', manual: 'axes turned by hand' };
+var ROT_COMMENT = { none: 'no rotation', varimax: 'varimax rotation', promax: 'promax rotation', oblimin: 'oblimin rotation', geomin: 'geomin rotation' };
+var ROT_R = { none: 'none', varimax: 'varimax', promax: 'promax', oblimin: 'oblimin', geomin: 'geominQ' };
 function vec(names) { return 'c(' + names.map(function (v) { return '"' + v + '"'; }).join(', ') + ')'; }
 function named(names, vals) { return 'c(' + names.map(function (v, i) { return v + ' = ' + vals[i]; }).join(', ') + ')'; }
 function wrap(prefix, body, width) {   /* breaks a long c(...) after commas */
@@ -1080,7 +1091,7 @@ function rCode(cfg, c, res) {
   var L = [];
   L.push('# Ten questions, one attitude? Indices of attitudes toward immigration');
   L.push('# Settings: ' + names.length + ' items; ' + (cfg.rev ? 'reversed so that higher is more favorable' : 'not reversed') + '; index: ' + METHOD_COMMENT[cfg.method] + ';');
-  L.push('#   ' + m + (m === 1 ? ' factor' : ' factors') + (m > 1 ? ', ' + ROT_COMMENT[rot] + (rot === 'manual' ? ' (' + cfg.angle + ' degrees)' : '') : '') +
+  L.push('#   ' + m + (m === 1 ? ' factor' : ' factors') + (m > 1 ? ', ' + ROT_COMMENT[rot] : '') +
          '; ' + (cfg.corr === 'poly' ? 'polychoric' : 'Pearson') + ' correlations for the factor analysis');
   L.push('# Data: World Values Survey wave 7, country-pooled file, version 5.0 (R format),');
   L.push('# from https://www.worldvaluessurvey.org. Later versions may differ slightly.');
@@ -1170,21 +1181,13 @@ function rCode(cfg, c, res) {
   L.push('fa.parallel(x, fa = "both", cor = ' + corArg + ', n.iter = 100)' + (cfg.corr === 'poly' ? '   # slow: 100 polychoric matrices' : ''));
   L.push('');
   L.push('# 5. The factor solution');
-  if (rot === 'manual') {
-    L.push('f0 <- fa(x, nfactors = 2, rotate = "none", fm = "minres", cor = ' + corArg + ')');
-    L.push('th <- ' + cfg.angle + ' * pi / 180');
-    L.push('L <- unclass(f0$loadings) %*% matrix(c(cos(th), sin(th), -sin(th), cos(th)), 2)');
-    L.push('round(L, 3)');
-    L.push('fs <- factor.scores(x, L, method = "tenBerge")$scores');
-  } else {
-    L.push('f <- fa(x, nfactors = ' + m + ', rotate = "' + rot + '", fm = "minres", cor = ' + corArg + ')');
-    L.push('print(f$loadings, cutoff = 0)       # pattern loadings');
-    if (m > 1 && (rot === 'promax' || rot === 'oblimin')) {
-      L.push('round(f$Phi, 3)                     # factor correlations');
-      L.push('print(f$Structure, cutoff = 0)      # structure loadings');
-    }
-    L.push('fs <- factor.scores(x, f, method = "tenBerge")$scores' + (m === 1 ? '   # regression scores for one factor' : ''));
+  L.push('f <- fa(x, nfactors = ' + m + ', rotate = "' + ROT_R[rot] + '", fm = "minres", cor = ' + corArg + ')');
+  L.push('print(f$loadings, cutoff = 0)       # pattern loadings');
+  if (m > 1 && (rot === 'promax' || rot === 'oblimin' || rot === 'geomin')) {
+    L.push('round(f$Phi, 3)                     # correlations between the factors');
+    L.push('print(f$Structure, cutoff = 0)      # structure loadings');
   }
+  L.push('fs <- factor.scores(x, f, method = "tenBerge")$scores' + (m === 1 ? '   # regression scores for one factor' : ''));
   L.push('colnames(fs) <- paste0("F", 1:ncol(fs))');
   L.push('');
   L.push('# 6. Five ways to combine the same items');
@@ -1242,12 +1245,12 @@ if (typeof module !== 'undefined') module.exports = RCODE;
 'use strict';
 var E = ENGINE, RC = RCODE, ITEMS = E.ITEMS, METHODS = E.METHODS;
 var DATA = JSON.parse(document.getElementById('data').textContent), C = E.prepare(DATA.countries[0]);
-var cfg = { items: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], rev: true, method: 'z', nf: 2, rot: 'oblimin', angle: 0, corr: 'pearson', rel: 'alpha' };
+var cfg = { items: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], rev: true, method: 'z', nf: 2, rot: 'oblimin', corr: 'pearson', rel: 'alpha' };
 var view = { scree: 'fa', load: 'pattern' };
 var A = null, paCache = {};
 var SHORT = { sum: 'Sum of raw codes', pomp: 'Average, each rescaled 0-1', z: 'Average of z-scores', pc: 'First principal component', fa: 'One-factor scores' };
 var FAMNAME = { gen: 'Overall view and policy', good: 'Statements of benefit', bad: 'Statements of harm' };
-var ROTNAME = { none: 'no rotation', varimax: 'varimax', promax: 'promax', oblimin: 'oblimin', manual: 'axes turned by hand' };
+var ROTNAME = { none: 'no rotation', varimax: 'varimax', promax: 'promax', oblimin: 'oblimin', geomin: 'geomin' };
 var WORD = ['none', 'one', 'two', 'three', 'four'];
 var EFFECT = '"From your point of view, what have been the effects of immigrants on the development of this country?" ';
 var AGREE = ' Answers: 0 = disagree, 1 = hard to say, 2 = agree.';
@@ -1292,7 +1295,7 @@ function factorsWord(m) { return WORD[m] + (m === 1 ? ' factor' : ' factors'); }
 var el = {};
 ['matrix', 'matrix-cap', 'loadplot', 'loadplot-cap', 'result', 'verdict', 'itemtbl', 'itemcap', 'dimtbl', 'dimlines', 'scree', 'scree-cap', 'sol-title', 'soltbl', 'solcap',
  'phibox', 'vmfig', 'vmcurve', 'vmcap', 'sollines', 'fivetbl', 'fivelines', 'regfig', 'regtbl', 'regcap', 'rcode', 'buildcode', 'copy', 'dl', 'json', 'copy-status',
- 'rev', 'poly', 'omega', 'pcpa', 'structure', 'itembox', 'items-hint', 'method-hint', 'rot-hint', 'anglebox', 'angle', 'angle-out'].forEach(function (id) { el[id.replace(/-/g, '_')] = document.getElementById(id); });
+ 'rev', 'poly', 'omega', 'pcpa', 'structure', 'itembox', 'items-hint', 'method-hint', 'rot-hint', 'reginterp'].forEach(function (id) { el[id.replace(/-/g, '_')] = document.getElementById(id); });
 
 /* ---------- Names of the factors, from the questions that load on them ---------- */
 function facInfo(a) {
@@ -1318,7 +1321,7 @@ function facNames() {
   out.forEach(function (f, a2) { if (seen[f.name] > 1) f.name += ', ' + (a2 + 1); });
   return out;
 }
-function oblique() { return A.m > 1 && (A.sol.rot === 'promax' || A.sol.rot === 'oblimin'); }
+function oblique() { return A.m > 1 && (A.sol.rot === 'promax' || A.sol.rot === 'oblimin' || A.sol.rot === 'geomin'); }
 function relName() { return cfg.rel === 'omega' ? 'Omega' : 'Alpha'; }
 function relOf(b) { return cfg.rel === 'omega' ? b.omegaM : b.alpha; }
 
@@ -1343,7 +1346,7 @@ function matrixSVG(width) {
   var narrow = fit(196) < 34, labW = narrow ? 52 : 196;
   var cs = Math.max(24, Math.min(44, fit(labW)));
   var top = 54, H = top + k * cs + 8, W = labW + k * cs + (bars ? gap + barW + gap + barW + 4 : 4);
-  matrixSVG.bars = bars;
+  matrixSVG.bars = bars; matrixSVG.hdr = [];
   var paper = css('--paper'), ink = css('--ink'), neg = css('--neg'), tint = css('--tint'), graphite = css('--graphite'), mono = esc(css('--mono'));
   var b = A.by[cfg.method], s = svgOpen(W, H), i, j;
   var lp = lum(paper, paper, 0), li = lum(ink, ink, 0), light = lp > li ? paper : ink, darkc = lp > li ? ink : paper;
@@ -1373,8 +1376,9 @@ function matrixSVG(width) {
   });
   if (!bars) return s + '</svg>';
   var x0 = labW + k * cs + gap, x1 = x0 + barW + gap, bl = barW - 34, maxw = Math.max(0.15, Math.max.apply(null, b.wshare.map(Math.abs)));
-  s += '<text x="' + x0 + '" y="' + (top - 8) + '" font-size="12" fill="' + graphite + '">Loading<title>Correlation of the question with the single factor of a one-factor model</title></text>';
-  s += '<text x="' + x1 + '" y="' + (top - 8) + '" font-size="12" fill="' + graphite + '">Weight<title>How much the question counts in the index chosen on the left</title></text>';
+  s += '<text x="' + x0 + '" y="' + (top - 22) + '" font-size="12" fill="' + ink + '">Loading</text><text x="' + x0 + '" y="' + (top - 8) + '" font-size="11.5" fill="' + graphite + '">one factor</text>';
+  s += '<text x="' + x1 + '" y="' + (top - 22) + '" font-size="12" fill="' + ink + '">Weight</text><text x="' + x1 + '" y="' + (top - 8) + '" font-size="11.5" fill="' + graphite + '">in the index</text>';
+  matrixSVG.hdr = [{ x: x0 + 47, y: top - 36, what: 'loading' }, { x: x1 + 43, y: top - 36, what: 'weight' }];
   for (i = 0; i < k; i++) {
     var yy = top + i * cs, lam = A.lam[i], ws = b.wshare[i], fc = famColor(ITEMS[sel[i]].fam), bh = Math.min(12, cs - 12);
     s += '<line x1="' + x0 + '" x2="' + x0 + '" y1="' + yy + '" y2="' + (yy + cs) + '" stroke="' + css('--rule') + '"/>';
@@ -1389,12 +1393,35 @@ function matrixSVG(width) {
 function matrixCap() {
   var anyNeg = A.R.some(function (r) { return r.some(function (v) { return v < -0.05; }); });
   var s = 'Correlations between the chosen questions, coded as the index uses them. Darker cells mean stronger correlations' + (anyNeg ? '; red marks a negative one' : '') + '. The boxes mark the statements of benefit and of harm.';
-  if (matrixSVG.bars) s += ' <b>Loading:</b> how closely each question follows what all the chosen questions share; it is the correlation of the question with the single factor of a one-factor model' +
-    (cfg.corr === 'poly' ? ', on ordinary correlations even with the polychoric switch on' : '') + '. <b>Weight:</b> how much each question counts in the index chosen on the left, as a share of the total. ' +
-    (cfg.method === 'z' ? 'With the average of z-scores every question counts the same.' : cfg.method === 'sum' ? 'Adding up raw codes gives more weight to questions whose answers vary more.' : 'The weights come from the method chosen.');
+  if (matrixSVG.bars) s += ' The two columns on the right show how closely each question follows what all of them share (loading) and how much it counts in the index (weight); the question marks explain both.';
   return s;
 }
-
+function loadingTip() {
+  var hi = 0, lo = 0, q;
+  for (q = 0; q < A.k; q++) { if (A.lam[q] > A.lam[hi]) hi = q; if (A.lam[q] < A.lam[lo]) lo = q; }
+  return 'Picture one hidden opinion about immigration behind all the chosen answers. A model with one factor estimates it, and the loading is the correlation between a question and that hidden opinion: near 1, the question follows it closely; near 0, it has little to do with it; below 0, it runs the other way. Here ' +
+    A.its[hi].v + ' (' + A.its[hi].tag.toLowerCase() + ') follows it most, at ' + num(A.lam[hi], 2) + ', and ' + A.its[lo].v + ' (' + A.its[lo].tag.toLowerCase() + ') least, at ' + num(A.lam[lo], 2) + '.' +
+    (cfg.corr === 'poly' ? ' These loadings use ordinary correlations even with the polychoric switch on.' : '');
+}
+function weightTip() {
+  var even = Math.round(100 / A.k);
+  return 'How much each question counts in the index chosen on the left, as a share of all the weight. ' +
+    (cfg.method === 'z' ? 'With the average of z-scores every question counts the same, ' + even + '% each.' :
+     cfg.method === 'sum' ? 'Adding up raw codes is not neutral: a question whose answers spread more, such as Q121 with five codes, counts for more.' :
+     cfg.method === 'pomp' ? 'Rescaling to 0-1 evens out the scales, but a question whose answers spread more still counts for more.' :
+     'The method sets the weights from the data, so questions that go more with the rest count for more.');
+}
+function placeHeaderTips() {
+  var fig = el.matrix.parentNode;
+  fig.classList.add('figwrap');
+  Array.prototype.forEach.call(fig.querySelectorAll('.tip.hdr'), function (b) { b.remove(); });
+  (matrixSVG.hdr || []).forEach(function (h) {
+    var holder = document.createElement('span');
+    holder.innerHTML = tip(h.what === 'loading' ? loadingTip() : weightTip(), h.what);
+    var b = holder.firstChild; b.classList.add('hdr'); b.style.left = h.x + 'px'; b.style.top = h.y + 'px';
+    fig.appendChild(b);
+  });
+}
 /* ---------- Loading plot ---------- */
 function loadPlotSVG(size) {
   var ink = css('--ink'), graphite = css('--graphite'), rule = css('--rule'), mono = esc(css('--mono')), m = A.m, sol = A.sol, k = A.k;
@@ -1419,6 +1446,10 @@ function loadPlotSVG(size) {
   s += '<circle cx="' + cx + '" cy="' + cy + '" r="' + R0 + '" fill="none" stroke="' + rule + '"/>';
   s += '<line x1="' + (cx - R0) + '" x2="' + (cx + R0) + '" y1="' + cy + '" y2="' + cy + '" stroke="' + rule + '" stroke-dasharray="3 3"/>';
   s += '<line x1="' + cx + '" x2="' + cx + '" y1="' + (cy - R0) + '" y2="' + (cy + R0) + '" stroke="' + rule + '" stroke-dasharray="3 3"/>';
+  if (m === 2) {
+    s += '<line x1="4" x2="20" y1="10" y2="10" stroke="' + ink + '" stroke-width="1.4"/><text x="24" y="14" font-size="11" fill="' + graphite + '">after rotation</text>';
+    s += '<line x1="4" x2="20" y1="26" y2="26" stroke="' + rule + '" stroke-dasharray="3 3" stroke-width="1.4"/><text x="24" y="30" font-size="11" fill="' + graphite + '">before rotation</text>';
+  }
   var pts;
   if (m === 2) {
     pts = sol.L0.map(function (r) { return P(r[0], r[1]); });
@@ -1442,7 +1473,8 @@ function loadPlotSVG(size) {
   });
   pts.forEach(function (p, q) {
     var it = ITEMS[A.sel[q]];
-    s += '<circle cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) + '" r="4.5" fill="' + famColor(it.fam) + '" fill-opacity="0.9"><title>' + it.v + ' ' + esc(it.tag) + '</title></circle>';
+    var Lq = sol.L[q];
+    s += '<circle cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) + '" r="4.5" fill="' + famColor(it.fam) + '" fill-opacity="0.9"><title>' + it.v + ' ' + esc(it.tag) + ': loading ' + num(Lq[0], 2) + ' on F1, ' + num(Lq[1], 2) + ' on F2</title></circle>';
   });
   groups.forEach(function (g) { g.txt = g.q.map(function (q) { return ITEMS[A.sel[q]].v.replace('Q', ''); }).join(' '); });
   var placed = [];
@@ -1462,17 +1494,17 @@ function loadPlotSVG(size) {
   return s + '</svg>';
 }
 function loadPlotCap() {
-  var sol = A.sol, src = cfg.corr === 'poly' ? ' (polychoric correlations)' : '';
-  if (A.m === 1) return 'Loadings on one factor' + src + ': how closely each question follows what all of them share. Colors mark the three kinds of question.';
+  var sol = A.sol, src = cfg.corr === 'poly' ? ', from polychoric correlations' : '';
+  var what = 'A loading is the correlation between a question and a factor, from -1 to 1. ';
+  if (A.m === 1) return what + 'Here each question\'s loading on a single factor' + src + '. Colors mark the three kinds of question.';
   if (A.m === 2) {
-    var s = 'Each dot is a question, placed by its loadings on two factors before rotation' + src + '; labels give the question number. The solid lines are the axes of the factors after rotation. Rotation turns the axes, not the dots, so the fit does not change.';
+    var s = what + 'Each dot is a question, placed by its loadings on the two factors before rotation (the dashed axes)' + src + ': further right means more of the first, higher means more of the second. The solid lines F1 and F2 are the factors after rotation; a dot close to a line loads mainly on that factor. Rotation turns the axes, not the dots, so the fit does not change. Hover over a dot for its loadings after rotation.';
     if (oblique()) s += ' Here the axes meet at ' + fl(Math.acos(Math.max(-1, Math.min(1, sol.Phi[0][1]))) * 180 / Math.PI) + ' degrees; the cosine of that angle, ' + num(sol.Phi[0][1], 2) + ', is the correlation between the factors.';
-    else if (sol.rot !== 'none') s += ' The axes stay at right angles, so the factors are uncorrelated.';
+    else s += ' With varimax the axes stay at right angles, so the factors are uncorrelated.';
     return s;
   }
-  return 'Loadings on the first two of ' + WORD[A.m] + ' factors' + src + '. With more than two factors the questions no longer lie in one plane, so this view is only part of the picture.';
+  return what + 'Here each dot is a question, placed by its loadings on the first two of ' + WORD[A.m] + ' factors after rotation' + src + '. With more than two factors the questions no longer lie in one plane, so this view shows only part of the picture.';
 }
-
 /* ---------- Eigenvalues against random data ---------- */
 function paOf() {
   var key = C.n + ':' + A.k;
@@ -1482,7 +1514,7 @@ function paOf() {
 function paKeep() { var pa = paOf(); return { fa: E.countAbove(A.faValues, pa.fa95), pc: E.countAbove(A.pcValues, pa.pc95) }; }
 function screeSVG() {
   var isFa = view.scree === 'fa', ev = isFa ? A.faValues : A.pcValues, pa = paOf(), ref = isFa ? pa.fa95 : pa.pc95, k = ev.length;
-  var W = 320, H = 188, ml = 32, mr = 8, mt = 10, mb = 36, ink = css('--ink'), graphite = css('--graphite'), rule = css('--rule');
+  var W = 320, H = 204, ml = 32, mr = 8, mt = 26, mb = 36, ink = css('--ink'), graphite = css('--graphite'), rule = css('--rule');
   var top = Math.max(1.2, Math.ceil(Math.max(ev[0], ref[0]) + 0.25)), bot = Math.min(0, Math.floor(Math.min.apply(null, ev.concat(ref)) * 2) / 2);
   var bw = (W - ml - mr) / k, Y = function (v) { return mt + (top - v) / (top - bot) * (H - mt - mb); };
   var s = svgOpen(W, H), i, keep = E.countAbove(ev, ref);
@@ -1497,6 +1529,9 @@ function screeSVG() {
   }
   s += '<line x1="' + ml + '" x2="' + (W - mr) + '" y1="' + Y(0) + '" y2="' + Y(0) + '" stroke="' + graphite + '"/>';
   s += '<text x="' + ((ml + W - mr) / 2) + '" y="' + (H - 3) + '" text-anchor="middle" font-size="11.5" fill="' + graphite + '">' + (isFa ? 'Factor' : 'Component') + '</text>';
+  var lx = W - mr - 168;
+  s += '<rect x="' + lx + '" y="4" width="10" height="12" fill="' + ink + '" fill-opacity="0.85"/><text x="' + (lx + 14) + '" y="14" font-size="11.5" fill="' + graphite + '">data</text>';
+  s += '<line x1="' + (lx + 52) + '" x2="' + (lx + 70) + '" y1="10" y2="10" stroke="' + css('--neg') + '" stroke-width="2"/><text x="' + (lx + 74) + '" y="14" font-size="11.5" fill="' + graphite + '">random data</text>';
   return s + '</svg>';
 }
 
@@ -1512,10 +1547,6 @@ function vmCurveSVG() {
   s += '<path d="' + d + '" fill="none" stroke="' + ink + '" stroke-width="1.6"/>';
   s += '<text x="' + (ml - 6) + '" y="' + (mt + 8) + '" text-anchor="end" font-size="11.5" fill="' + graphite + '">high</text><text x="' + (ml - 6) + '" y="' + (H - mb) + '" text-anchor="end" font-size="11.5" fill="' + graphite + '">low</text>';
   [best, best > 0 ? best - 90 : best + 90].forEach(function (t) { if (t >= -90 && t <= 90) s += '<circle cx="' + X(t) + '" cy="' + Y(hi) + '" r="3.5" fill="none" stroke="' + ink + '"/>'; });
-  if (A.sol.rot === 'manual') {
-    var cv = E.varimaxCriterion(E.rotate2(L0, cfg.angle));
-    s += '<line x1="' + X(cfg.angle) + '" x2="' + X(cfg.angle) + '" y1="' + mt + '" y2="' + (H - mb) + '" stroke="' + css('--neg') + '" stroke-width="1.5"/><circle cx="' + X(cfg.angle) + '" cy="' + Y(cv) + '" r="4" fill="' + css('--neg') + '"/>';
-  }
   s += '<text x="' + ((ml + W - mr) / 2) + '" y="' + (H - 2) + '" text-anchor="middle" font-size="11.5" fill="' + graphite + '">Angle by which the axes are turned</text>';
   vmCurveSVG.best = best;
   return s + '</svg>';
@@ -1574,11 +1605,10 @@ function methodHint() {
 function rotHint() {
   if (A.m === 1) return 'With one factor there is nothing to rotate.';
   switch (A.sol.rot) {
-    case 'none': return 'Before rotation, the first factor takes as much of the shared variation as it can and the second takes what is left.';
-    case 'varimax': return 'Turns the axes, kept at right angles, until each factor has a few large loadings and many near zero.';
+    case 'varimax': return 'Turns the axes, kept at right angles, until each factor has a few large loadings and many near zero. The factors stay uncorrelated.';
     case 'promax': return 'Starts from varimax and lets the axes lean toward each other, so that the factors can correlate.';
-    case 'oblimin': return 'Lets the axes lean toward each other, so that each question can load on one factor and stay near zero on the others. The default in psych.';
-    default: return 'Turn the axes yourself and watch the loadings change. The fit does not.';
+    case 'geomin': return 'Lets the axes lean, rewarding questions that load near zero on at least one factor. The default of efa() in the R package lavaan.';
+    default: return 'Lets the axes lean toward each other, so that each question can load on one factor and stay near zero on the others. The default in the R package psych.';
   }
 }
 function resultHTML() {
@@ -1614,7 +1644,7 @@ function verdictHTML() {
   }
   if (A.sol.heywood) {
     var hq = A.sol.h2.map(function (h, q) { return q; }).filter(function (q) { return A.sol.h2[q] > 0.994; }).map(function (q) { return A.its[q].v; });
-    out.push('With ' + factorsWord(A.m) + ' the model explains 99.5% of the variation in answers to ' + hq.join(' and ') + ', the most psych allows. No survey question is answered without error, so ' +
+    out.push('With ' + factorsWord(A.m) + ' the model explains 99.5% of the variation in answers to ' + hq.join(' and ') + ', the ceiling of the fitting procedure. Survey answers always contain some error, so ' +
       (A.m > 1 ? 'a factor has been spent on a single question: a sign of too many factors.' : 'this one-factor solution deserves little trust.'));
   }
   if (!out.length) out.push(relTxt + '.');
@@ -1649,21 +1679,21 @@ function itemTableHTML() {
 }
 function itemCap() {
   return 'Means and standard deviations are on each question\'s own scale, as coded for the index. Item-rest correlations and ' + relName().toLowerCase() + ' use the questions as this index weights them.' +
-    (A.oneHeywood ? ' <span class="warn">The one-factor model explains almost all of one question\'s variation here, so its loadings deserve little trust.</span>' : '');
+    (A.oneHeywood ? ' <span class="warn">Warning:</span> the one-factor model explains almost all of one question\'s variation here, so its loadings deserve little trust.' : '');
 }
 function dimTableHTML() {
   var rows = '', ok = A.fits.filter(function (f) { return f.fit.dof > 0; }), minBic = Math.min.apply(null, ok.map(function (f) { return f.fit.bic; }));
   A.fits.forEach(function (f) {
     var st = f.fit, good = st.dof > 0;
     rows += '<tr' + (f.m === A.m ? ' class="cur"' : '') + '><td>' + factorsWord(f.m).replace(/^./, function (c) { return c.toUpperCase(); }) +
-      (f.heywood ? ' <span class="warn">(one question almost fully explained' + tip('The model explains 99.5% of one question\'s variation, the most psych allows. Since no survey question is answered without error, this usually means too many factors.', 'one question almost fully explained') + ')</span>' : '') + '</td>' +
+      (f.heywood ? ' <span class="warn">warning</span>' + tip('A Heywood case: the model explains 99.5% of the variation in one question\'s answers, the ceiling of the fitting procedure. Survey answers always contain some random error, so no factor should explain a question completely. Usually this means the model has more factors than the data support.', 'warning') : '') + '</td>' +
       '<td>' + (good ? num(st.rmsea, 3) : '-') + '</td><td>' + (good ? num(st.tli, 3) : '-') + '</td><td' + (good && st.bic === minBic ? ' class="strong"' : '') + '>' + (good ? num(st.bic, 1) : '-') + '</td></tr>';
   });
   return '<table class="cmp"><thead><tr><th>Model of the ' + A.k + ' questions</th><th>RMSEA' +
     tip('Misfit, allowing for the size of the model. Below about 0.05 is usually called close and above 0.10 poor.', 'RMSEA') + '</th><th>TLI' +
     tip('How much better the model fits than a model in which the questions are unrelated, from 0 to 1. Above about 0.95 is usually called good.', 'TLI') + '</th><th>BIC' +
     tip('A score that rewards fit and penalizes extra factors. Lower is better; the lowest is in bold.', 'BIC') + '</th></tr></thead><tbody>' + rows + '</tbody></table>' +
-    '<p class="cap">Lower RMSEA and BIC, and higher TLI, mean a better fit. A dash means the model has too few questions to test. Fitted to ' + (cfg.corr === 'poly' ? 'polychoric' : 'ordinary') + ' correlations as <code>psych::fa()</code> does, for ' + n0(C.n) + ' respondents; the rotation does not change the fit.</p>';
+    '<p class="cap">Lower RMSEA and BIC, and higher TLI, mean a better fit. A dash means the model has too few questions to test. Fitted to ' + (cfg.corr === 'poly' ? 'polychoric' : 'ordinary') + ' correlations as the <code>fa()</code> function of the R package psych does, for ' + n0(C.n) + ' respondents; the rotation does not change the fit.</p>';
 }
 function dimLinesHTML() {
   var keep = paKeep(), s = '', km = A.kmo.msa;
@@ -1688,14 +1718,14 @@ function solTableHTML() {
     for (a = 0; a < m; a++) rows += '<td class="' + (Math.abs(M[q][a]) >= 0.3 ? 'strong' : 'faint') + '">' + num(M[q][a], 2) + '</td>';
     rows += '<td>' + num(sol.h2[q], 2) + '</td></tr>';
   }
-  var ss = '<tr><td>Variation explained by the factor' + tip(oblique() ? 'For correlated factors, psych splits the variation the factors share between them; the numbers add up to the total the factors explain.' : 'The sum of the squared loadings on the factor.', 'variation explained') + '</td>';
+  var ss = '<tr><td>Variation explained by the factor' + tip(oblique() ? 'For correlated factors, the R package psych splits the variation the factors share between them; the numbers add up to the total the factors explain.' : 'The sum of the squared loadings on the factor.', 'variation explained') + '</td>';
   for (a = 0; a < m; a++) ss += '<td>' + num(sol.vacc[a], 2) + '</td>';
   ss += '<td>' + num(tot, 2) + '</td></tr><tr><td>Share of all the variation</td>';
   for (a = 0; a < m; a++) ss += '<td>' + num(sol.vacc[a] / A.k, 2) + '</td>';
   ss += '<td>' + num(tot / A.k, 2) + '</td></tr>';
   var head = '<tr><th>Question</th>';
   for (a = 0; a < m; a++) head += '<th>F' + (a + 1) + tip('Factor ' + (a + 1) + ': ' + names[a].name + ' (' + names[a].high + ').', 'factor ' + (a + 1)) + '</th>';
-  head += '<th>Explained' + tip('The share of the question\'s variation that the factors explain together (h2 in psych). It is the same under every rotation.', 'explained') + '</th></tr>';
+  head += '<th>Explained' + tip('The share of the question\'s variation that the factors explain together (h2 in the R output). It is the same under every rotation.', 'explained') + '</th></tr>';
   return '<table class="cmp"><thead>' + head + '</thead><tbody>' + rows + ss + '</tbody></table>';
 }
 function solCap() {
@@ -1706,7 +1736,7 @@ function solCap() {
 function phiHTML() {
   var m = A.m, sol = A.sol;
   if (m === 1) return '';
-  if (!oblique()) return '<p class="cap">' + (sol.rot === 'none' ? 'Before rotation' : sol.rot === 'manual' ? 'With the axes turned at right angles' : 'With varimax') + ', the factors are uncorrelated by construction.</p>';
+  if (!oblique()) return '<p class="cap">With varimax the factors are uncorrelated by construction.</p>';
   var s = '<table class="cmp" style="width:auto"><thead><tr><th>Correlation between factors</th>', a, b;
   for (a = 0; a < m; a++) s += '<th>F' + (a + 1) + '</th>';
   s += '</tr></thead><tbody>';
@@ -1715,17 +1745,51 @@ function phiHTML() {
 }
 function solLinesHTML() {
   var s = '', m = A.m, names = facNames(), a;
-  if (m > 1) {
-    var parts = [];
-    for (a = 0; a < m; a++) parts.push('factor ' + (a + 1) + ' ' + (names[a].kind === 'one' ? 'is ' + names[a].name : 'gathers the ' + names[a].name) + ' (' + names[a].high + ')');
-    s += '<p>' + parts.join('; ').replace(/^f/, 'F') + '.</p>';
-    s += '<p>Every rotation predicts the correlations equally well: the Explained column and the fit do not change when you switch rotations. Only the way the shared variation is divided among the factors does.</p>';
+  if (m === 1) return '';
+  var parts = [];
+  for (a = 0; a < m; a++) parts.push('factor ' + (a + 1) + ' ' + (names[a].kind === 'one' ? 'is ' + names[a].name : 'gathers the ' + names[a].name) + ' (' + names[a].high + ')');
+  s += '<p>' + parts.join('; ').replace(/^f/, 'F') + '.</p>';
+  s += interpFactorsHTML(names);
+  s += '<p>Every rotation predicts the correlations equally well: the Explained column and the fit do not change when you switch rotations. Only the way the shared variation is divided among the factors does.</p>';
+  return s;
+}
+function kindIndex(names, kind) { for (var a = 0; a < names.length; a++) if (names[a].kind === kind) return a; return -1; }
+function itemIndex(v) { for (var q = 0; q < A.k; q++) if (A.its[q].v === v) return q; return -1; }
+function interpFactorsHTML(names) {
+  var s = '', iH = kindIndex(names, 'bad'), iB = kindIndex(names, 'good'), mixed = A.dirs.some(function (d) { return d < 0; });
+  names.forEach(function (f, a) { if (f.kind === 'one') s += '<p>Factor ' + (a + 1) + ' is a single question. A factor made of one question rarely marks an attitude of its own; it is more often a sign of one factor too many.</p>'; });
+  if (iH < 0 || iB < 0 || mixed) return s;
+  var L = A.sol.L, both = [];
+  ['Q121', 'Q130'].forEach(function (v) { var q = itemIndex(v); if (q >= 0 && Math.abs(L[q][iH]) >= 0.25 && Math.abs(L[q][iB]) >= 0.25) both.push(v); });
+  var goods = [], q;
+  for (q = 0; q < A.k; q++) if (A.its[q].fam === 'good') goods.push(q);
+  goods.sort(function (x, y) { return L[x][iB] - L[y][iB]; });
+  var weakest = goods.length >= 3 ? A.its[goods[0]].v : null;
+  s += '<p><b>One possible reading.</b> People may judge immigration on two related scales: what it costs the country (crime, terrorism, unemployment, conflict) and what it adds (useful work, diversity, refuge, new lives).' +
+    (both.length === 2 ? ' The overall verdict on its impact (Q121) and the policy question on who may come to work (Q130) draw on both.' : both.length === 1 ? ' ' + (both[0] === 'Q121' ? 'The overall verdict on its impact (Q121)' : 'The policy question on who may come to work (Q130)') + ' draws on both.' : '') +
+    (weakest === 'Q125' && L[goods[0]][iB] < 0.5 ? ' The asylum statement goes least with the other benefits; it may read as a description of what the country does rather than as a judgment of what immigrants bring.' : '') +
+    (oblique() ? ' The two scales correlate ' + num(A.sol.Phi[iH][iB], 2) + ': those who see more benefits tend to see less harm, but far from always.' : '') + '</p>';
+  s += '<p><b>Another reading</b> is about wording rather than substance. The harm statements and the benefit statements also run in opposite directions, so part of the split may come from how people answer agree-disagree questions. The notes at the bottom of the page come back to this.</p>';
+  return s;
+}
+function interpRegHTML() {
+  if (A.m !== 2 || A.dirs.some(function (d) { return d < 0; })) return '';
+  var names = facNames(), iH = kindIndex(names, 'bad'), iB = kindIndex(names, 'good');
+  if (iH < 0 || iB < 0 || A.reg.preds.length < 4) return '';
+  var cH = A.reg.by['f' + (iH + 1)].coefs, cB = A.reg.by['f' + (iB + 1)].coefs, cI = A.reg.by[cfg.method].coefs, s = '';
+  var eH = cH[0], eB = cB[0], aH = cH[1], aB = cB[1], fH = cH[2], fB = cB[2], bH = cH[3], bB = cB[3];
+  if (eH.b > 0 && eB.b > 0 && eH.p < 0.05 && eB.p < 0.05) {
+    if (eB.b > 1.5 * eH.b) s += '<p><b>Two readings of the education gap.</b> Education goes with a more favorable view on both factors, but more on benefits (' + num(eB.b, 2) + ' per level) than on harms (' + num(eH.b, 2) + '); the single index lands in between (' + num(cI[0].b, 2) + '). One reading is about substance: schooling may shape how much people value what immigration adds more than how much they worry about what it may cost. The other is about answering: the benefit statements are worded in favor of immigration and the harm statements against it, so a habit of agreeing with statements that rose with education would produce the same gap. These ten questions cannot tell the two apart.</p>';
+    else if (eH.b > 1.5 * eB.b) s += '<p><b>Two readings of the education gap.</b> Education goes with a more favorable view on both factors, but more on harms (' + num(eH.b, 2) + ' per level) than on benefits (' + num(eB.b, 2) + '). One reading is about substance: schooling may ease worries about what immigration costs more than it raises the value people see in it. The other is about answering: a habit of agreeing with statements that fell with education would produce the same gap. These ten questions cannot tell the two apart.</p>';
+    else s += '<p>Education goes with a more favorable view on both factors by similar amounts (' + num(eB.b, 2) + ' and ' + num(eH.b, 2) + ' per level).</p>';
   }
+  if (aH.b < 0 && aH.p < 0.05 && Math.abs(aH.b) > 1.5 * Math.abs(aB.b)) s += '<p><b>Age</b> goes mainly with seeing more harm (' + num(aH.b, 2) + ' per decade) and much less with seeing fewer benefits (' + num(aB.b, 2) + '). A possible reading: concern about costs, more than doubt about contributions, rises with age; differences between generations and differences that come with growing older look the same in one survey.</p>';
+  if (bH.b > 0 && bB.b > 0 && bH.p < 0.05 && bB.p < 0.05) s += '<p><b>Respondents born abroad</b>, immigrants themselves, view immigration more favorably on both factors, by about ' + num((bH.b + bB.b) / 2, 1) + ' standard deviations.</p>';
+  if (fH.p >= 0.05 && fB.p >= 0.05) s += '<p><b>Women and men</b> barely differ once education, age, and birthplace are held constant.</p>';
   return s;
 }
 function vmCap() {
-  return 'The varimax criterion as the two axes turn together: higher means that each question loads mainly on one factor. Varimax turns the axes to a peak of this curve (circles), here at ' + vmCurveSVG.best + ' degrees; the curve repeats every 90 degrees.' +
-    (A.sol.rot === 'manual' ? ' The red line is your angle.' : ' Choose "By hand" to turn the axes yourself.');
+  return 'What varimax maximizes. Turning the two axes together changes how unequal the loadings are; the curve measures that, and higher means that each question loads mainly on one factor. Varimax stops at a peak (circles), here at ' + vmCurveSVG.best + ' degrees from the unrotated axes; the curve repeats every 90 degrees.';
 }
 function fiveTableHTML() {
   var rows = '', m = A.m, a, names = facNames();
@@ -1804,10 +1868,7 @@ document.addEventListener('click', function (e) { var b = tipOf(e.target); if (b
 function syncControls() {
   var mmax = E.maxFactors(cfg.items.length), m = Math.min(cfg.nf, mmax);
   Array.prototype.forEach.call(document.querySelectorAll('input[name=nf]'), function (r) { r.disabled = +r.value > mmax; r.checked = +r.value === m; });
-  if (cfg.rot === 'manual' && m !== 2) cfg.rot = 'oblimin';
-  Array.prototype.forEach.call(document.querySelectorAll('input[name=rot]'), function (r) { r.disabled = m === 1 || (r.value === 'manual' && m !== 2); r.checked = r.value === cfg.rot; });
-  el.anglebox.hidden = !(cfg.rot === 'manual' && m === 2);
-  el.angle_out.innerHTML = cfg.angle + '&deg;';
+  Array.prototype.forEach.call(document.querySelectorAll('input[name=rot]'), function (r) { r.disabled = m === 1; r.checked = r.value === cfg.rot; });
 }
 function refit() { syncControls(); A = E.analyze(C, cfg); }
 function draw() {
@@ -1818,6 +1879,7 @@ function draw() {
   el.matrix.parentNode.style.width = Math.min(mainW, +el.matrix.firstChild.getAttribute('width')) + 'px';
   el.matrix.setAttribute('aria-label', 'Correlation matrix of the ' + A.k + ' chosen questions, with one-factor loadings and the weight of each question in the index.');
   el.matrix_cap.innerHTML = matrixCap();
+  placeHeaderTips();
   el.loadplot.innerHTML = loadPlotSVG(sw);
   el.loadplot.parentNode.style.width = Math.min(mainW, +el.loadplot.firstChild.getAttribute('width')) + 'px';
   el.loadplot.setAttribute('aria-label', 'Loading plot of the ' + A.m + '-factor solution.');
@@ -1830,14 +1892,15 @@ function draw() {
   el.dimlines.innerHTML = dimLinesHTML();
   el.scree.innerHTML = screeSVG();
   el.scree.setAttribute('aria-label', 'Eigenvalues of the questions against random data.');
-  el.scree_cap.innerHTML = (view.scree === 'fa' ? 'How much of the shared variation each factor could take (its eigenvalue, bars)' : 'How much of the total variation each component takes (its eigenvalue, bars)') +
-    ', against the 95th percentile from random data of the same size (red). Dark bars are kept.' + (view.scree === 'pc' ? ' The dashed line marks 1, an older rule that keeps every component above it.' : '');
+  el.scree_cap.innerHTML = 'Each bar is an eigenvalue: how much of the ' + (view.scree === 'fa' ? 'shared variation a factor takes' : 'variation a component takes') + ', largest first. Each red line shows how large the same eigenvalue gets by chance: the page draws 100 sets of random answers from ' + n0(C.n) + ' people to ' + A.k + ' unrelated questions, and in 95 of them the eigenvalue stays below the line. A bar that rises above its red line beats chance; parallel analysis keeps those, the dark bars.' +
+    (view.scree === 'fa' ? tip('Why is the first red line so high? Fitted to random data, a one-factor model often lets a single question take nearly all of the factor, which pushes the chance level for the first factor close to 1. The R package psych does the same.', 'the first red line') : ' The dashed line marks 1, an older rule that keeps every component above it.');
   el.sol_title.textContent = 'The factor solution: ' + (A.m === 1 ? 'one factor' : WORD[A.m] + ' factors, ' + ROTNAME[A.sol.rot]) + (cfg.corr === 'poly' ? ', polychoric' : '');
   el.soltbl.innerHTML = solTableHTML();
   el.solcap.innerHTML = solCap();
   el.phibox.innerHTML = phiHTML();
-  el.vmfig.hidden = A.m !== 2;
-  if (A.m === 2) { el.vmcurve.innerHTML = vmCurveSVG(); el.vmcurve.setAttribute('aria-label', 'Varimax criterion by angle of rotation.'); el.vmcap.innerHTML = vmCap(); }
+  var showVm = A.m === 2 && A.sol.rot === 'varimax';
+  el.vmfig.hidden = !showVm;
+  if (showVm) { el.vmcurve.innerHTML = vmCurveSVG(); el.vmcurve.setAttribute('aria-label', 'Varimax criterion by angle of rotation.'); el.vmcap.innerHTML = vmCap(); }
   el.sollines.innerHTML = solLinesHTML();
   el.fivetbl.innerHTML = fiveTableHTML();
   el.fivelines.innerHTML = fiveLinesHTML();
@@ -1845,6 +1908,7 @@ function draw() {
   el.regfig.setAttribute('aria-label', 'Regression coefficients of the index and the factor scores on education, age, gender, and birthplace.');
   el.regtbl.innerHTML = regTableHTML();
   el.regcap.innerHTML = regCap();
+  el.reginterp.innerHTML = interpRegHTML();
   el.rcode.innerHTML = highlightR(RC.rCode(cfg, C, A));
   el.method_hint.textContent = methodHint();
   el.rot_hint.textContent = rotHint();
@@ -1865,7 +1929,6 @@ function bind() {
   Array.prototype.forEach.call(document.querySelectorAll('input[name=method]'), function (r) { r.addEventListener('change', function () { cfg.method = r.value; render(); }); });
   Array.prototype.forEach.call(document.querySelectorAll('input[name=nf]'), function (r) { r.addEventListener('change', function () { cfg.nf = +r.value; render(); }); });
   Array.prototype.forEach.call(document.querySelectorAll('input[name=rot]'), function (r) { r.addEventListener('change', function () { cfg.rot = r.value; render(); }); });
-  el.angle.addEventListener('input', function () { cfg.angle = +el.angle.value; if (cfg.rot !== 'manual') cfg.rot = 'manual'; render(); });
   el.rev.addEventListener('change', function () { cfg.rev = el.rev.checked; render(); });
   el.poly.addEventListener('change', function () { cfg.corr = el.poly.checked ? 'poly' : 'pearson'; render(); });
   el.omega.addEventListener('change', function () { cfg.rel = el.omega.checked ? 'omega' : 'alpha'; render(); });
@@ -1891,7 +1954,7 @@ function bind() {
 function readControls() {
   var m = document.querySelector('input[name=method]:checked'), nf = document.querySelector('input[name=nf]:checked'), rot = document.querySelector('input[name=rot]:checked');
   if (m) cfg.method = m.value; if (nf) cfg.nf = +nf.value; if (rot) cfg.rot = rot.value;
-  cfg.rev = el.rev.checked; cfg.corr = el.poly.checked ? 'poly' : 'pearson'; cfg.angle = +el.angle.value; cfg.rel = el.omega.checked ? 'omega' : 'alpha';
+  cfg.rev = el.rev.checked; cfg.corr = el.poly.checked ? 'poly' : 'pearson'; cfg.rel = el.omega.checked ? 'omega' : 'alpha';
   view.scree = el.pcpa.checked ? 'pc' : 'fa'; view.load = el.structure.checked ? 'structure' : 'pattern';
 }
 bind(); readControls(); refit(); draw();
